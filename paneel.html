@@ -34,6 +34,7 @@
 
     .list {
       max-width: 800px;
+      width: 95%;
       margin: 0 auto;
       background: white;
       border-radius: 16px;
@@ -42,11 +43,12 @@
     }
 
     .row {
-      display: grid;
-      grid-template-columns: 80px 1fr 160px;
+      display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 15px 0;
       border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
     }
 
     .row:last-child {
@@ -63,17 +65,36 @@
       align-items: center;
       font-size: 12px;
       color: #555;
+      flex-shrink: 0;
+      margin-right: 10px;
     }
 
     .name {
       font-size: 18px;
       font-weight: bold;
+      flex: 1 1 auto;
+      min-width: 100px;
     }
 
     .value {
       font-size: 20px;
       font-weight: bold;
       text-align: right;
+      flex: 0 0 auto;
+      margin-left: 10px;
+      word-wrap: break-word;
+    }
+
+    @media screen and (max-width: 400px) {
+      .row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .value {
+        text-align: left;
+        margin-left: 0;
+        margin-top: 5px;
+      }
     }
   </style>
 </head>
@@ -81,7 +102,7 @@
 
   <div class="topbar">
     <h1>Paneeldaten</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="back-btn" href="start.html">Zurück zum Hauptmenü</a>
   </div>
 
   <div class="list">
@@ -121,7 +142,6 @@
   <script>
     async function ladePaneeldaten() {
       try {
-        // Beispiel-Endpunkt des Pico (Adresse später anpassen)
         const response = await fetch("http://PICO_IP/paneel");
         const data = await response.json();
 
@@ -135,10 +155,7 @@
       }
     }
 
-    // Initial laden
     ladePaneeldaten();
-
-    // Alle 15 Sekunden aktualisieren
     setInterval(ladePaneeldaten, 15000);
   </script>
 
