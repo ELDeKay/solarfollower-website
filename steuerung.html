@@ -1,77 +1,144 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steuerung Modul</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steuerung</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
       margin: 0;
       padding: 20px;
+    }
+
+    .topbar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
+      margin-bottom: 30px;
     }
 
-    h1 {
-      margin-bottom: 40px;
+    .topbar h1 {
+      margin: 0;
     }
 
-    .button {
-      display: inline-block;
-      margin: 10px;
-      padding: 20px 40px;
-      font-size: 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
+    .back-btn {
+      text-decoration: none;
       background: #007BFF;
       color: white;
-      transition: background 0.2s;
-    }
-
-    .button:hover {
-      background: #0056b3;
-    }
-
-    a {
-      margin-top: 30px;
-      text-decoration: none;
-      color: #007BFF;
+      padding: 10px 16px;
+      border-radius: 10px;
       font-weight: bold;
     }
-  
+
+    .list {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 80px 1fr 200px;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      background: #ccc;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+
+    .btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      background: #007BFF;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
+
 <body>
 
-  <h1>Steuerung Modul</h1>
+  <!-- Kopfzeile -->
+  <div class="topbar">
+    <h1>Steuerung</h1>
+    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+  </div>
 
-  <button class="button" onclick="steuereMotor('motor1','vor')">Motor 1 Vorwärts</button>
-  <button class="button" onclick="steuereMotor('motor1','zurueck')">Motor 1 Rückwärts</button>
+  <!-- Steuerungs-Liste -->
+  <div class="list">
 
-  <button class="button" onclick="steuereMotor('motor2','vor')">Motor 2 Vorwärts</button>
-  <button class="button" onclick="steuereMotor('motor2','zurueck')">Motor 2 Rückwärts</button>
+    <!-- Motor 1 -->
+    <div class="row">
+      <div class="icon">Bild</div>
+      <div class="name">Motor 1 – Neigung</div>
+      <div class="controls">
+        <button class="btn" onclick="motorMinus(1)">−</button>
+        <button class="btn" onclick="motorPlus(1)">+</button>
+      </div>
+    </div>
 
-  <a href="index.html">← Zurück zum Menü</a>
+    <!-- Motor 2 -->
+    <div class="row">
+      <div class="icon">Bild</div>
+      <div class="name">Motor 2 – Ausrichtung</div>
+      <div class="controls">
+        <button class="btn" onclick="motorMinus(2)">−</button>
+        <button class="btn" onclick="motorPlus(2)">+</button>
+      </div>
+    </div>
 
+  </div>
+
+  <!-- JavaScript (noch ohne Backend) -->
   <script>
-    async function steuereMotor(motor, richtung) {
-      try {
-        // Pico IP-Adresse anpassen
-        const url = `http://192.168.1.50/control?motor=${motor}&richtung=${richtung}`;
-        const response = await fetch(url);
-        if (response.ok) {
-          alert(`${motor} bewegt sich ${richtung}`);
-        } else {
-          alert('Fehler beim Ansteuern des Motors');
-        }
-      } catch (e) {
-        alert('Keine Verbindung zum Pico');
-      }
+    function motorPlus(motor) {
+      console.log("Motor", motor, "PLUS");
+      // später: fetch → Backend → Pico
+    }
+
+    function motorMinus(motor) {
+      console.log("Motor", motor, "MINUS");
+      // später: fetch → Backend → Pico
     }
   </script>
 
