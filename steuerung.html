@@ -20,10 +20,6 @@
       margin-bottom: 30px;
     }
 
-    .topbar h1 {
-      margin: 0;
-    }
-
     .back-btn {
       text-decoration: none;
       background: #007BFF;
@@ -33,61 +29,70 @@
       font-weight: bold;
     }
 
-    .list {
-      max-width: 800px;
+    /* Motor Layout */
+    .motors {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 900px;
       margin: 0 auto;
+    }
+
+    .motor-box {
       background: white;
       border-radius: 16px;
-      padding: 20px;
+      padding: 25px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
     }
 
-    .row {
-      display: grid;
-      grid-template-columns: 80px 1fr 200px;
-      align-items: center;
-      padding: 20px 0;
-      border-bottom: 1px solid #e0e0e0;
+    .motor-box h2 {
+      margin-bottom: 20px;
     }
 
-    .row:last-child {
-      border-bottom: none;
-    }
-
-    .icon {
-      width: 60px;
-      height: 60px;
-      background: #ccc;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      color: #555;
-    }
-
-    .name {
+    .value-box {
+      border: 2px solid #000;
+      padding: 15px;
+      margin-bottom: 15px;
       font-size: 18px;
       font-weight: bold;
     }
 
+    .value-box span {
+      display: block;
+      margin-top: 5px;
+      font-size: 24px;
+    }
+
+    .input-box {
+      border: 2px solid #000;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .input-box input {
+      width: 100%;
+      font-size: 20px;
+      padding: 8px;
+      text-align: center;
+    }
+
     .controls {
       display: flex;
-      justify-content: flex-end;
-      gap: 15px;
+      justify-content: center;
+      gap: 30px;
     }
 
     .btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      border: none;
-      font-size: 28px;
+      width: 60px;
+      height: 60px;
+      font-size: 32px;
       font-weight: bold;
-      cursor: pointer;
-      color: white;
+      border: none;
+      border-radius: 12px;
       background: #007BFF;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      color: white;
+      cursor: pointer;
     }
 
     .btn:active {
@@ -96,52 +101,73 @@
 
     /* Sturmmodus */
     .storm-box {
-      max-width: 800px;
-      margin: 30px auto 0;
+      max-width: 900px;
+      margin: 40px auto 0;
       background: white;
       border-radius: 16px;
       padding: 25px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .checkbox-row {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       font-size: 20px;
-      gap: 15px;
     }
 
     input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .motors {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Kopfzeile -->
   <div class="topbar">
     <h1>Steuerung</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="back-btn" href="index.html">Zurück</a>
   </div>
 
-  <!-- Motorsteuerung -->
-  <div class="list">
+  <div class="motors">
 
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Motor 1 – Neigung</div>
+    <!-- Motor 1 -->
+    <div class="motor-box">
+      <h2>Motor 1 – Drehen</h2>
+
+      <div class="value-box">
+        aktueller Wert
+        <span id="motor1-current">-- °</span>
+      </div>
+
+      <div class="input-box">
+        <input type="number" id="motor1-target" placeholder="Zielwert eingeben (°)">
+      </div>
+
       <div class="controls">
         <button class="btn" onclick="motorMinus(1)">−</button>
         <button class="btn" onclick="motorPlus(1)">+</button>
       </div>
     </div>
 
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Motor 2 – Ausrichtung</div>
+    <!-- Motor 2 -->
+    <div class="motor-box">
+      <h2>Motor 2 – Heben / Senken</h2>
+
+      <div class="value-box">
+        aktueller Wert
+        <span id="motor2-current">-- °</span>
+      </div>
+
+      <div class="input-box">
+        <input type="number" id="motor2-target" placeholder="Zielwert eingeben (°)">
+      </div>
+
       <div class="controls">
         <button class="btn" onclick="motorMinus(2)">−</button>
         <button class="btn" onclick="motorPlus(2)">+</button>
@@ -152,41 +178,36 @@
 
   <!-- Sturmmodus -->
   <div class="storm-box">
-    <div class="checkbox-row">
-      <input type="checkbox" id="stormMode" />
-      <label for="stormMode">Sturmmodus aktivieren</label>
-    </div>
+    <span>Sturmmodus aktivieren</span>
+    <input type="checkbox" id="stormMode">
   </div>
 
-  <!-- JavaScript -->
   <script>
     const API_BASE = "https://solar-backend-ljck.onrender.com";
 
     function motorPlus(motor) {
-      console.log("Motor", motor, "PLUS");
-      // später: POST /api/motor
+      const target = document.getElementById(`motor${motor}-target`).value;
+      console.log("Motor", motor, "+ Ziel:", target);
+
+      // später:
+      // POST /api/motor
     }
 
     function motorMinus(motor) {
-      console.log("Motor", motor, "MINUS");
-      // später: POST /api/motor
+      const target = document.getElementById(`motor${motor}-target`).value;
+      console.log("Motor", motor, "- Ziel:", target);
     }
 
     const checkbox = document.getElementById("stormMode");
 
     checkbox.addEventListener("change", async () => {
-      const status = checkbox.checked;
-
       try {
-        const response = await fetch(`${API_BASE}/api/sturmmodus`, {
+        await fetch(`${API_BASE}/api/sturmmodus`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ aktiv: status })
+          body: JSON.stringify({ aktiv: checkbox.checked })
         });
-
-        const data = await response.json();
-        console.log("Sturmmodus gesetzt:", data.sturmmodus);
-      } catch (e) {
+      } catch {
         console.log("Backend nicht erreichbar");
       }
     });
