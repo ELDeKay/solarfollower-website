@@ -64,10 +64,12 @@
       font-size: 24px;
     }
 
+    /* Eingabefelder standardmäßig versteckt */
     .input-box {
       border: 2px solid #000;
       padding: 15px;
       margin-bottom: 20px;
+      display: none;
     }
 
     .input-box input {
@@ -99,7 +101,7 @@
       transform: scale(0.95);
     }
 
-    /* Sturmmodus */
+    /* Manuelle Steuerung */
     .storm-box {
       max-width: 900px;
       margin: 40px auto 0;
@@ -145,7 +147,7 @@
         <span id="motor1-current">-- °</span>
       </div>
 
-      <div class="input-box">
+      <div class="input-box" id="motor1-input">
         <input type="number" id="motor1-target" placeholder="Zielwert eingeben (°)">
       </div>
 
@@ -164,7 +166,7 @@
         <span id="motor2-current">-- °</span>
       </div>
 
-      <div class="input-box">
+      <div class="input-box" id="motor2-input">
         <input type="number" id="motor2-target" placeholder="Zielwert eingeben (°)">
       </div>
 
@@ -176,7 +178,7 @@
 
   </div>
 
-  <!-- Sturmmodus -->
+  <!-- Manuelle Steuerung -->
   <div class="storm-box">
     <span>manuelle Steuerung</span>
     <input type="checkbox" id="stormMode">
@@ -185,32 +187,37 @@
   <script>
     const API_BASE = "https://solar-backend-ljck.onrender.com";
 
+    const checkbox = document.getElementById("stormMode");
+    const motor1Input = document.getElementById("motor1-input");
+    const motor2Input = document.getElementById("motor2-input");
+
+    checkbox.addEventListener("change", async () => {
+      const aktiv = checkbox.checked;
+
+      // Eingabefelder ein-/ausblenden
+      motor1Input.style.display = aktiv ? "block" : "none";
+      motor2Input.style.display = aktiv ? "block" : "none";
+
+      try {
+        await fetch(`${API_BASE}/api/sturmmodus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aktiv })
+        });
+      } catch {
+        console.log("Backend nicht erreichbar");
+      }
+    });
+
     function motorPlus(motor) {
       const target = document.getElementById(`motor${motor}-target`).value;
       console.log("Motor", motor, "+ Ziel:", target);
-
-      // später:
-      // POST /api/motor
     }
 
     function motorMinus(motor) {
       const target = document.getElementById(`motor${motor}-target`).value;
       console.log("Motor", motor, "- Ziel:", target);
     }
-
-    const checkbox = document.getElementById("stormMode");
-
-    checkbox.addEventListener("change", async () => {
-      try {
-        await fetch(`${API_BASE}/api/sturmmodus`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ aktiv: checkbox.checked })
-        });
-      } catch {
-        console.log("Backend nicht erreichbar");
-      }
-    });
   </script>
 
 </body>
