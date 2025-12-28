@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wetterdaten</title>
-
+  <title>Extras</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,18 +11,15 @@
       margin: 0;
       padding: 20px;
     }
-
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 30px;
     }
-
     .topbar h1 {
       margin: 0;
     }
-
     .back-btn {
       text-decoration: none;
       background: #007BFF;
@@ -32,119 +28,60 @@
       border-radius: 10px;
       font-weight: bold;
     }
-
-    .list {
-      max-width: 800px;
+    .box {
+      max-width: 600px;
       margin: 0 auto;
       background: white;
       border-radius: 16px;
-      padding: 20px;
+      padding: 30px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-
-    .row {
-      display: grid;
-      grid-template-columns: 80px 1fr 140px;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .row:last-child {
-      border-bottom: none;
-    }
-
-    .icon {
-      width: 60px;
-      height: 60px;
-      background: #ccc;
-      border-radius: 12px;
+    .checkbox-row {
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 12px;
-      color: #555;
-    }
-
-    .name {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .value {
       font-size: 20px;
-      font-weight: bold;
-      text-align: right;
+      gap: 15px;
+    }
+    input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
     }
   </style>
 </head>
-
 <body>
 
-  <!-- Kopfzeile -->
   <div class="topbar">
-    <h1>Wetterdaten</h1>
+    <h1>Extras</h1>
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- Datenliste -->
-  <div class="list">
-
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Temperatur</div>
-      <div class="value" id="temp">-- °C</div>
+  <div class="box">
+    <div class="checkbox-row">
+      <input type="checkbox" id="stormMode" />
+      <label for="stormMode">Sturmmodus aktivieren</label>
     </div>
-
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Windstärke</div>
-      <div class="value" id="wind">-- m/s</div>
-    </div>
-
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Leistung</div>
-      <div class="value" id="watt">-- W</div>
-    </div>
-
   </div>
 
-<!-- JavaScript -->
-<script>
-const API_BASE = "https://solar-backend-ljck.onrender.com";
+  <script>
+    const checkbox = document.getElementById("stormMode");
+    const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-async function ladeWetterdaten() {
-  try {
-    const response = await fetch(`${API_BASE}/api/data`);
-    const daten = await response.json();
+    checkbox.addEventListener("change", async () => {
+      const status = checkbox.checked; // true/false
 
-    if (daten.length === 0) {
-      console.log("Noch keine Daten vorhanden");
-      return;
-    }
-
-    const letzterWert = daten[daten.length - 1];
-
-    document.getElementById("temp").innerText =
-      letzterWert.temperatur + " °C";
-    document.getElementById("wind").innerText =
-      letzterWert.wind + " m/s";
-    document.getElementById("watt").innerText =
-      letzterWert.watt + " W";
-
-  } catch (e) {
-    console.log("Backend nicht erreichbar");
-  }
-}
-
-// Initial laden
-ladeWetterdaten();
-
-// Alle 15 Sekunden aktualisieren
-setInterval(ladeWetterdaten, 15000);
-</script>
-
+      try {
+        const response = await fetch(`${API_BASE}/api/sturmmodus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aktiv: status })
+        });
+        const data = await response.json();
+        console.log("Sturmmodus gesetzt:", data.sturmmodus);
+      } catch (e) {
+        console.log("Backend nicht erreichbar");
+      }
+    });
   </script>
 
 </body>
