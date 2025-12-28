@@ -93,6 +93,29 @@
     .btn:active {
       transform: scale(0.95);
     }
+
+    /* Sturmmodus */
+    .storm-box {
+      max-width: 800px;
+      margin: 30px auto 0;
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      gap: 15px;
+    }
+
+    input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -104,10 +127,9 @@
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- Steuerungs-Liste -->
+  <!-- Motorsteuerung -->
   <div class="list">
 
-    <!-- Motor 1 -->
     <div class="row">
       <div class="icon">Bild</div>
       <div class="name">Motor 1 – Neigung</div>
@@ -117,7 +139,6 @@
       </div>
     </div>
 
-    <!-- Motor 2 -->
     <div class="row">
       <div class="icon">Bild</div>
       <div class="name">Motor 2 – Ausrichtung</div>
@@ -129,17 +150,46 @@
 
   </div>
 
-  <!-- JavaScript (noch ohne Backend) -->
+  <!-- Sturmmodus -->
+  <div class="storm-box">
+    <div class="checkbox-row">
+      <input type="checkbox" id="stormMode" />
+      <label for="stormMode">Sturmmodus aktivieren</label>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
   <script>
+    const API_BASE = "https://solar-backend-ljck.onrender.com";
+
     function motorPlus(motor) {
       console.log("Motor", motor, "PLUS");
-      // später: fetch → Backend → Pico
+      // später: POST /api/motor
     }
 
     function motorMinus(motor) {
       console.log("Motor", motor, "MINUS");
-      // später: fetch → Backend → Pico
+      // später: POST /api/motor
     }
+
+    const checkbox = document.getElementById("stormMode");
+
+    checkbox.addEventListener("change", async () => {
+      const status = checkbox.checked;
+
+      try {
+        const response = await fetch(`${API_BASE}/api/sturmmodus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aktiv: status })
+        });
+
+        const data = await response.json();
+        console.log("Sturmmodus gesetzt:", data.sturmmodus);
+      } catch (e) {
+        console.log("Backend nicht erreichbar");
+      }
+    });
   </script>
 
 </body>
