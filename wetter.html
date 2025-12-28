@@ -90,23 +90,29 @@
 
   <!-- Datenliste -->
   <div class="list">
-
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Temperatur</div>
-      <div class="value" id="temp">-- °C</div>
-    </div>
-
+    
     <div class="row">
       <div class="icon">Bild</div>
       <div class="name">Windstärke</div>
       <div class="value" id="wind">-- m/s</div>
+      
+    </div>
+        <div class="row">
+      <div class="icon">Bild</div>
+      <div class="name">Sonnenaufgang</div>
+      <div class="value" id="sunrise">-- m/s</div>
+    </div>
+   
+    <div class="row">
+      <div class="icon">Bild</div>
+      <div class="name">Sonnenuntergang</div>
+      <div class="value" id="sunset">-- °C</div>
     </div>
 
     <div class="row">
       <div class="icon">Bild</div>
-      <div class="name">Leistung</div>
-      <div class="value" id="watt">-- W</div>
+      <div class="name">Sonnenstunden (Anzahl)</div>
+      <div class="value" id="sunhours">-- W</div>
     </div>
 
   </div>
@@ -127,12 +133,17 @@ async function ladeWetterdaten() {
 
     const letzterWert = daten[daten.length - 1];
 
-    document.getElementById("temp").innerText =
-      letzterWert.temperatur + " °C";
     document.getElementById("wind").innerText =
       letzterWert.wind + " m/s";
-    document.getElementById("watt").innerText =
-      letzterWert.watt + " W";
+    
+    document.getElementById("sunrise").innerText =
+      letzterWert.sunrise + " Uhr";
+    
+    document.getElementById("sunset").innerText =
+      letzterWert.sunset + " Uhr";
+
+    document.getElementById("sunhours").innerText =
+      letzterWert.watt + " h";
 
   } catch (e) {
     console.log("Backend nicht erreichbar");
