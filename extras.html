@@ -70,19 +70,21 @@
   </div>
 
   <script>
-    const checkbox = document.getElementById("stormMode");
-
     checkbox.addEventListener("change", async () => {
-      const status = checkbox.checked ? 1 : 0;
+  const status = checkbox.checked ? 1 : 0;
 
-      try {
-        // Beispiel: Pico-Endpunkt für Sturmmodus
-        await fetch(`http://PICO_IP/sturmmodus?aktiv=${status}`);
-        console.log("Pico erfolgreich gepingt, Sturmmodus:", status);
-      } catch (e) {
-        console.log("Pico nicht erreichbar");
-      }
+  try {
+    await fetch("https://solar-backend-ljck.onrender.com/api/sturmmodus", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aktiv: status })
     });
+    console.log("Sturmmodus gesetzt:", status);
+  } catch (e) {
+    console.log("Backend nicht erreichbar");
+  }
+});
+
   </script>
 
 </body>
