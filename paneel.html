@@ -116,7 +116,7 @@
     <div class="row">
       <div class="icon">Bild</div>
       <div class="name">Ausrichtung Modul</div>
-      <div class="value" id="orientation">-- °</div>
+      <div class="value" id="orient">-- °</div>
     </div>
 
     <div class="row">
@@ -140,18 +140,34 @@
   </div>
 
   <script>
-    async function ladePaneeldaten() {
-      try {
-        const response = await fetch("http://PICO_IP/paneel");
-        const data = await response.json();
+  const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-        document.getElementById("tilt").innerText = data.neigung + " °";
-        document.getElementById("orientation").innerText = data.ausrichtung + " °";
-        document.getElementById("voltage").innerText = data.spannung + " V";
-        document.getElementById("current").innerText = data.strom + " A";
-        document.getElementById("power").innerText = data.watt + " W";
-      } catch (e) {
-        console.log("Keine Verbindung zum Pico");
+async function ladeWetterdaten() {
+  try {
+    const response = await fetch(`${API_BASE}/api/data`);
+    const daten = await response.json();
+
+    if (daten.length === 0) {
+      console.log("Noch keine Daten vorhanden");
+      return;
+    }
+
+    const letzterWert = daten[daten.length - 1];
+
+       document.getElementById("tilt").innerText = letzterWert.tilt + " °";
+    
+       document.getElementById("orient").innerText = letzterWert.orient + " °";
+
+       document.getElementById("voltage").innerText = letzterWert.volatge + " V";
+    
+       document.getElementById("current").innerText = letzterWert.current + " A";
+  
+       document.getElementById("power").innerText = letzterWert.power + " W";
+
+      } catch (e)
+    
+      {
+      console.log("Backend nicht erreichbar");
       }
     }
 
