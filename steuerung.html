@@ -199,25 +199,16 @@ const motor2Current = document.getElementById("motor2-current");
 
 /* Backend-Daten laden */
 async function ladeWetterdaten() {
-  try {
-    const response = await fetch(`${API_BASE}/api/data`);
-    const daten = await response.json();
+  // SIMULATION (unabhängig vom Backend)
+  checkbox.checked = true;
 
-    if (!daten.length) return;
+  motor1Current.innerText = "15 °";
+  motor2Current.innerText = "15 °";
 
-    const letzterWert = daten[daten.length - 1];
-
-    checkbox.checked = letzterWert.manuell;
-    motor1Current.innerText = "15 °";
-    motor2Current.innerText = `${letzterWert.motor2} °`;
-
-    motor1.style.display = checkbox.checked ? "block" : "none";
-    motor2.style.display = checkbox.checked ? "block" : "none";
-
-  } catch {
-    console.log("Backend nicht erreichbar");
-  }
+  motor1.style.display = "block";
+  motor2.style.display = "block";
 }
+
 
 /* Checkbox ändern */
 checkbox.addEventListener("change", async () => {
