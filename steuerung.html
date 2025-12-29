@@ -64,7 +64,7 @@
     }
 
     /* Eingabefelder & Buttons standardmäßig versteckt */
-    .manual-controls {
+    .manual-motor-controls {
       display: none;
     }
 
@@ -103,7 +103,7 @@
       transform: scale(0.95);
     }
 
-    .storm-box {
+    .manuell-box {
       max-width: 900px;
       margin: 40px auto 0;
       background: white;
@@ -148,7 +148,7 @@
         <span id="motor1-current">-- °</span>
       </div>
 
-      <div class="manual-controls" id="motor1-manual">
+      <div class="manual-motor-controls" id="motor1">
         <div class="input-box">
           <input type="number" id="motor1-target" placeholder="Zielwert eingeben (°)">
         </div>
@@ -169,7 +169,7 @@
         <span id="motor2-current">-- °</span>
       </div>
 
-      <div class="manual-controls" id="motor2-manual">
+      <div class="manual.motor-controls" id="motor2">
         <div class="input-box">
           <input type="number" id="motor2-target" placeholder="Zielwert eingeben (°)">
         </div>
@@ -183,23 +183,34 @@
 
   </div>
 
-  <div class="storm-box">
+  <div class="manuell-box">
     <span>manuelle Steuerung</span>
-    <input type="checkbox" id="stormMode">
+    <input type="checkbox" id="manuell">
   </div>
 
   <script>
 const API_BASE = "https://solar-backend-ljck.onrender.com";
+    
+async function ladeWetterdaten() {
+  try {
+    const response = await fetch(`${API_BASE}/api/data`);
+    const daten = await response.json();
 
-const checkbox = document.getElementById("stormMode");
-const motor1Manual = document.getElementById("motor1-manual");
-const motor2Manual = document.getElementById("motor2-manual");
+    if (daten.length === 0) {
+      console.log("Noch keine Daten vorhanden");
+      return;
+    }
+        const letzterWert = daten[daten.length - 1];
+    
+document.getElementById("manuell").innerText = letzterWert.manuell;
+document.getElementById("motor1").innerText = letzterWert.motor1;
+document.getElementById("motor2").innerText = letzterWert.motor2;
 
 checkbox.addEventListener("change", async () => {
   const aktiv = checkbox.checked;
 
-  motor1Manual.style.display = aktiv ? "block" : "none";
-  motor2Manual.style.display = aktiv ? "block" : "none";
+  motor1.style.display = aktiv ? "block" : "none";
+  motor2.style.display = aktiv ? "block" : "none";
 
   try {
     await fetch(`${API_BASE}/api/sturmmodus`, {
