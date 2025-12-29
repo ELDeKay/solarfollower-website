@@ -208,7 +208,7 @@ async function ladeWetterdaten() {
     const letzterWert = daten[daten.length - 1];
 
     checkbox.checked = letzterWert.manuell;
-    motor1Current.innerText = "15°;
+    motor1Current.innerText = "15 °";
     motor2Current.innerText = `${letzterWert.motor2} °`;
 
     motor1.style.display = checkbox.checked ? "block" : "none";
