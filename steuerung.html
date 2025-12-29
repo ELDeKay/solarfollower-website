@@ -241,16 +241,37 @@ checkbox.addEventListener("change", async () => {
 function motorPlus(motor) {
   const input = document.getElementById(`motor${motor}-target`);
   const current = document.getElementById(`motor${motor}-current`);
-  let value = parseInt(input.value) || parseInt(current.innerText);
+
+  let value = parseInt(input.value);
+
+  if (isNaN(value)) {
+    value = parseInt(current.innerText);
+  }
+
+  if (isNaN(value)) {
+    value = 0;
+  }
+
   input.value = value + 1;
 }
 
 function motorMinus(motor) {
   const input = document.getElementById(`motor${motor}-target`);
   const current = document.getElementById(`motor${motor}-current`);
-  let value = parseInt(input.value) || parseInt(current.innerText);
+
+  let value = parseInt(input.value);
+
+  if (isNaN(value)) {
+    value = parseInt(current.innerText);
+  }
+
+  if (isNaN(value)) {
+    value = 0;
+  }
+
   input.value = value - 1;
 }
+
 
 /* Initial laden */
 ladeWetterdaten();
