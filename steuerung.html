@@ -199,30 +199,35 @@ const motor2Current = document.getElementById("motor2-current");
 
 
 /* Backend-Daten laden */
+let uiInitialisiert = false;
+
 async function ladeWetterdaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
-
     if (!daten.length) return;
 
     const letzterWert = daten[daten.length - 1];
 
-    // Checkbox setzen
-    checkbox.checked = letzterWert.manuell;
+    // Aktuelle Motorwerte IMMER aktualisieren
+    motor1Current.innerText =
+      letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
+    motor2Current.innerText =
+      letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
 
-    // Aktuelle Werte in den <span> setzen
-    motor1Current.innerText = letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
-    motor2Current.innerText = letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
-
-    // Sichtbarkeit der manuellen Steuerung
-    motor1.style.display = checkbox.checked ? "block" : "none";
-    motor2.style.display = checkbox.checked ? "block" : "none";
+    // UI-Zustand NUR EINMAL vom Backend übernehmen
+    if (!uiInitialisiert) {
+      checkbox.checked = !!letzterWert.manuell;
+      motor1.style.display = checkbox.checked ? "block" : "none";
+      motor2.style.display = checkbox.checked ? "block" : "none";
+      uiInitialisiert = true;
+    }
 
   } catch {
     console.log("Backend nicht erreichbar");
   }
 }
+
 
 
 /* Checkbox ändern */
