@@ -161,80 +161,63 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-  const API_BASE = "https://solarfollower-databank.onrender.com";
-  let currentChart;
-  const loadingText = document.getElementById("loadingText");
+    const API_BASE = "https://solarfollower-databank.onrender.com";
+    let currentChart;
 
-  function berechneDurchschnitt(daten) {
-    if (!daten.length) return "0,00 Watt";
-    const summe = daten.reduce((s, e) => s + e.watt, 0);
-    return (summe / daten.length).toFixed(2).replace(".", ",") + " Watt";
-  }
-
-  async function fetchMitRetry(url, retries = 5, delay = 2000) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Server schläft");
-      return await response.json();
-    } catch (err) {
-      if (retries > 0) {
-        loadingText.textContent = "Server wird gestartet … bitte warten";
-        await new Promise(r => setTimeout(r, delay));
-        return fetchMitRetry(url, retries - 1, delay);
-      }
-      throw err;
+    function berechneDurchschnitt(daten) {
+      if (!daten.length) return "0,00 Watt";
+      const summe = daten.reduce((s, e) => s + e.watt, 0);
+      return (summe / daten.length).toFixed(2).replace(".", ",") + " Watt";
     }
-  }
 
-  async function ladeDurchschnittswerte() {
-    const map = [
-      { endpoint: "/api/watt_24h", element: "avg24h" },
-      { endpoint: "/api/watt_7d",  element: "avg7d" },
-      { endpoint: "/api/watt_30d", element: "avg30d" }
-    ];
+    async function ladeDurchschnittswerte() {
+      const map = [
+        { endpoint: "/api/watt_24h", element: "avg24h" },
+        { endpoint: "/api/watt_7d",  element: "avg7d" },
+        { endpoint: "/api/watt_30d", element: "avg30d" }
+      ];
 
-    for (const eintrag of map) {
-      try {
-        const daten = await fetchMitRetry(`${API_BASE}${eintrag.endpoint}`);
+      for (const eintrag of map) {
+        const response = await fetch(`${API_BASE}${eintrag.endpoint}`);
+        const daten = await response.json();
         document.getElementById(eintrag.element).textContent =
           berechneDurchschnitt(daten);
-      } catch {
-        document.getElementById(eintrag.element).textContent = "–";
       }
     }
-  }
 
-  function formatZeit(zeit, range) {
-    const d = new Date(zeit);
-    if (range === "24h") return d.getHours() + ":00";
-    if (range === "7d" || range === "30d")
-      return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
-    if (range === "12m")
-      return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
-    return zeit;
-  }
-
-  async function ladeWattDaten(range) {
-    let endpoint;
-    switch (range) {
-      case "24h": endpoint = "/api/watt_24h"; break;
-      case "7d":  endpoint = "/api/watt_7d"; break;
-      case "30d": endpoint = "/api/watt_30d"; break;
-      case "12m": endpoint = "/api/watt_12monate"; break;
+    function formatZeit(zeit, range) {
+      const d = new Date(zeit);
+      if (range === "24h") return d.getHours() + ":00";
+      if (range === "7d" || range === "30d")
+        return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+      if (range === "12m")
+        return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
+      return zeit;
     }
 
-    try {
-      loadingText.style.display = "block";
-      const daten = await fetchMitRetry(`${API_BASE}${endpoint}`);
+    async function ladeWattDaten(range) {
+      let endpoint;
+      switch(range) {
+        case "24h": endpoint = "/api/watt_24h"; break;
+        case "7d":  endpoint = "/api/watt_7d"; break;
+        case "30d": endpoint = "/api/watt_30d"; break;
+        case "12m": endpoint = "/api/watt_12monate"; break;
+      }
+
+      const response = await fetch(`${API_BASE}${endpoint}`);
+      const daten = await response.json();
 
       const labels = daten.map(e => formatZeit(e.zeit, range));
       const wattData = daten.map(e => e.watt);
 
+
+      // 🔹 Aktueller Stundenwert = letzter Wert aus 24h
       if (range === "24h" && daten.length > 0) {
-        const letzterWert = daten[daten.length - 1].watt;
-        document.getElementById("avgLive").textContent =
-          letzterWert.toFixed(2).replace(".", ",") + " Watt";
+      const letzterWert = daten[daten.length - 1].watt;
+      document.getElementById("avgLive").textContent =
+      letzterWert.toFixed(2).replace(".", ",") + " Watt";
       }
+
 
       const ctx = document.getElementById("wattChart").getContext("2d");
       if (currentChart) currentChart.destroy();
@@ -256,41 +239,38 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            tooltip: {
-              enabled: true,
-              callbacks: {
-                label: ctx => ctx.parsed.y.toFixed(2) + " Watt"
-              }
-            }
-          },
+           plugins: {
+              tooltip: {
+                enabled: true,
+                mode: 'nearest',
+                intersect: false,
+                callbacks: {
+                label: function(context) {
+                    return context.parsed.y.toFixed(2) + " Watt";
+                                          }
+                        }
+                      }
+                  },
           scales: {
             x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
             y: { title: { display: true, text: "Watt" } }
           }
         }
       });
-
-      loadingText.style.display = "none";
-
-    } catch {
-      loadingText.textContent = "Daten derzeit nicht verfügbar";
     }
-  }
 
-  document.querySelectorAll("#chartButtons button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#chartButtons button")
-        .forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      ladeWattDaten(btn.dataset.range);
+    document.querySelectorAll("#chartButtons button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#chartButtons button")
+          .forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        ladeWattDaten(btn.dataset.range);
+      });
     });
-  });
 
-  ladeWattDaten("24h");
-  ladeDurchschnittswerte();
-</script>
-
+    ladeWattDaten("24h");
+    ladeDurchschnittswerte();
+  </script>
 
 </body>
 </html>
