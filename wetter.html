@@ -144,14 +144,10 @@ async function ladeWetterdaten()
             return;
           }
     
-        const letzterWert = daten[daten.length - 1];
-    
-        document.getElementById("wind").innerText = letzterWert.wind + " m/s";
-        
-        document.getElementById("sunrise").innerText = letzterWert.sunrise + " Uhr";
-        
-        document.getElementById("sunset").innerText = letzterWert.sunset + " Uhr";
-    
+        const letzterWert = daten[daten.length - 1];    
+        document.getElementById("wind").innerText = letzterWert.wind + " m/s";        
+        document.getElementById("sunrise").innerText = letzterWert.sunrise + " Uhr";        
+        document.getElementById("sunset").innerText = letzterWert.sunset + " Uhr";    
         document.getElementById("sunhours").innerText = letzterWert.sunhours + " h";
     
       } 
