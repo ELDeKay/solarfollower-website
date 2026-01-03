@@ -7,76 +7,86 @@
   <title>Wetterdaten</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 20px;
-    }
+    body 
+      {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+    .topbar 
+      {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
 
-    .topbar h1 {
-      margin: 0;
-    }
+    .topbar h1 
+      {
+        margin: 0;
+      }
 
-    .back-btn {
-      text-decoration: none;
-      background: #007BFF;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
+    .back-btn 
+      {
+        text-decoration: none;
+        background: #007BFF;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: bold;
+      }
 
-    .list {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
+    .list 
+      {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
 
-    .row {
-      display: grid;
-      grid-template-columns: 80px 1fr 140px;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
+    .row 
+      {
+        display: grid;
+        grid-template-columns: 80px 1fr 140px;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
 
-    .row:last-child {
-      border-bottom: none;
-    }
+    .row:last-child 
+      {
+        border-bottom: none;
+      }
 
-    .icon {
-      width: 60px;
-      height: 60px;
-      background: #ccc;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      color: #555;
-    }
+    .icon 
+      {
+        width: 60px;
+        height: 60px;
+        background: #ccc;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        color: #555;
+      }
 
-    .name {
-      font-size: 18px;
-      font-weight: bold;
-    }
+    .name 
+      {
+        font-size: 18px;
+        font-weight: bold;
+      }
 
-    .value {
-      font-size: 20px;
-      font-weight: bold;
-      text-align: right;
-    }
+    .value 
+      {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: right;
+      }
   </style>
 </head>
 
@@ -121,34 +131,35 @@
 <script>
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-async function ladeWetterdaten() {
-  try {
-    const response = await fetch(`${API_BASE}/api/data`);
-    const daten = await response.json();
-
-    if (daten.length === 0) {
-      console.log("Noch keine Daten vorhanden");
-      return;
-    }
-
-    const letzterWert = daten[daten.length - 1];
-
-    document.getElementById("wind").innerText =
-      letzterWert.wind + " m/s";
+async function ladeWetterdaten() 
+  {
+    try 
+      {
+        const response = await fetch(`${API_BASE}/api/data`);
+        const daten = await response.json();
     
-    document.getElementById("sunrise").innerText =
-      letzterWert.sunrise + " Uhr";
+        if (daten.length === 0) 
+          {
+            console.log("Noch keine Daten vorhanden");
+            return;
+          }
     
-    document.getElementById("sunset").innerText =
-      letzterWert.sunset + " Uhr";
-
-    document.getElementById("sunhours").innerText =
-      letzterWert.sunhours + " h";
-
-  } catch (e) {
-    console.log("Backend nicht erreichbar");
+        const letzterWert = daten[daten.length - 1];
+    
+        document.getElementById("wind").innerText = letzterWert.wind + " m/s";
+        
+        document.getElementById("sunrise").innerText = letzterWert.sunrise + " Uhr";
+        
+        document.getElementById("sunset").innerText = letzterWert.sunset + " Uhr";
+    
+        document.getElementById("sunhours").innerText = letzterWert.sunhours + " h";
+    
+      } 
+    catch (e) 
+      {
+        console.log("Backend nicht erreichbar");
+      }
   }
-}
 
 // Initial laden
 ladeWetterdaten();
