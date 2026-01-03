@@ -5,97 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Paneeldaten</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .topbar h1 {
-      margin: 0;
-    }
-
-    .back-btn {
-      text-decoration: none;
-      background: #007BFF;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
-    .list {
-      max-width: 800px;
-      width: 95%;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 0;
-      border-bottom: 1px solid #e0e0e0;
-      flex-wrap: wrap;
-    }
-
-    .row:last-child {
-      border-bottom: none;
-    }
-
-    .icon {
-      width: 60px;
-      height: 60px;
-      background: #ccc;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      color: #555;
-      flex-shrink: 0;
-      margin-right: 10px;
-    }
-
-    .name {
-      font-size: 18px;
-      font-weight: bold;
-      flex: 1 1 auto;
-      min-width: 100px;
-    }
-
-    .value {
-      font-size: 20px;
-      font-weight: bold;
-      text-align: right;
-      flex: 0 0 auto;
-      margin-left: 10px;
-      word-wrap: break-word;
-    }
-
-    @media screen and (max-width: 400px) {
-      .row {
-        flex-direction: column;
-        align-items: flex-start;
+    body 
+      {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        margin: 0;
+        padding: 20px;
       }
-      .value {
-        text-align: left;
-        margin-left: 0;
-        margin-top: 5px;
+
+    .topbar 
+      {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
       }
-    }
+
+    .topbar h1 
+      {
+        margin: 0;
+      }
+
+    .back-btn 
+      {
+        text-decoration: none;
+        background: #007BFF;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: bold;
+      }
+
+    .list 
+      {
+        max-width: 800px;
+        width: 95%;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+
+    .row 
+      {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+      }
+
+    .row:last-child 
+      {
+        border-bottom: none;
+      }
+
+    .icon 
+      {
+        width: 60px;
+        height: 60px;
+        background: #ccc;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        color: #555;
+        flex-shrink: 0;
+        margin-right: 10px;
+      }
+
+    .name 
+      {
+        font-size: 18px;
+        font-weight: bold;
+        flex: 1 1 auto;
+        min-width: 100px;
+      }
+
+    .value 
+      {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: right;
+        flex: 0 0 auto;
+        margin-left: 10px;
+        word-wrap: break-word;
+      }
+
+    @media screen and (max-width: 400px) 
+      {
+        .row 
+          {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        .value 
+          {
+            text-align: left;
+            margin-left: 0;
+            margin-top: 5px;
+          }
+      }
   </style>
 </head>
 <body>
@@ -142,33 +155,30 @@
   <script>
   const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-async function ladeWetterdaten() {
-  try {
-    const response = await fetch(`${API_BASE}/api/data`);
-    const daten = await response.json();
-
-    if (daten.length === 0) {
-      console.log("Noch keine Daten vorhanden");
-      return;
-    }
-
-    const letzterWert = daten[daten.length - 1];
-
-       document.getElementById("tilt").innerText = letzterWert.tilt + " °";
-    
-       document.getElementById("orient").innerText = letzterWert.orient + " °";
-
-       document.getElementById("voltage").innerText = letzterWert.voltage + " V";
-    
-       document.getElementById("current").innerText = letzterWert.current + " A";
-  
-       document.getElementById("power").innerText = letzterWert.power + " W";
-
-      } catch (e)
-    
+async function ladeWetterdaten() 
+  {
+    try 
       {
-      console.log("Backend nicht erreichbar");
-      }
+        const response = await fetch(`${API_BASE}/api/data`);
+        const daten = await response.json();
+    
+        if (daten.length === 0) 
+          {
+            console.log("Noch keine Daten vorhanden");
+            return;
+          }
+      
+        const letzterWert = daten[daten.length - 1];    
+        document.getElementById("tilt").innerText = letzterWert.tilt + " °";
+        document.getElementById("orient").innerText = letzterWert.orient + " °";
+        document.getElementById("voltage").innerText = letzterWert.voltage + " V";
+        document.getElementById("current").innerText = letzterWert.current + " A";      
+        document.getElementById("power").innerText = letzterWert.power + " W";    
+      } catch (e)
+      
+        {
+          console.log("Backend nicht erreichbar");
+        }
     }
 
     ladeWetterdaten();
