@@ -63,15 +63,21 @@
 
     .icon 
       {
-        width: 60px;
-        height: 60px;
-        background: #ccc;
+        width: 100px;
+        height: 100px;
         border-radius: 12px;
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 12px;
         color: #555;
+      }
+    
+    .icon img 
+      {
+        width: 100%;          /* Bild füllt Block gut aus */
+        height: 100%;
+        object-fit: contain;
       }
 
     .name 
@@ -130,35 +136,39 @@
   </div>
 
   <div class="list">
+    
     <div class="row">
-      <div class="icon">Bild</div>
+      <div class="icon">
+        <img src= "durchW.png">
+      </div>
       <div class="name">Durchschnittl. Leistung</div>
       <div class="value" id="avgLive">XX,XX Watt</div>
     </div>
 
     <div class="row">
-      <div class="icon">Bild</div>
+      <div class="icon">
+       <img src= "durch24h"> 
+      </div>
       <div class="name">Leistung 24h</div>
       <div class="value" id="avg24h">XX,XX Watt</div>
     </div>
 
     <div class="row">
-      <div class="icon">Bild</div>
+      <div class="icon">
+        <img src= "durch7d">
+      </div>
       <div class="name">Leistung 7d</div>
       <div class="value" id="avg7d">XX,XX Watt</div>
     </div>
 
     <div class="row">
-      <div class="icon">Bild</div>
+      <div class="icon">
+        <img src="durch30d">
+      </div>
       <div class="name">Leistung 30d</div>
       <div class="value" id="avg30d">XX,XX Watt</div>
     </div>
 
-    <div class="row">
-      <div class="icon">Bild</div>
-      <div class="name">Sonnenstunden h</div>
-      <div class="value">XX,XX h</div>
-    </div>
   </div>
 
   <div id="chartButtons">
