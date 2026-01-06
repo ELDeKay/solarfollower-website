@@ -294,72 +294,58 @@ checkbox.addEventListener("change", async () =>
       }
 });
 
-/* Buttons */
-function motorPlus(motor) 
-  {
-    const target = document.getElementById(`motor${motor}-target`);
-    const current = document.getElementById(`motor${motor}-current`);
+/* ---------- Button-Hold-Logik mit Beschleunigung ---------- */
 
-    let value = parseInt(target.innerText);
-    if (isNaN(value)) value = parseInt(current.innerText) || 0;
-
-    const { min, max } = MOTOR_LIMITS[motor];
-
-    if (value < max) 
-      {
-        value++;
-      }
-
-    target.innerText = value + " °";
-  }
-
-function motorMinus(motor) 
-  {
-    const target = document.getElementById(`motor${motor}-target`);
-    const current = document.getElementById(`motor${motor}-current`);
-
-    let value = parseInt(target.innerText);
-    if (isNaN(value)) value = parseInt(current.innerText) || 0;
-
-    const { min, max } = MOTOR_LIMITS[motor];
-
-    if (value > min) 
-      {
-        value--;
-      }
-
-    target.innerText = value + " °";
-  }
-  
-let intervalId = null;
+let holdTimer = null;
+let holdMotor = null;
+let holdDirection = 0;
+let holdStep = 1;
 
 function changeMotorValue(motor, delta) 
-  {
-    const target = document.getElementById(`motor${motor}-target`);
-    const current = document.getElementById(`motor${motor}-current`);
-  
-    let value = parseInt(target.innerText);
-    if (isNaN(value)) value = parseInt(current.innerText) || 0;
-  
-    const { min, max } = MOTOR_LIMITS[motor];
-    value = Math.min(max, Math.max(min, value + delta));
-  
-    target.innerText = value + " °";
-  }
+{
+  const target = document.getElementById(`motor${motor}-target`);
+  const current = document.getElementById(`motor${motor}-current`);
 
-function startHold(motor, delta) 
+  let value = parseInt(target.innerText);
+  if (isNaN(value)) value = parseInt(current.innerText) || 0;
+
+  const { min, max } = MOTOR_LIMITS[motor];
+  value = Math.max(min, Math.min(max, value + delta));
+
+  target.innerText = value + " °";
+}
+
+function startHold(motor, direction) 
+{
+  stopHold(); // Sicherheit: alten Timer stoppen
+
+  holdMotor = motor;
+  holdDirection = direction;
+  holdStep = 1;
+
+  // sofortige Reaktion
+  changeMotorValue(holdMotor, holdDirection * holdStep);
+
+  holdTimer = setInterval(() => 
   {
-    changeMotorValue(motor, delta); // sofort reagieren
-    intervalId = setInterval(() => {
-      changeMotorValue(motor, delta);
-    }, 120);
-  }
+    holdStep = Math.min(holdStep + 1, 8); // Beschleunigung (max Schrittweite)
+    changeMotorValue(holdMotor, holdDirection * holdStep);
+  }, 150);
+}
 
 function stopHold() 
-  {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
+{
+  if (holdTimer) 
+    {
+      clearInterval(holdTimer);
+      holdTimer = null;
+    }
+
+  holdMotor = null;
+  holdDirection = 0;
+  holdStep = 1;
+}
+
 
 
 
