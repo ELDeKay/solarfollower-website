@@ -204,7 +204,7 @@ const motor1 = document.getElementById("motor1");
 const motor2 = document.getElementById("motor2");
 const motor1Current = document.getElementById("motor1-current");
 const motor2Current = document.getElementById("motor2-current");
-
+const MOTOR_LIMITS = { 1: { min: 0,  max: 300 }, 2: { min: 14, max: 75  }};
 
 /* Backend-Daten laden */
 let uiInitialisiert = false;
@@ -271,22 +271,36 @@ function motorPlus(motor)
   {
     const target = document.getElementById(`motor${motor}-target`);
     const current = document.getElementById(`motor${motor}-current`);
-  
+
     let value = parseInt(target.innerText);
     if (isNaN(value)) value = parseInt(current.innerText) || 0;
-  
-    target.innerText = (value + 1) + " °";
+
+    const { min, max } = MOTOR_LIMITS[motor];
+
+    if (value < max) 
+      {
+        value++;
+      }
+
+    target.innerText = value + " °";
   }
 
 function motorMinus(motor) 
   {
     const target = document.getElementById(`motor${motor}-target`);
     const current = document.getElementById(`motor${motor}-current`);
-  
+
     let value = parseInt(target.innerText);
     if (isNaN(value)) value = parseInt(current.innerText) || 0;
-  
-    target.innerText = (value - 1) + " °";
+
+    const { min, max } = MOTOR_LIMITS[motor];
+
+    if (value > min) 
+      {
+        value--;
+      }
+
+    target.innerText = value + " °";
   }
 
 
