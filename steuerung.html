@@ -352,7 +352,7 @@ function startHold(motor, delta)
     changeMotorValue(motor, delta); // sofort reagieren
     intervalId = setInterval(() => {
       changeMotorValue(motor, delta);
-    }, 40);
+    }, 80);
   }
 
 function stopHold() 
