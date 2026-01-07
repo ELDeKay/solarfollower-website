@@ -149,7 +149,7 @@
 
       <div class="value-box">
         aktueller Wert
-        <span id="motor1-current">-- °</span>
+        <span id="motor1">-- °</span>
       </div>
 
       <div class="manual-motor-controls" id="motor1">
@@ -186,7 +186,7 @@
 
       <div class="value-box">
         aktueller Wert
-        <span id="motor2-current">-- °</span>
+        <span id="motor2">-- °</span>
       </div>
 
       <div class="manual-motor-controls" id="motor2">
@@ -230,78 +230,98 @@ const API_BASE = "https://solar-backend-ljck.onrender.com";
 const checkbox = document.getElementById("manuell");
 const motor1 = document.getElementById("motor1");
 const motor2 = document.getElementById("motor2");
-const motor1Current = document.getElementById("motor1-current");
-const motor2Current = document.getElementById("motor2-current");
-const MOTOR_LIMITS = { 1: { min: 0,  max: 300 }, 2: { min: 14, max: 75  }};
+const motor1Current = document.getElementById("motor1_target");
+const motor2Current = document.getElementById("motor2_target");
 
-/* Backend-Daten laden */
+const MOTOR_LIMITS = {
+  1: { min: 0,  max: 300 },
+  2: { min: 14, max: 75  }
+};
+
+/* ---------------- Backend-Daten laden ---------------- */
+
 let uiInitialisiert = false;
 
-async function ladeWetterdaten() 
-  {
-    try 
-      {
-        const response = await fetch(`${API_BASE}/api/data`);
-        const daten = await response.json();
-        if (!daten.length) return;
-    
-        const letzterWert = daten[daten.length - 1];
-    
-        // Aktuelle Motorwerte IMMER aktualisieren
-        motor1Current.innerText =
-          letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
-        motor2Current.innerText =
-          letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
-    
-        // UI-Zustand NUR EINMAL vom Backend übernehmen
-        if (!uiInitialisiert) 
-          {
-            checkbox.checked = !!letzterWert.manuell;
-            motor1.style.display = checkbox.checked ? "block" : "none";
-            motor2.style.display = checkbox.checked ? "block" : "none";
-            uiInitialisiert = true;
-          }
-    
-      } 
-    catch 
-      {
-        console.log("Backend nicht erreichbar");
-      }
+async function ladeWetterdaten()
+{
+  try {
+    const response = await fetch(`${API_BASE}/api/data`);
+    const daten = await response.json();
+    if (!daten.length) return;
+
+    const letzterWert = daten[daten.length - 1];
+
+    motor1.innerText =
+      letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
+
+    motor2.innerText =
+      letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
+
+    if (!uiInitialisiert) {
+      checkbox.checked = !!letzterWert.manuell;
+      motor1.style.display = checkbox.checked ? "block" : "none";
+      motor2.style.display = checkbox.checked ? "block" : "none";
+      uiInitialisiert = true;
+    }
   }
+  catch {
+    console.log("Backend nicht erreichbar");
+  }
+}
 
+/* ---------------- Manuell Checkbox ---------------- */
 
+checkbox.addEventListener("change", async () =>
+{
+  const manuell = checkbox.checked;
 
-/* Checkbox ändern */
-checkbox.addEventListener("change", async () => 
-  {
-    const manuell = checkbox.checked;
-  
-    motor1.style.display = manuell ? "block" : "none";
-    motor2.style.display = manuell ? "block" : "none";
-  
-    try 
-      {
-        await fetch(`${API_BASE}/api/sturmmodus`, 
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ manuell })
-          });
-      } 
-    catch 
-      {
-        console.log("Backend nicht erreichbar");
-      }
+  motor1.style.display = manuell ? "block" : "none";
+  motor2.style.display = manuell ? "block" : "none";
+
+  try {
+    await fetch(`${API_BASE}/api/sturmmodus`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aktiv: manuell })
+    });
+  }
+  catch {
+    console.log("Backend nicht erreichbar");
+  }
 });
 
-/* ---------- Button-Hold-Logik mit Beschleunigung ---------- */
+/* ---------------- Motor Target senden ---------------- */
+
+async function sendMotorTargets()
+{
+  const m1 = parseInt(document.getElementById("motor1_target").innerText);
+  const m2 = parseInt(document.getElementById("motor2_target").innerText);
+
+  if (isNaN(m1) || isNaN(m2)) return;
+
+  try {
+    await fetch(`${API_BASE}/api/motor_targets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        motor1_target: m1,
+        motor2_target: m2
+      })
+    });
+  }
+  catch {
+    console.log("Motor-Zielwerte konnten nicht gesendet werden");
+  }
+}
+
+/* ---------------- Button-Hold-Logik ---------------- */
 
 let holdTimer = null;
 let holdMotor = null;
 let holdDirection = 0;
 let holdStep = 1;
 
-function changeMotorValue(motor, delta) 
+function changeMotorValue(motor, delta)
 {
   const target = document.getElementById(`motor${motor}-target`);
   const current = document.getElementById(`motor${motor}-current`);
@@ -315,44 +335,45 @@ function changeMotorValue(motor, delta)
   target.innerText = value + " °";
 }
 
-function startHold(motor, direction) 
+function startHold(motor, direction)
 {
-  stopHold(); // Sicherheit: alten Timer stoppen
+  stopHold();
 
   holdMotor = motor;
   holdDirection = direction;
   holdStep = 1;
 
-  // sofortige Reaktion
-  changeMotorValue(holdMotor, holdDirection * holdStep);
+  changeMotorValue(holdMotor, holdDirection);
 
-  holdTimer = setInterval(() => 
+  holdTimer = setInterval(() =>
   {
-    holdStep = Math.min(holdStep + 1, 8); // Beschleunigung (max Schrittweite)
+    holdStep = Math.min(holdStep + 1, 8);
     changeMotorValue(holdMotor, holdDirection * holdStep);
   }, 150);
 }
 
-function stopHold() 
+function stopHold()
 {
-  if (holdTimer) 
-    {
-      clearInterval(holdTimer);
-      holdTimer = null;
-    }
+  if (holdTimer) {
+    clearInterval(holdTimer);
+    holdTimer = null;
+
+    // ✅ Zielwerte nach dem Einstellen ans Backend senden
+    sendMotorTargets();
+  }
 
   holdMotor = null;
   holdDirection = 0;
   holdStep = 1;
 }
 
+/* ---------------- Initial ---------------- */
 
-
-
-/* Initial laden */
 ladeWetterdaten();
 setInterval(ladeWetterdaten, 5000);
 </script>
+
+
 
 </body>
 </html>
