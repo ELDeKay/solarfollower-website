@@ -170,8 +170,8 @@ async function ladeWetterdaten()
           }
       
         const letzterWert = daten[daten.length - 1];    
-        document.getElementById("tilt").innerText = letzterWert.tilt + " °";
-        document.getElementById("orient").innerText = letzterWert.orient + " °";
+        document.getElementById("tilt").innerText = letzterWert.motor2 + " °";
+        document.getElementById("orient").innerText = letzterWert.motor1 + " °";
         document.getElementById("voltage").innerText = letzterWert.voltage + " V";
         document.getElementById("current").innerText = letzterWert.current + " A";      
         document.getElementById("power").innerText = letzterWert.power + " W";    
