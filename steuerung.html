@@ -274,10 +274,10 @@ async function ladeWetterdaten()
 /* Checkbox ändern */
 checkbox.addEventListener("change", async () => 
   {
-    const aktiv = checkbox.checked;
+    const manuell = checkbox.checked;
   
-    motor1.style.display = aktiv ? "block" : "none";
-    motor2.style.display = aktiv ? "block" : "none";
+    motor1.style.display = manuell ? "block" : "none";
+    motor2.style.display = manuell ? "block" : "none";
   
     try 
       {
@@ -285,7 +285,7 @@ checkbox.addEventListener("change", async () =>
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ aktiv })
+            body: JSON.stringify({ manuell })
           });
       } 
     catch 
