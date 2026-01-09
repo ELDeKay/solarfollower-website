@@ -7,6 +7,12 @@
   <title>Wetterdaten</title>
 
   <style>
+    *,
+    *::before,
+    *::after {
+    box-sizing: border-box;
+    }
+    
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -105,45 +111,61 @@
     }
 
     /* 📱 Mobile Optimierung */
-    @media (max-width: 600px) {
-      body {
-        padding: 14px;
-      }
+  @media (max-width: 600px) {
+  body {
+    padding: 14px;
+    align-items: stretch;      /* <<< wichtig: nicht mehr alles "schmal" zentrieren */
+  }
 
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 18px;
-      }
+  .topbar {
+    width: 100%;
+    max-width: 800px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
 
-      .back-btn {
-        width: 100%;
-        text-align: center;
-      }
+  /* <<< absolut zentriertes h1 auf Mobile wieder "normal" machen */
+  .topbar h1 {
+    position: static;
+    transform: none;
+    text-align: center;
+    order: 1;
+  }
 
-      .list {
-        padding: 16px;
-        margin-top: 10px;
-      }
+  .back-btn {
+    width: 100%;
+    text-align: center;
+    order: 2;                 /* <<< Button unter Überschrift */
+    margin-left: 0;
+  }
 
-      .row {
-        grid-template-columns: 56px 1fr auto;
-        padding: 12px 0;
-      }
+  .list {
+    width: 100%;
+    max-width: 800px;
+    padding: 16px;
+    margin: 0;               /* <<< kein auto-margins nötig im stretch-body */
+  }
 
-      .icon {
-        width: 44px;
-        height: 44px;
-      }
+  .row {
+    grid-template-columns: 56px 1fr auto;
+    padding: 12px 0;
+  }
 
-      .name {
-        font-size: 16px;
-      }
+  .icon {
+    width: 44px;
+    height: 44px;
+  }
 
-      .value {
-        font-size: 18px;
-      }
-    }
+  .name {
+    font-size: 16px;
+  }
+
+  .value {
+    font-size: 18px;
+  }
+}
   </style>
 </head>
 
