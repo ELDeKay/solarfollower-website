@@ -2,132 +2,239 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Analyse</title>
+
   <style>
-    body 
-      {
-        font-family: Arial, sans-serif;
-        background: #f0f0f0;
-        margin: 0;
-        padding: 20px;
+    /* ✅ Kein horizontales Overflow durch padding/width */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ✅ Topbar: Desktop Titel exakt mittig, Button rechts */
+    .topbar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .topbar h1 {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      text-align: center;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: #007BFF;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+
+      margin-left: auto;
+      display: inline-block;
+    }
+
+    /* ✅ Boxen immer sauber mittig und nicht zu breit */
+    .list {
+      width: 100%;
+      max-width: 800px;
+      margin: 0;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 120px 1fr 160px;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #e0e0e0;
+      gap: 12px;
+      min-height: 72px;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ✅ Buttons: zentriert, aber auf Mobile umbrechbar */
+    #chartButtons {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 20px 0;
+      flex-wrap: wrap;
+    }
+
+    #chartButtons button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+
+      touch-action: manipulation;
+    }
+
+    #chartButtons button.active {
+      background-color: #0056b3;
+    }
+
+    /* ✅ Chart-Container: volle Breite, nicht größer als max-width */
+    #wattChartContainer {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 0 40px 0;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* ✅ Mobile Optimierung */
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+        align-items: stretch;
       }
 
-    .topbar 
-      {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 18px;
       }
 
-    .topbar h1 
-      {
-        margin: 0;
+      .topbar h1 {
+        position: static;
+        transform: none;
+        text-align: center;
+        order: 1;
       }
 
-    .back-btn 
-      {
-        text-decoration: none;
-        background: #007BFF;
-        color: white;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-weight: bold;
+      .back-btn {
+        width: 100%;
+        text-align: center;
+        order: 2;
+        margin-left: 0;
       }
 
-    .list 
-      {
-        max-width: 800px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        margin-bottom: 20px;
+      .list {
+        padding: 16px;
       }
 
-    .row 
-      {
-        display: grid;
-        grid-template-columns: 120px 1fr 160px;
-        align-items: center;
-        padding: 15px 0;
-        border-bottom: 1px solid #e0e0e0;
+      .row {
+        grid-template-columns: 56px 1fr auto; /* ✅ rechte Spalte flexibel */
+        padding: 12px 0;
+        min-height: 64px;
       }
 
-    .row:last-child 
-      {
-        border-bottom: none;
+      .icon {
+        width: 44px;
+        height: 44px;
       }
 
-    .icon 
-      {
-        width: 100px;
-        height: 100px;
-        border-radius: 12px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 12px;
-        color: #555;
-      }
-    
-    .icon img 
-      {
-        width: 100%;          /* Bild füllt Block gut aus */
-        height: 100%;
-        object-fit: contain;
+      .name {
+        font-size: 16px;
       }
 
-    .name 
-      {
+      .value {
         font-size: 18px;
-        font-weight: bold;
       }
 
-    .value 
-      {
-        font-size: 20px;
-        font-weight: bold;
-        text-align: right;
+      #chartButtons {
+        justify-content: space-between;
+        gap: 8px;
       }
 
-    #wattChartContainer 
-      {
-        max-width: 800px;
-        margin: 0 auto 40px auto;
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      #chartButtons button {
+        flex: 1 1 calc(50% - 8px); /* 2 pro Reihe */
+        padding: 10px 10px;
       }
 
-    #chartButtons 
-      {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 20px;
+      #wattChartContainer {
+        padding: 16px;
       }
+    }
 
-    #chartButtons button 
-      {
-        padding: 10px 16px;
-        border-radius: 8px;
-        border: none;
-        background-color: #007BFF;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
+    /* ✅ Optional: bessere Chart-Höhe auf kleinen Screens */
+    @media (max-width: 600px) {
+      #wattChartContainer {
+        height: 320px;
       }
+    }
 
-    #chartButtons button.active 
-      {
-        background-color: #0056b3;
+    @media (min-width: 601px) {
+      #wattChartContainer {
+        height: 420px;
       }
+    }
   </style>
 </head>
+
 <body>
 
   <div class="topbar">
@@ -136,10 +243,10 @@
   </div>
 
   <div class="list">
-    
+
     <div class="row">
       <div class="icon">
-        <img src= "durchW.png">
+        <img src="durchW.png" alt="Durchschnitt">
       </div>
       <div class="name">Durchschnittl. Leistung</div>
       <div class="value" id="avgLive">XX,XX Watt</div>
@@ -147,7 +254,7 @@
 
     <div class="row">
       <div class="icon">
-       <img src= "durch24h.png"> 
+        <img src="durch24h.png" alt="24h">
       </div>
       <div class="name">Leistung 24h</div>
       <div class="value" id="avg24h">XX,XX Watt</div>
@@ -155,7 +262,7 @@
 
     <div class="row">
       <div class="icon">
-        <img src= "durch7d.png">
+        <img src="durch7d.png" alt="7 Tage">
       </div>
       <div class="name">Leistung 7d</div>
       <div class="value" id="avg7d">XX,XX Watt</div>
@@ -163,7 +270,7 @@
 
     <div class="row">
       <div class="icon">
-        <img src="durch30d.png">
+        <img src="durch30d.png" alt="30 Tage">
       </div>
       <div class="name">Leistung 30d</div>
       <div class="value" id="avg30d">XX,XX Watt</div>
@@ -188,130 +295,109 @@
     const API_BASE = "https://solarfollower-databank.onrender.com";
     let currentChart;
 
-    function berechneDurchschnitt(daten) 
-      {
-        if (!daten.length) return "0,00 Watt";
-        const summe = daten.reduce((s, e) => s + e.watt, 0);
-        return (summe / daten.length).toFixed(2).replace(".", ",") + " Watt";
-      }
-
-    async function ladeDurchschnittswerte() 
-      {
-        const map = 
-          [
-            { endpoint: "/api/watt_24h", element: "avg24h" },
-            { endpoint: "/api/watt_7d",  element: "avg7d" },
-            { endpoint: "/api/watt_30d", element: "avg30d" }
-          ];
-
-        for (const eintrag of map) 
-          {
-            const response = await fetch(`${API_BASE}${eintrag.endpoint}`);
-            const daten = await response.json();
-            document.getElementById(eintrag.element).textContent =
-            berechneDurchschnitt(daten);
-          }
-      }
-
-    function formatZeit(zeit, range) 
-      {
-        const d = new Date(zeit);
-        if (range === "24h") return d.getHours() + ":00";
-        if (range === "7d" || range === "30d")
-        return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
-        if (range === "12m")
-        return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
-        return zeit;
-      }
-
-    async function ladeWattDaten(range) 
-      {
-        let endpoint;
-        switch(range) 
-          {
-            case "24h": endpoint = "/api/watt_24h"; break;
-            case "7d":  endpoint = "/api/watt_7d"; break;
-            case "30d": endpoint = "/api/watt_30d"; break;
-            case "12m": endpoint = "/api/watt_12monate"; break;
-          }
-
-        const response = await fetch(`${API_BASE}${endpoint}`);
-        const daten = await response.json();
-
-        const labels = daten.map(e => formatZeit(e.zeit, range));
-        const wattData = daten.map(e => e.watt);
-
-
-      // 🔹 Aktueller Stundenwert = letzter Wert aus 24h
-        if (range === "24h" && daten.length > 0) 
-          {
-            const letzterWert = daten[daten.length - 1].watt;
-            document.getElementById("avgLive").textContent =
-            letzterWert.toFixed(2).replace(".", ",") + " Watt";
-          }
-
-
-        const ctx = document.getElementById("wattChart").getContext("2d");
-        if (currentChart) currentChart.destroy();
-
-        currentChart = new Chart(ctx,
-          {
-            type: "line",
-            data: 
-              {
-                labels,
-                datasets: 
-                  [
-                    {
-                      label: "Leistung (Watt)",
-                      data: wattData,
-                      borderColor: "#007BFF",
-                      backgroundColor: "rgba(0,123,255,0.15)",
-                      fill: true,
-                      tension: 0.25,
-                      pointRadius: 1,
-                      pointHoverRadius: 3
-                    }
-                  ]
-              },
-            options: 
-              {
-                responsive: true,
-                plugins: 
-                  {
-                    tooltip: 
-                      {
-                        enabled: true,
-                        mode: 'nearest',
-                        intersect: false,
-                        callbacks: 
-                          {
-                            label: function(context) 
-                              {
-                                return context.parsed.y.toFixed(2) + " Watt";
-                              }
-                          }
-                      }
-                  },
-                scales: 
-                  {
-                    x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
-                    y: { title: { display: true, text: "Watt" } }
-                  }
-              }
-          });
+    function berechneDurchschnitt(daten) {
+      if (!daten.length) return "0,00 Watt";
+      const summe = daten.reduce((s, e) => s + e.watt, 0);
+      return (summe / daten.length).toFixed(2).replace(".", ",") + " Watt";
     }
 
-    document.querySelectorAll("#chartButtons button").forEach(btn => 
-      {
-        btn.addEventListener("click", () => 
-            {
-              document.querySelectorAll("#chartButtons button")
-              .forEach(b => b.classList.remove("active"));
-              btn.classList.add("active");
-              ladeWattDaten(btn.dataset.range);
-            });
+    async function ladeDurchschnittswerte() {
+      const map = [
+        { endpoint: "/api/watt_24h", element: "avg24h" },
+        { endpoint: "/api/watt_7d",  element: "avg7d" },
+        { endpoint: "/api/watt_30d", element: "avg30d" }
+      ];
+
+      for (const eintrag of map) {
+        const response = await fetch(`${API_BASE}${eintrag.endpoint}`);
+        const daten = await response.json();
+        document.getElementById(eintrag.element).textContent = berechneDurchschnitt(daten);
+      }
+    }
+
+    function formatZeit(zeit, range) {
+      const d = new Date(zeit);
+      if (range === "24h") return d.getHours() + ":00";
+      if (range === "7d" || range === "30d") {
+        return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+      }
+      if (range === "12m") {
+        return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
+      }
+      return zeit;
+    }
+
+    async function ladeWattDaten(range) {
+      let endpoint;
+      switch(range) {
+        case "24h": endpoint = "/api/watt_24h"; break;
+        case "7d":  endpoint = "/api/watt_7d"; break;
+        case "30d": endpoint = "/api/watt_30d"; break;
+        case "12m": endpoint = "/api/watt_12monate"; break;
+      }
+
+      const response = await fetch(`${API_BASE}${endpoint}`);
+      const daten = await response.json();
+
+      const labels = daten.map(e => formatZeit(e.zeit, range));
+      const wattData = daten.map(e => e.watt);
+
+      // 🔹 Aktueller Stundenwert = letzter Wert aus 24h
+      if (range === "24h" && daten.length > 0) {
+        const letzterWert = daten[daten.length - 1].watt;
+        document.getElementById("avgLive").textContent =
+          letzterWert.toFixed(2).replace(".", ",") + " Watt";
+      }
+
+      const ctx = document.getElementById("wattChart").getContext("2d");
+      if (currentChart) currentChart.destroy();
+
+      currentChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Leistung (Watt)",
+            data: wattData,
+            borderColor: "#007BFF",
+            backgroundColor: "rgba(0,123,255,0.15)",
+            fill: true,
+            tension: 0.25,
+            pointRadius: 1,
+            pointHoverRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, /* ✅ damit unsere Containerhöhe wirkt */
+          plugins: {
+            tooltip: {
+              enabled: true,
+              mode: "nearest",
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  return context.parsed.y.toFixed(2) + " Watt";
+                }
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
+            y: { title: { display: true, text: "Watt" } }
+          }
+        }
       });
+    }
+
+    document.querySelectorAll("#chartButtons button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#chartButtons button")
+          .forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        ladeWattDaten(btn.dataset.range);
+      });
+    });
 
     ladeWattDaten("24h");
     ladeDurchschnittswerte();
