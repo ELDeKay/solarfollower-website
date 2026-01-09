@@ -2,97 +2,157 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Einstellungen</title>
 
   <style>
-    body
-      {
-        font-family: Arial, sans-serif;
-        background: #f0f0f0;
-        margin: 0;
-        padding: 20px;
+    /* ✅ Kein horizontales Overflow */
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ✅ Einheitliche Breite */
+    .topbar,
+    .box {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    /* ✅ Desktop: Titel exakt mittig, Button rechts */
+    .topbar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .topbar h1 {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      text-align: center;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: #007BFF;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+
+      margin-left: auto;
+      display: inline-block;
+      touch-action: manipulation;
+    }
+
+    .box {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin: 0;
+    }
+
+    .box h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .field input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 30px;
+      font-size: 18px;
+      gap: 12px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 14px;
+      text-align: center;
+      color: #555;
+    }
+
+    /* ✅ Mobile */
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+        align-items: stretch;
       }
 
-    .topbar
-      {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 18px;
       }
 
-    .back-btn
-      {
-        text-decoration: none;
-        background: #007BFF;
-        color: white;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-weight: bold;
-      }
-
-    .box
-      {
-        max-width: 600px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      }
-
-    .box h2
-      {
-        margin-top: 0;
-        margin-bottom: 20px;
+      .topbar h1 {
+        position: static;
+        transform: none;
         text-align: center;
+        order: 1;
       }
 
-    .field
-      {
-        margin-bottom: 20px;
-      }
-
-    .field label
-      {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: bold;
-      }
-
-    .field input[type="number"]
-      {
+      .back-btn {
         width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-      }
-
-    .checkbox-row
-      {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 30px;
-        font-size: 18px;
-      }
-
-    .checkbox-row input[type="checkbox"]
-      {
-        width: 26px;
-        height: 26px;
-        cursor: pointer;
-      }
-
-    .status
-      {
-        margin-top: 20px;
-        font-size: 14px;
         text-align: center;
-        color: #555;
+        order: 2;
+        margin-left: 0;
       }
+
+      .box {
+        padding: 18px;
+      }
+
+      .checkbox-row {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 
@@ -137,56 +197,44 @@
   </div>
 
 <script>
-const API_BASE = "https://solar-backend-ljck.onrender.com"; // ggf. anpassen
+const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const latitudeInput = document.getElementById("latitude");
 const longitudeInput = document.getElementById("longitude");
 const checkbox = document.getElementById("coordscheck");
 const statusText = document.getElementById("statusText");
 
-checkbox.addEventListener("change", async () =>
-  {
-    if (!checkbox.checked)
-      {
-        statusText.innerText = "Daten werden nicht übertragen";
-        return;
-      }
+checkbox.addEventListener("change", async () => {
+  if (!checkbox.checked) {
+    statusText.innerText = "Daten werden nicht übertragen";
+    return;
+  }
 
-    const latitude = parseFloat(latitudeInput.value);
-    const longitude = parseFloat(longitudeInput.value);
+  const latitude = parseFloat(latitudeInput.value);
+  const longitude = parseFloat(longitudeInput.value);
 
-    if (isNaN(latitude) || isNaN(longitude))
-      {
-        alert("Bitte gültige Koordinaten eingeben");
-        checkbox.checked = false;
-        return;
-      }
+  if (isNaN(latitude) || isNaN(longitude)) {
+    alert("Bitte gültige Koordinaten eingeben");
+    checkbox.checked = false;
+    return;
+  }
 
-    try
-      {
-        await fetch(`${API_BASE}/api/coordscheck`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(
-              {
-                latitude,
-                longitude
-              })
-          });
+  try {
+    const res = await fetch(`${API_BASE}/api/coordscheck`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude, longitude })
+    });
 
-        statusText.innerText = "Koordinaten wurden an den Pico gesendet";
-      }
-    catch
-      {
-        statusText.innerText = "Übertragung fehlgeschlagen";
-        checkbox.checked = false;
-      }
-  });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    statusText.innerText = "Koordinaten wurden an den Pico gesendet";
+  } catch {
+    statusText.innerText = "Übertragung fehlgeschlagen";
+    checkbox.checked = false;
+  }
+});
 </script>
 
 </body>
 </html>
-
-
-
