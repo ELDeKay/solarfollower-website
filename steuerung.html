@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Steuerung</title>
 
   <style>
@@ -13,13 +13,17 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      height: 100%;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
       margin: 0;
       padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* ✅ iOS/Safari Safe-Area */
 
-      /* ✅ wie bei wetter.html: sauberes Zentrieren ohne Overflow */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -52,7 +56,7 @@
       border-radius: 10px;
       font-weight: bold;
 
-      margin-left: auto; /* Button nach rechts */
+      margin-left: auto;
       display: inline-block;
     }
 
@@ -114,6 +118,12 @@
       background: #007BFF;
       color: white;
       cursor: pointer;
+
+      /* ✅ reduziert mobile "Doppelklick/Zoom" Nebenwirkungen */
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     .btn:active {
@@ -124,6 +134,7 @@
       width: 100%;
       max-width: 900px;
       margin: 40px 0 0;
+      margin-bottom: 12px; /* ✅ etwas Luft unten (hilft gegen Overlay-Gefühl) */
       background: white;
       border-radius: 16px;
       padding: 25px;
@@ -146,7 +157,8 @@
     @media (max-width: 700px) {
       body {
         padding: 14px;
-        align-items: stretch; /* verhindert “schmale” Inhalte */
+        padding-bottom: calc(14px + env(safe-area-inset-bottom)); /* ✅ Safe-Area auch mobile */
+        align-items: stretch;
       }
 
       /* Topbar: Titel oben, Button darunter, beide volle Breite */
@@ -199,7 +211,6 @@
 </head>
 
 <body>
-
   <div class="topbar">
     <h1>Steuerung</h1>
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
@@ -217,29 +228,15 @@
       </div>
 
       <div class="manual-motor-controls" id="motor1">
-      <div class="value-box">
-        Zielwert
-      <span id="motor1-target" style="font-size:24px;font-weight:bold;">-- °</span>
-      </div>
-
+        <div class="value-box">
+          Zielwert
+          <span id="motor1-target" style="font-size:24px;font-weight:bold;">-- °</span>
+        </div>
 
         <div class="controls">
-          <button class="btn"
-            onmousedown="startHold(1, -1)"
-            onmouseup="stopHold()"
-            onmouseleave="stopHold()"
-            ontouchstart="startHold(1, -1)"
-            ontouchend="stopHold()"
-          >−</button>
-
-          <button class="btn"
-            onmousedown="startHold(1, +1)"
-            onmouseup="stopHold()"
-            onmouseleave="stopHold()"
-            ontouchstart="startHold(1, +1)"
-            ontouchend="stopHold()"
-          >+</button>
-
+          <!-- ✅ KEINE touch/mouse Inline-Handler mehr -->
+          <button class="btn js-hold-btn" type="button" data-motor="1" data-dir="-1">−</button>
+          <button class="btn js-hold-btn" type="button" data-motor="1" data-dir="1">+</button>
         </div>
       </div>
     </div>
@@ -254,29 +251,15 @@
       </div>
 
       <div class="manual-motor-controls" id="motor2">
-      <div class="value-box">
-        Zielwert
-      <span id="motor2-target" style="font-size:24px;font-weight:bold;">-- °</span>
-      </div>
-
+        <div class="value-box">
+          Zielwert
+          <span id="motor2-target" style="font-size:24px;font-weight:bold;">-- °</span>
+        </div>
 
         <div class="controls">
-          <button class="btn"
-            onmousedown="startHold(2, -1)"
-            onmouseup="stopHold()"
-            onmouseleave="stopHold()"
-            ontouchstart="startHold(2, -1)"
-            ontouchend="stopHold()"
-          >−</button>
-          
-          <button class="btn"
-            onmousedown="startHold(2, +1)"
-            onmouseup="stopHold()"
-            onmouseleave="stopHold()"
-            ontouchstart="startHold(2, +1)"
-            ontouchend="stopHold()"
-          >+</button>
-
+          <!-- ✅ KEINE touch/mouse Inline-Handler mehr -->
+          <button class="btn js-hold-btn" type="button" data-motor="2" data-dir="-1">−</button>
+          <button class="btn js-hold-btn" type="button" data-motor="2" data-dir="1">+</button>
         </div>
       </div>
     </div>
@@ -306,8 +289,7 @@ const MOTOR_LIMITS = {
 
 let uiInitialisiert = false;
 
-async function ladeWetterdaten()
-{
+async function ladeWetterdaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
@@ -335,8 +317,7 @@ async function ladeWetterdaten()
 
 /* ---------------- Manuell Checkbox ---------------- */
 
-checkbox.addEventListener("change", async () =>
-{
+checkbox.addEventListener("change", async () => {
   const manuell = checkbox.checked;
 
   motor1_strg.style.display = manuell ? "block" : "none";
@@ -356,8 +337,7 @@ checkbox.addEventListener("change", async () =>
 
 /* ---------------- Motor Target senden ---------------- */
 
-async function sendMotorTargets()
-{
+async function sendMotorTargets() {
   const m1 = parseInt(document.getElementById("motor1-target").innerText);
   const m2 = parseInt(document.getElementById("motor2-target").innerText);
 
@@ -385,8 +365,7 @@ let holdMotor = null;
 let holdDirection = 0;
 let holdStep = 1;
 
-function changeMotorValue(motor, delta)
-{
+function changeMotorValue(motor, delta) {
   const target = document.getElementById(`motor${motor}-target`);
   const current = document.getElementById(`motor${motor}-current`);
 
@@ -399,8 +378,7 @@ function changeMotorValue(motor, delta)
   target.innerText = value + " °";
 }
 
-function startHold(motor, direction)
-{
+function startHold(motor, direction) {
   stopHold();
 
   holdMotor = motor;
@@ -409,21 +387,17 @@ function startHold(motor, direction)
 
   changeMotorValue(holdMotor, holdDirection);
 
-  holdTimer = setInterval(() =>
-  {
+  holdTimer = setInterval(() => {
     holdStep = Math.min(holdStep + 1, 8);
     changeMotorValue(holdMotor, holdDirection * holdStep);
   }, 150);
 }
 
-function stopHold()
-{
+function stopHold() {
   if (holdTimer) {
     clearInterval(holdTimer);
     holdTimer = null;
-
-    // ✅ Zielwerte nach dem Einstellen ans Backend senden
-    sendMotorTargets();
+    sendMotorTargets(); // ✅ Zielwerte nach dem Einstellen ans Backend senden
   }
 
   holdMotor = null;
@@ -431,13 +405,46 @@ function stopHold()
   holdStep = 1;
 }
 
+/* ---------------- ✅ Pointer Events Binding (fix für "1 Tap = 2 Schritte") ---------------- */
+
+function bindHoldButtons() {
+  const buttons = document.querySelectorAll(".js-hold-btn");
+
+  buttons.forEach((btn) => {
+    // PointerDown startet Hold (funktioniert für Touch + Maus)
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+
+      // sorgt dafür, dass "pointerup" sicher beim gleichen Button ankommt
+      try { btn.setPointerCapture(e.pointerId); } catch {}
+
+      const motor = parseInt(btn.dataset.motor, 10);
+      const dir = parseInt(btn.dataset.dir, 10);
+
+      startHold(motor, dir);
+    });
+
+    // PointerUp stoppt Hold
+    btn.addEventListener("pointerup", (e) => {
+      e.preventDefault();
+      stopHold();
+    });
+
+    // Abbruchfälle
+    btn.addEventListener("pointercancel", stopHold);
+    btn.addEventListener("pointerleave", stopHold);
+
+    // Optional: Kontextmenü auf Long-Press verhindern
+    btn.addEventListener("contextmenu", (e) => e.preventDefault());
+  });
+}
+
 /* ---------------- Initial ---------------- */
 
+bindHoldButtons();
 ladeWetterdaten();
 setInterval(ladeWetterdaten, 5000);
 </script>
-
-
 
 </body>
 </html>
