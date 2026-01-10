@@ -6,11 +6,7 @@
   <title>Paneeldaten</title>
 
   <style>
-    /* ✅ Kein horizontales Overflow / kein "Rauszoomen" */
-    *,
-    *::before,
-    *::after { box-sizing: border-box; }
-
+    * , *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; }
 
     body {
@@ -19,25 +15,24 @@
       margin: 0;
       padding: 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
-
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* ✅ Topbar + List gleiche Breite */
+    /* ✅ Topbar + Stamp + List gleiche Breite */
     .topbar,
+    .stamp,
     .list {
       width: 100%;
       max-width: 800px;
     }
 
-    /* ✅ Desktop: Titel exakt mittig, Button rechts */
     .topbar {
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
     }
 
     .topbar h1 {
@@ -55,10 +50,17 @@
       padding: 10px 16px;
       border-radius: 10px;
       font-weight: bold;
-
       margin-left: auto;
       display: inline-block;
       touch-action: manipulation;
+    }
+
+    /* ✅ Statuszeile (Zeit) */
+    .stamp {
+      margin: 0 0 18px 0;
+      font-size: 13px;
+      color: #666;
+      text-align: right;
     }
 
     .list {
@@ -100,7 +102,7 @@
     .name {
       font-size: 18px;
       font-weight: bold;
-      min-width: 0; /* ✅ damit Text sauber umbrechen kann */
+      min-width: 0;
     }
 
     .value {
@@ -110,7 +112,6 @@
       white-space: nowrap;
     }
 
-    /* ✅ Mobile Optimierung */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -122,7 +123,7 @@
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        margin-bottom: 18px;
+        margin-bottom: 8px;
       }
 
       .topbar h1 {
@@ -139,19 +140,20 @@
         margin-left: 0;
       }
 
+      .stamp {
+        text-align: center;
+        margin-bottom: 14px;
+      }
+
       .list { padding: 16px; }
 
       .row {
-        grid-template-columns: 56px 1fr auto; /* ✅ rechte Spalte nur so breit wie Inhalt */
+        grid-template-columns: 56px 1fr auto;
         padding: 12px 0;
         min-height: 64px;
       }
 
-      .icon {
-        width: 44px;
-        height: 44px;
-      }
-
+      .icon { width: 44px; height: 44px; }
       .name { font-size: 16px; }
       .value { font-size: 18px; }
     }
@@ -164,6 +166,9 @@
     <h1>Paneeldaten</h1>
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
+
+  <!-- ✅ Statusanzeige Zeit -->
+  <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
   <div class="list">
 
@@ -201,6 +206,26 @@
 
   <script>
     const API_BASE = "https://solar-backend-ljck.onrender.com";
+    const stampEl = document.getElementById("dataStamp");
+
+    function formatISODateTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return null;
+
+      const datum = d.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+
+      const zeit = d.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+
+      return `${datum} ${zeit}`;
+    }
 
     async function ladeWetterdaten() {
       try {
@@ -208,18 +233,34 @@
         const daten = await response.json();
 
         if (!daten.length) {
-          console.log("Noch keine Daten vorhanden");
+          stampEl.innerText = "Keine Daten von Steuerung empfangen";
           return;
         }
 
         const letzterWert = daten[daten.length - 1];
 
-        document.getElementById("tilt").innerText = letzterWert.motor2 + " °";
-        document.getElementById("orient").innerText = letzterWert.motor1 + " °";
-        document.getElementById("voltage").innerText = letzterWert.voltage + " V";
-        document.getElementById("current").innerText = letzterWert.current + " A";
-        document.getElementById("power").innerText = letzterWert.power + " W";
+        if (letzterWert.zeit) {
+          const formatted = formatISODateTime(letzterWert.zeit);
+          stampEl.innerText = formatted
+            ? `Daten vom: ${formatted}`
+            : "Keine gültige Zeitangabe empfangen";
+        } else {
+          stampEl.innerText = "Keine gültige Zeitangabe empfangen";
+        }
+
+        document.getElementById("tilt").innerText =
+          (letzterWert.motor2 ?? "--") + " °";
+        document.getElementById("orient").innerText =
+          (letzterWert.motor1 ?? "--") + " °";
+        document.getElementById("voltage").innerText =
+          (letzterWert.voltage ?? "--") + " V";
+        document.getElementById("current").innerText =
+          (letzterWert.current ?? "--") + " A";
+        document.getElementById("power").innerText =
+          (letzterWert.power ?? "--") + " W";
+
       } catch (e) {
+        stampEl.innerText = "Backend nicht erreichbar";
         console.log("Backend nicht erreichbar");
       }
     }
