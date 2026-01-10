@@ -18,7 +18,6 @@
       margin: 0;
       padding: 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
-
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -26,6 +25,7 @@
 
     /* Einheitliche Seitenbreite */
     .topbar,
+    .stamp,
     .list,
     #chartButtons,
     #wattChartContainer {
@@ -38,7 +38,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
     }
 
     .topbar h1 {
@@ -59,6 +59,14 @@
       margin-left: auto;
       display: inline-block;
       touch-action: manipulation;
+    }
+
+    /* ✅ Statuszeile (Zeit) */
+    .stamp {
+      margin: 0 0 18px 0;
+      font-size: 13px;
+      color: #666;
+      text-align: right;
     }
 
     .list {
@@ -128,18 +136,15 @@
 
     #chartButtons button.active { background-color: #0056b3; }
 
-    /* ✅ Chart-Container: jetzt wirklich groß (PC) */
     #wattChartContainer {
       background: white;
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       margin: 0 0 40px 0;
-
-      height: 820px;          /* <<< PC / allgemein: deutlich größer */
+      height: 820px;
     }
 
-    /* ✅ GANZ WICHTIG: Canvas muss den Container komplett füllen */
     #wattChart {
       display: block;
       width: 100% !important;
@@ -158,7 +163,7 @@
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        margin-bottom: 18px;
+        margin-bottom: 8px;
       }
 
       .topbar h1 {
@@ -173,6 +178,11 @@
         text-align: center;
         order: 2;
         margin-left: 0;
+      }
+
+      .stamp {
+        text-align: center;
+        margin-bottom: 14px;
       }
 
       .list { padding: 16px; }
@@ -199,15 +209,13 @@
 
       #wattChartContainer {
         padding: 16px;
-        height: 560px;       /* <<< Mobile: auch deutlich größer */
+        height: 560px;
       }
     }
 
-    /* Landscape auf Phones/Tablets: extra groß */
+    /* Landscape */
     @media (max-width: 900px) and (orientation: landscape) {
-      #wattChartContainer {
-        height: 340px;
-      }
+      #wattChartContainer { height: 340px; }
     }
   </style>
 </head>
@@ -217,6 +225,9 @@
     <h1>Analyse</h1>
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
+
+  <!-- ✅ Statusanzeige Zeit -->
+  <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
   <div class="list">
     <div class="row">
@@ -259,7 +270,53 @@
 
   <script>
     const API_BASE = "https://solarfollower-databank.onrender.com";
+    const API_STATUS = "https://solar-backend-ljck.onrender.com"; // ✅ für Zeitstempel aus Steuerung
+    const stampEl = document.getElementById("dataStamp");
     let currentChart;
+
+    function formatISODateTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return null;
+
+      const datum = d.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+
+      const zeit = d.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+
+      return `${datum} ${zeit}`;
+    }
+
+    async function ladeZeitstempel() {
+      try {
+        const res = await fetch(`${API_STATUS}/api/data`);
+        const arr = await res.json();
+
+        if (!arr.length) {
+          stampEl.innerText = "Keine Daten von Steuerung empfangen";
+          return;
+        }
+
+        const last = arr[arr.length - 1];
+        if (!last.zeit) {
+          stampEl.innerText = "Keine gültige Zeitangabe empfangen";
+          return;
+        }
+
+        const formatted = formatISODateTime(last.zeit);
+        stampEl.innerText = formatted
+          ? `Daten vom: ${formatted}`
+          : "Keine gültige Zeitangabe empfangen";
+      } catch {
+        stampEl.innerText = "Backend nicht erreichbar";
+      }
+    }
 
     function berechneDurchschnitt(daten) {
       if (!daten.length) return "0,00 Watt";
@@ -363,6 +420,10 @@
         ladeWattDaten(btn.dataset.range);
       });
     });
+
+    // ✅ Initial + regelmäßiges Update
+    ladeZeitstempel();
+    setInterval(ladeZeitstempel, 5000);
 
     ladeWattDaten("24h");
     ladeDurchschnittswerte();
