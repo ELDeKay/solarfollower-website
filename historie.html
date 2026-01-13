@@ -274,24 +274,40 @@
     const stampEl = document.getElementById("dataStamp");
     let currentChart;
 
-    function formatISODateTime(iso) {
-      const d = new Date(iso);
-      if (isNaN(d.getTime())) return null;
+    function formatISODateTime(value) {
+  if (!value) return null;
 
-      const datum = d.toLocaleDateString("de-DE", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      });
+  let d;
 
-      const zeit = d.toLocaleTimeString("de-DE", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
+  // Fall 1: Unix Timestamp (Sekunden)
+  if (typeof value === "number") {
+    d = new Date(value * 1000);
+  }
+  // Fall 2: String-Zahl ("1768327581")
+  else if (/^\d+$/.test(value)) {
+    d = new Date(parseInt(value, 10) * 1000);
+  }
+  // Fall 3: ISO-String
+  else {
+    d = new Date(value);
+  }
 
-      return `${datum} ${zeit}`;
-    }
+  if (isNaN(d.getTime())) return null;
+
+  const datum = d.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+
+  const zeit = d.toLocaleTimeString("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  return `${datum} ${zeit}`;
+}
 
     async function ladeZeitstempel() {
       try {
