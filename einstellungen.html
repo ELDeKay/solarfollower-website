@@ -6,7 +6,6 @@
   <title>Einstellungen</title>
 
   <style>
-    /* ✅ Kein horizontales Overflow */
     *,
     *::before,
     *::after { box-sizing: border-box; }
@@ -19,26 +18,14 @@
       margin: 0;
       padding: 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
-
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* Topbar wie auf allen anderen Seiten */
     .topbar {
       width: 100%;
       max-width: 800px;
-    }
-    
-    /* Formular bewusst schmaler */
-    .box {
-      width: 100%;
-      max-width: 800px;
-    }
-
-    /* ✅ Desktop: Titel exakt mittig, Button rechts */
-    .topbar {
       position: relative;
       display: flex;
       align-items: center;
@@ -60,13 +47,14 @@
       padding: 10px 16px;
       border-radius: 10px;
       font-weight: bold;
-
       margin-left: auto;
       display: inline-block;
       touch-action: manipulation;
     }
 
     .box {
+      width: 100%;
+      max-width: 800px;
       background: white;
       border-radius: 16px;
       padding: 25px;
@@ -80,9 +68,7 @@
       text-align: center;
     }
 
-    .field {
-      margin-bottom: 20px;
-    }
+    .field { margin-bottom: 20px; }
 
     .field label {
       display: block;
@@ -90,7 +76,8 @@
       font-weight: bold;
     }
 
-    .field input[type="number"] {
+    .field input[type="number"],
+    .field input[type="text"] {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -121,7 +108,6 @@
       color: #555;
     }
 
-    /* ✅ Mobile */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -150,13 +136,8 @@
         margin-left: 0;
       }
 
-      .box {
-        padding: 18px;
-      }
-
-      .checkbox-row {
-        font-size: 16px;
-      }
+      .box { padding: 18px; }
+      .checkbox-row { font-size: 16px; }
     }
   </style>
 </head>
@@ -191,6 +172,18 @@
       />
     </div>
 
+    <!-- ✅ NEU: IP-Adresse Leistungsmesser -->
+    <div class="field">
+      <label for="powertracker">IP-Adresse Leistungsmesser</label>
+      <input
+        type="text"
+        id="powertracker"
+        placeholder="Tragen Sie hier die IP-Adresse des Leistungsmessers ein"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
     <div class="checkbox-row">
       <span>Daten überliefern</span>
       <input type="checkbox" id="coordscheck">
@@ -206,8 +199,21 @@ const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const latitudeInput = document.getElementById("latitude");
 const longitudeInput = document.getElementById("longitude");
+const powertrackerInput = document.getElementById("powertracker");
 const checkbox = document.getElementById("coordscheck");
 const statusText = document.getElementById("statusText");
+
+function istGueltigeIPv4(ip) {
+  // akzeptiert z.B. 192.168.0.10
+  const parts = ip.split(".");
+  if (parts.length !== 4) return false;
+  return parts.every(p => {
+    if (p.trim() === "") return false;
+    if (!/^\d+$/.test(p)) return false;
+    const n = Number(p);
+    return n >= 0 && n <= 255;
+  });
+}
 
 checkbox.addEventListener("change", async () => {
   if (!checkbox.checked) {
@@ -217,9 +223,16 @@ checkbox.addEventListener("change", async () => {
 
   const latitude = parseFloat(latitudeInput.value);
   const longitude = parseFloat(longitudeInput.value);
+  const powertracker = (powertrackerInput.value || "").trim();
 
   if (isNaN(latitude) || isNaN(longitude)) {
     alert("Bitte gültige Koordinaten eingeben");
+    checkbox.checked = false;
+    return;
+  }
+
+  if (powertracker.length === 0 || !istGueltigeIPv4(powertracker)) {
+    alert("Bitte eine gültige IPv4-Adresse eingeben (z. B. 192.168.0.10)");
     checkbox.checked = false;
     return;
   }
@@ -228,12 +241,12 @@ checkbox.addEventListener("change", async () => {
     const res = await fetch(`${API_BASE}/api/coordscheck`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ latitude, longitude })
+      body: JSON.stringify({ latitude, longitude, powertracker })
     });
 
     if (!res.ok) throw new Error("HTTP " + res.status);
 
-    statusText.innerText = "Koordinaten wurden an den Pico gesendet";
+    statusText.innerText = "Koordinaten & IP wurden an den Pico gesendet";
   } catch {
     statusText.innerText = "Übertragung fehlgeschlagen";
     checkbox.checked = false;
@@ -243,6 +256,3 @@ checkbox.addEventListener("change", async () => {
 
 </body>
 </html>
-
-
-
