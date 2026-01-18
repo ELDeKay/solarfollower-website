@@ -84,16 +84,11 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;   /* ✅ zentriert die Gruppe */
-      gap: 14px;                 /* Abstand zwischen Text & Checkbox */
-      margin-top: 30px;
-      font-size: 18px;
-    }
-
+    
+    <div class="checkbox-row">
+      <span>Daten überliefern</span>
+      <input type="checkbox" id="coordscheck">
+    </div>
 
     .checkbox-row input[type="checkbox"] {
       width: 26px;
@@ -225,7 +220,8 @@ const latitudeInput = document.getElementById("latitude");
 const longitudeInput = document.getElementById("longitude");
 const powertrackerInput = document.getElementById("powertracker");
 
-const checkbox = document.getElementById("coordscheck");
+const sendGeoBtn = document.getElementById("sendGeoBtn");
+const sendIpBtn = document.getElementById("sendIpBtn");
 const factoryBtn = document.getElementById("factoryBtn");
 const statusText = document.getElementById("statusText");
 
@@ -253,37 +249,47 @@ async function postCoordsAndIp(payload) {
 /* -----------------------------------------
    Checkbox: Daten überliefern (Coords + IP)
 ------------------------------------------ */
-checkbox.addEventListener("change", async () => {
-  if (!checkbox.checked) {
-    statusText.innerText = "Daten werden nicht übertragen";
-    return;
-  }
-
+/* -----------------------------------------
+   Button 1: GeoDaten übertragen
+------------------------------------------ */
+sendGeoBtn.addEventListener("click", async () => {
   const latitude = parseFloat(latitudeInput.value);
   const longitude = parseFloat(longitudeInput.value);
-  const powertracker = (powertrackerInput.value || "").trim();
 
   if (isNaN(latitude) || isNaN(longitude)) {
     alert("Bitte gültige Koordinaten eingeben");
-    checkbox.checked = false;
-    return;
-  }
-
-  if (powertracker.length === 0 || !istGueltigeIPv4(powertracker)) {
-    alert("Bitte eine gültige IPv4-Adresse eingeben (z. B. 192.168.0.10)");
-    checkbox.checked = false;
     return;
   }
 
   try {
-    statusText.innerText = "Übertragung läuft ...";
-    await postCoordsAndIp({ latitude, longitude, powertracker });
-    statusText.innerText = "Koordinaten / IP wurden an den Pico gesendet";
+    statusText.innerText = "Daten werden übertragen";
+    await postCoordsAndIp({ latitude, longitude });
+    statusText.innerText = "Daten werden übertragen";
   } catch (e) {
     statusText.innerText = "Übertragung fehlgeschlagen";
-    checkbox.checked = false;
   }
 });
+
+/* -----------------------------------------
+   Button 2: IP-Adresse übertragen
+------------------------------------------ */
+sendIpBtn.addEventListener("click", async () => {
+  const powertracker = (powertrackerInput.value || "").trim();
+
+  if (powertracker.length === 0 || !istGueltigeIPv4(powertracker)) {
+    alert("Bitte eine gültige IPv4-Adresse eingeben (z. B. 192.168.0.10)");
+    return;
+  }
+
+  try {
+    statusText.innerText = "Daten werden übertragen";
+    await postCoordsAndIp({ powertracker });
+    statusText.innerText = "Daten werden übertragen";
+  } catch (e) {
+    statusText.innerText = "Übertragung fehlgeschlagen";
+  }
+});
+
 
 /* -----------------------------------------
    Werkseinstellung: alles zurücksetzen
@@ -304,8 +310,7 @@ factoryBtn.addEventListener("click", async () => {
     latitudeInput.value = "";
     longitudeInput.value = "";
     powertrackerInput.value = "";
-    checkbox.checked = false;
-
+    
     statusText.innerText = "Werkseinstellung gesetzt (Pico wird zurücksetzen)";
   } catch (e) {
     statusText.innerText = "Werkseinstellung fehlgeschlagen";
@@ -315,6 +320,7 @@ factoryBtn.addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
