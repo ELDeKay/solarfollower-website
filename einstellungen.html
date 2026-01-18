@@ -183,6 +183,28 @@
         spellcheck="false"
       />
     </div>
+  <div class="field">
+    <button id="factoryBtn" type="button"
+      style="
+        width:100%;
+        padding:12px;
+        font-size:16px;
+        font-weight:bold;
+        border:none;
+        border-radius:10px;
+        background:#007BFF;
+        color:white;
+        cursor:pointer;
+      "
+     >
+      Werkseinstellung
+    </button>
+
+    <div style="margin-top:10px; font-size:14px; color:#555; line-height:1.4;">
+    setzt den Geo-Daten, die IP-Adresse des Leistungsmessers und den WLAN Zugang zurück.
+    </div>
+  </div>
+
 
     <div class="checkbox-row">
       <span>Daten überliefern</span>
@@ -200,11 +222,12 @@ const API_BASE = "https://solar-backend-ljck.onrender.com";
 const latitudeInput = document.getElementById("latitude");
 const longitudeInput = document.getElementById("longitude");
 const powertrackerInput = document.getElementById("powertracker");
+
 const checkbox = document.getElementById("coordscheck");
+const factoryBtn = document.getElementById("factoryBtn");
 const statusText = document.getElementById("statusText");
 
 function istGueltigeIPv4(ip) {
-  // akzeptiert z.B. 192.168.0.10
   const parts = ip.split(".");
   if (parts.length !== 4) return false;
   return parts.every(p => {
@@ -215,6 +238,19 @@ function istGueltigeIPv4(ip) {
   });
 }
 
+async function postCoordsAndIp(payload) {
+  const res = await fetch(`${API_BASE}/api/coordscheck`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json().catch(() => ({}));
+}
+
+/* -----------------------------------------
+   Checkbox: Daten überliefern (Coords + IP)
+------------------------------------------ */
 checkbox.addEventListener("change", async () => {
   if (!checkbox.checked) {
     statusText.innerText = "Daten werden nicht übertragen";
@@ -238,22 +274,44 @@ checkbox.addEventListener("change", async () => {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/coordscheck`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ latitude, longitude, powertracker })
-    });
-
-    if (!res.ok) throw new Error("HTTP " + res.status);
-
-    statusText.innerText = "Koordinaten & IP wurden an den Pico gesendet";
-  } catch {
+    statusText.innerText = "Übertragung läuft ...";
+    await postCoordsAndIp({ latitude, longitude, powertracker });
+    statusText.innerText = "Koordinaten / IP wurden an den Pico gesendet";
+  } catch (e) {
     statusText.innerText = "Übertragung fehlgeschlagen";
     checkbox.checked = false;
+  }
+});
+
+/* -----------------------------------------
+   Werkseinstellung: alles zurücksetzen
+   (POST an denselben Endpoint)
+------------------------------------------ */
+factoryBtn.addEventListener("click", async () => {
+  const ok = confirm(
+    "Werkseinstellung ausführen?\n\n" +
+    "Dabei werden Geo-Daten, IP-Adresse des Leistungsmessers und WLAN-Zugang zurückgesetzt."
+  );
+  if (!ok) return;
+
+  try {
+    statusText.innerText = "Werkseinstellung wurden gerückgesetzt ...";
+    await postCoordsAndIp({ factory_reset: true });
+
+    // UI zurücksetzen
+    latitudeInput.value = "";
+    longitudeInput.value = "";
+    powertrackerInput.value = "";
+    checkbox.checked = false;
+
+    statusText.innerText = "Werkseinstellung gesetzt (Pico wird zurücksetzen)";
+  } catch (e) {
+    statusText.innerText = "Werkseinstellung fehlgeschlagen";
   }
 });
 </script>
 
 </body>
 </html>
+
 
