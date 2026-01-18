@@ -84,17 +84,30 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-    
-    <div class="checkbox-row">
-      <span>Daten überliefern</span>
-      <input type="checkbox" id="coordscheck">
-    </div>
 
-    .checkbox-row input[type="checkbox"] {
-      width: 26px;
-      height: 26px;
+    /* ✅ NEU: Button-Zeile (2 Buttons nebeneinander) */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #007BFF;
+      color: white;
       cursor: pointer;
-      flex: 0 0 auto;
+      touch-action: manipulation;
+    }
+
+    .action-btn:active {
+      transform: scale(0.99);
     }
 
     .status {
@@ -133,7 +146,11 @@
       }
 
       .box { padding: 18px; }
-      .checkbox-row { font-size: 16px; }
+
+      /* ✅ Mobile: Buttons untereinander */
+      .btn-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -150,63 +167,43 @@
 
     <div class="field">
       <label for="latitude">Breitengrad (Latitude)</label>
-      <input
-        type="number"
-        id="latitude"
-        step="0.000001"
-        placeholder="z. B. 48.137154"
-      />
+      <input type="number" id="latitude" step="0.000001" placeholder="z. B. 48.137154" />
     </div>
 
     <div class="field">
       <label for="longitude">Längengrad (Longitude)</label>
-      <input
-        type="number"
-        id="longitude"
-        step="0.000001"
-        placeholder="z. B. 11.576124"
-      />
+      <input type="number" id="longitude" step="0.000001" placeholder="z. B. 11.576124" />
     </div>
 
-    <!-- ✅ NEU: IP-Adresse Leistungsmesser -->
     <div class="field">
       <label for="powertracker">IP-Adresse Leistungsmesser</label>
       <input
         type="text"
         id="powertracker"
-        placeholder="z.B. 192.168.12.4"
+        placeholder="Tragen Sie hier die IP-Adresse des Leistungsmessers ein"
         autocomplete="off"
         spellcheck="false"
       />
     </div>
- 
-    <div class="checkbox-row">
-      <span>Daten überliefern</span>
-      <input type="checkbox" id="coordscheck">
-    </div>
-    
-<br><br>
-    
-     <div class="field">
-    <button id="factoryBtn" type="button"
-      style="
-        width:100%;
-        padding:12px;
-        font-size:16px;
-        font-weight:bold;
-        border:none;
-        border-radius:10px;
-        background:#007BFF;
-        color:white;
-        cursor:pointer;
-      "
-     >
-      Werkseinstellung
-    </button>
 
-    <div style="margin-top:10px; font-size:14px; color:#555; line-height:1.4;text-align:center;">
+    <!-- ✅ HIER: zwei Buttons nebeneinander -->
+    <div class="btn-row">
+      <button id="sendGeoBtn" type="button" class="action-btn">Geo-Daten schicken</button>
+      <button id="sendIpBtn" type="button" class="action-btn">IP-Adresse schicken</button>
     </div>
-  </div>
+
+    <br>
+
+    <!-- Werkseinstellung Button (volle Breite) -->
+    <div class="field">
+      <button id="factoryBtn" type="button" class="action-btn" style="width:100%;">
+        Werkseinstellung
+      </button>
+
+      <div style="margin-top:10px; font-size:14px; color:#555; line-height:1.4; text-align:center;">
+        setzt den Geo-Daten, die IP-Adresse des Leistungsmessers und den WLAN Zugang zurück.
+      </div>
+    </div>
 
     <div class="status" id="statusText">
       Daten werden nicht übertragen
@@ -236,7 +233,7 @@ function istGueltigeIPv4(ip) {
   });
 }
 
-async function postCoordsAndIp(payload) {
+async function postCoordsCheck(payload) {
   const res = await fetch(`${API_BASE}/api/coordscheck`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -246,12 +243,9 @@ async function postCoordsAndIp(payload) {
   return res.json().catch(() => ({}));
 }
 
-/* -----------------------------------------
-   Checkbox: Daten überliefern (Coords + IP)
------------------------------------------- */
-/* -----------------------------------------
-   Button 1: GeoDaten übertragen
------------------------------------------- */
+/* -----------------------
+   Button: Geo senden
+------------------------ */
 sendGeoBtn.addEventListener("click", async () => {
   const latitude = parseFloat(latitudeInput.value);
   const longitude = parseFloat(longitudeInput.value);
@@ -262,17 +256,17 @@ sendGeoBtn.addEventListener("click", async () => {
   }
 
   try {
+    statusText.innerText = "Übertragung läuft ...";
+    await postCoordsCheck({ latitude, longitude });
     statusText.innerText = "Daten werden übertragen";
-    await postCoordsAndIp({ latitude, longitude });
-    statusText.innerText = "Daten werden übertragen";
-  } catch (e) {
+  } catch {
     statusText.innerText = "Übertragung fehlgeschlagen";
   }
 });
 
-/* -----------------------------------------
-   Button 2: IP-Adresse übertragen
------------------------------------------- */
+/* -----------------------
+   Button: IP senden
+------------------------ */
 sendIpBtn.addEventListener("click", async () => {
   const powertracker = (powertrackerInput.value || "").trim();
 
@@ -282,19 +276,17 @@ sendIpBtn.addEventListener("click", async () => {
   }
 
   try {
+    statusText.innerText = "Übertragung läuft ...";
+    await postCoordsCheck({ powertracker });
     statusText.innerText = "Daten werden übertragen";
-    await postCoordsAndIp({ powertracker });
-    statusText.innerText = "Daten werden übertragen";
-  } catch (e) {
+  } catch {
     statusText.innerText = "Übertragung fehlgeschlagen";
   }
 });
 
-
-/* -----------------------------------------
-   Werkseinstellung: alles zurücksetzen
-   (POST an denselben Endpoint)
------------------------------------------- */
+/* -----------------------
+   Button: Werkseinstellung
+------------------------ */
 factoryBtn.addEventListener("click", async () => {
   const ok = confirm(
     "Werkseinstellung ausführen?\n\n" +
@@ -303,16 +295,16 @@ factoryBtn.addEventListener("click", async () => {
   if (!ok) return;
 
   try {
-    statusText.innerText = "Werkseinstellung wurden gerückgesetzt ...";
-    await postCoordsAndIp({ factory_reset: true });
+    statusText.innerText = "Werkseinstellung läuft ...";
+    await postCoordsCheck({ factory_reset: true });
 
     // UI zurücksetzen
     latitudeInput.value = "";
     longitudeInput.value = "";
     powertrackerInput.value = "";
-    
-    statusText.innerText = "Werkseinstellung gesetzt (Pico wird zurücksetzen)";
-  } catch (e) {
+
+    statusText.innerText = "Daten werden übertragen";
+  } catch {
     statusText.innerText = "Werkseinstellung fehlgeschlagen";
   }
 });
@@ -320,13 +312,3 @@ factoryBtn.addEventListener("click", async () => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
