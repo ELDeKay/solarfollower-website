@@ -184,7 +184,13 @@
         spellcheck="false"
       />
     </div>
-  <div class="field">
+ 
+    <div class="checkbox-row">
+      <span>Daten überliefern</span>
+      <input type="checkbox" id="coordscheck">
+    </div>
+
+     <div class="field">
     <button id="factoryBtn" type="button"
       style="
         width:100%;
@@ -205,12 +211,6 @@
     setzt den Geo-Daten, die IP-Adresse des Leistungsmessers und den WLAN Zugang zurück.
     </div>
   </div>
-
-
-    <div class="checkbox-row">
-      <span>Daten überliefern</span>
-      <input type="checkbox" id="coordscheck">
-    </div>
 
     <div class="status" id="statusText">
       Daten werden nicht übertragen
@@ -314,6 +314,7 @@ factoryBtn.addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
