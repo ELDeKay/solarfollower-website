@@ -526,7 +526,17 @@ function bindHoldButtons() {
     btn.addEventListener("contextmenu", (e) => e.preventDefault());
   });
 }
+window.addEventListener("pagehide", () => {
+  const payload = {
+    aktiv: false,
+    snowmode: false
+  };
 
+  navigator.sendBeacon(
+    `${API_BASE}/api/manuell`,
+    JSON.stringify(payload)
+  );
+});
 /* ---------------- Initial ---------------- */
 bindHoldButtons();
 ladeWetterdaten();
