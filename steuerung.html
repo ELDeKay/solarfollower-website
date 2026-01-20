@@ -526,17 +526,43 @@ function bindHoldButtons() {
     btn.addEventListener("contextmenu", (e) => e.preventDefault());
   });
 }
-window.addEventListener("pagehide", () => {
-  const payload = {
-    aktiv: false,
-    snowmode: false
-  };
+  function sendOnLeave(payload) {
+    try {
+      const url = `${API_BASE}/api/manuell`;
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
 
-  navigator.sendBeacon(
-    `${API_BASE}/api/manuell`,
-    JSON.stringify(payload)
-  );
-});
+      // 1) zuverlässig beim Verlassen
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(url, blob);
+        return;
+      }
+
+      // 2) Fallback
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  // Wenn Seite verlassen wird (auch Link-Klick, Reload, Tabwechsel)
+  window.addEventListener("pagehide", () => {
+    // nur senden, wenn überhaupt aktiviert war
+    if (checkbox.checked || snowCheckbox.checked) {
+      sendOnLeave({ aktiv: false, snowmode: false });
+    }
+  });
+
+  // Optional zusätzlich (manche Browser feuern eher visibilitychange)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      if (checkbox.checked || snowCheckbox.checked) {
+        sendOnLeave({ aktiv: false, snowmode: false });
+      }
+    }
+  });
 /* ---------------- Initial ---------------- */
 bindHoldButtons();
 ladeWetterdaten();
