@@ -28,7 +28,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
+      margin-bottom: 10px;
       width: 100%;
       max-width: 900px;
     }
@@ -263,30 +263,35 @@
 
   </div>
 
-<div class="manuell-box">
-  <span>manuelle Steuerung</span>
-  <input type="checkbox" id="manuell">
-</div>
+  <!-- ✅ Schneemodus oben, aber wird nur sichtbar wenn "manuell" aktiv ist -->
+  <div class="manuell-box" id="snowBox" style="display:none;">
+    <span>Schneemodus aktivieren</span>
+    <input type="checkbox" id="snowmode">
+  </div>
 
-<div class="manuell-box">
-  <span>Schneemodus aktivieren</span>
-  <input type="checkbox" id="snowmode">
-</div>
-  
+  <!-- ✅ Manuell unten -->
+  <div class="manuell-box">
+    <span>manuelle Steuerung</span>
+    <input type="checkbox" id="manuell">
+  </div>
+
 <script>
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const checkbox = document.getElementById("manuell");
 const snowCheckbox = document.getElementById("snowmode");
+const snowBox = document.getElementById("snowBox");
+
 const motor1_strg = document.getElementById("motor1");
 const motor2_strg = document.getElementById("motor2");
+
 const motor1Current = document.getElementById("motor1-current");
 const motor2Current = document.getElementById("motor2-current");
 const stampEl = document.getElementById("dataStamp");
 
 const MOTOR_LIMITS = {
   1: { min: 0,  max: 300 },
-  2: { min: 14, max: 75  }
+  2: { min: 14, max: 75 }
 };
 
 let uiInitialisiert = false;
@@ -296,16 +301,11 @@ function formatISODateTime(value) {
 
   let d;
 
-  // Fall 1: Unix Timestamp (Sekunden)
   if (typeof value === "number") {
     d = new Date(value * 1000);
-  }
-  // Fall 2: String-Zahl ("1768327581")
-  else if (/^\d+$/.test(value)) {
+  } else if (/^\d+$/.test(value)) {
     d = new Date(parseInt(value, 10) * 1000);
-  }
-  // Fall 3: ISO-String
-  else {
+  } else {
     d = new Date(value);
   }
 
@@ -325,7 +325,6 @@ function formatISODateTime(value) {
 
   return `${datum} ${zeit}`;
 }
-
 
 /* ---------------- Backend-Daten laden ---------------- */
 async function ladeWetterdaten() {
@@ -356,10 +355,23 @@ async function ladeWetterdaten() {
     motor2Current.innerText =
       letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
 
+    // UI-Zustand nur einmal initial übernehmen
     if (!uiInitialisiert) {
-      checkbox.checked = !!letzterWert.manuell;
-      motor1_strg.style.display = checkbox.checked ? "block" : "none";
-      motor2_strg.style.display = checkbox.checked ? "block" : "none";
+      const manuell = !!letzterWert.manuell;
+
+      checkbox.checked = manuell;
+
+      motor1_strg.style.display = manuell ? "block" : "none";
+      motor2_strg.style.display = manuell ? "block" : "none";
+      snowBox.style.display     = manuell ? "flex"  : "none";
+
+      // falls snowmode im /api/data mal enthalten ist:
+      if (typeof letzterWert.snowmode === "boolean") {
+        snowCheckbox.checked = letzterWert.snowmode;
+      } else {
+        snowCheckbox.checked = false;
+      }
+
       uiInitialisiert = true;
     }
   }
@@ -375,7 +387,23 @@ checkbox.addEventListener("change", async () => {
 
   motor1_strg.style.display = manuell ? "block" : "none";
   motor2_strg.style.display = manuell ? "block" : "none";
+  snowBox.style.display     = manuell ? "flex"  : "none";
 
+  // Wenn manuell AUS -> snowmode AUS (und ans Backend schicken)
+  if (!manuell) {
+    snowCheckbox.checked = false;
+    try {
+      await fetch(`${API_BASE}/api/manuell`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snowmode: false })
+      });
+    } catch {
+      console.log("Backend nicht erreichbar (snowmode reset)");
+    }
+  }
+
+  // manuell ans Backend
   try {
     await fetch(`${API_BASE}/api/manuell`, {
       method: "POST",
@@ -388,8 +416,14 @@ checkbox.addEventListener("change", async () => {
   }
 });
 
-  /* ---------------- Schneemodus Checkbox ---------------- */
+/* ---------------- Schneemodus Checkbox ---------------- */
 snowCheckbox.addEventListener("change", async () => {
+  // Schneemodus nur erlaubt wenn manuell aktiv
+  if (!checkbox.checked) {
+    snowCheckbox.checked = false;
+    return;
+  }
+
   const snowmode = snowCheckbox.checked;
 
   try {
