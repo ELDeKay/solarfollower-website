@@ -70,6 +70,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       margin: 0;
     }
+    
 
     .row {
       display: grid;
@@ -203,6 +204,30 @@
     </div>
 
   </div>
+  <!-- ✅ Kalibrierung Button -->
+  <div style="
+    width:100%;
+    max-width:800px;
+    margin: 24px auto 0;
+    text-align:center;
+  ">
+      <button id="calibrationBtn"
+        type="button"
+        style="
+          padding:14px 22px;
+          font-size:16px;
+          font-weight:bold;
+          border:none;
+          border-radius:12px;
+          background:#007BFF;
+          color:white;
+          cursor:pointer;
+          min-width:220px;
+        ">
+        Kalibrierung Panel
+      </button>
+    </div>
+
 
   <script>
     const API_BASE = "https://solar-backend-ljck.onrender.com";
@@ -280,6 +305,30 @@
         console.log("Backend nicht erreichbar");
       }
     }
+    /* ---------------- Kalibrierung Panel ---------------- */
+    const calibrationBtn = document.getElementById("calibrationBtn");
+    
+    calibrationBtn.addEventListener("click", async () => {
+      const ok = confirm(
+        "Panel-Kalibrierung starten?\n\n" +
+        "Das Panel wird neu ausgerichtet."
+      );
+      if (!ok) return;
+    
+      try {
+        await fetch(`${API_BASE}/api/manuell`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ calibration: true })
+        });
+    
+        alert("Kalibrierung wurde an die Steuerung gesendet.");
+      } catch (e) {
+        alert("Kalibrierung konnte nicht gesendet werden.");
+        console.log(e);
+      }
+    });
+
 
     ladeWetterdaten();
     setInterval(ladeWetterdaten, 15000);
