@@ -206,7 +206,8 @@
 
   <div class="topbar">
     <h1>Steuerung</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+  <a class="back-btn" id="backBtn" href="index.html">Zurück zum Hauptmenü</a>
+
   </div>
 
   <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
@@ -484,22 +485,37 @@ function sendOnLeave(payload) {
 
     if (navigator.sendBeacon) {
       navigator.sendBeacon(url, blob);
-      return;
+    } else {
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(() => {});
     }
-
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true
-    }).catch(() => {});
   } catch {}
 }
 
-window.addEventListener("pagehide", () => {
-  if (manuellCb.checked || snowCb.checked) {
+/* ✅ 1) Back-Button: zuverlässig vor Navigation senden */
+if (backBtn) {
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
     sendOnLeave({ aktiv: false, snowmode: false });
-  }
+
+    // UI sofort aus (optional, aber fühlt sich gut an)
+    if (manuellCb) manuellCb.checked = false;
+    if (snowCb) snowCb.checked = false;
+    setManualUI(false);
+
+    const href = backBtn.getAttribute("href") || "index.html";
+    setTimeout(() => { window.location.href = href; }, 120);
+  });
+}
+
+/* ✅ 2) Tab schließen / Reload / Navigation allgemein */
+window.addEventListener("pagehide", () => {
+  sendOnLeave({ aktiv: false, snowmode: false });
 });
 
 /* ---------------- Initial ---------------- */
