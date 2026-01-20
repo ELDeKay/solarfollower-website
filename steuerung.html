@@ -263,15 +263,21 @@
 
   </div>
 
-  <div class="manuell-box">
-    <span>manuelle Steuerung</span>
-    <input type="checkbox" id="manuell">
-  </div>
+<div class="manuell-box">
+  <span>manuelle Steuerung</span>
+  <input type="checkbox" id="manuell">
+</div>
 
+<div class="manuell-box">
+  <span>Schneemodus aktivieren</span>
+  <input type="checkbox" id="snowmode">
+</div>
+  
 <script>
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const checkbox = document.getElementById("manuell");
+const snowCheckbox = document.getElementById("snowmode");
 const motor1_strg = document.getElementById("motor1");
 const motor2_strg = document.getElementById("motor2");
 const motor1Current = document.getElementById("motor1-current");
@@ -379,6 +385,22 @@ checkbox.addEventListener("change", async () => {
   }
   catch {
     console.log("Backend nicht erreichbar");
+  }
+});
+
+  /* ---------------- Schneemodus Checkbox ---------------- */
+snowCheckbox.addEventListener("change", async () => {
+  const snowmode = snowCheckbox.checked;
+
+  try {
+    await fetch(`${API_BASE}/api/snowmode`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ snowmode })
+    });
+  }
+  catch {
+    console.log("Backend nicht erreichbar (snowmode)");
   }
 });
 
