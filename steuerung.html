@@ -23,7 +23,6 @@
       align-items: center;
     }
 
-    /* ✅ Topbar: Desktop Titel exakt mittig, Button rechts */
     .topbar {
       position: relative;
       display: flex;
@@ -53,7 +52,6 @@
       touch-action: manipulation;
     }
 
-    /* ✅ Statuszeile wie bei wetter.html */
     .stamp {
       width: 100%;
       max-width: 900px;
@@ -63,7 +61,6 @@
       text-align: right;
     }
 
-    /* ✅ Motor-Grid */
     .motors {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -212,12 +209,10 @@
     <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- ✅ Zeit / Status -->
   <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
   <div class="motors">
 
-    <!-- Motor 1 -->
     <div class="motor-box">
       <h2>Motor 1 – Drehen</h2>
 
@@ -239,7 +234,6 @@
       </div>
     </div>
 
-    <!-- Motor 2 -->
     <div class="motor-box">
       <h2>Motor 2 – Heben / Senken</h2>
 
@@ -263,7 +257,7 @@
 
   </div>
 
-  <!-- ✅ Schneemodus oben, aber wird nur sichtbar wenn "manuell" aktiv ist -->
+  <!-- ✅ Schneemodus oben, erscheint nur wenn manuell aktiv -->
   <div class="manuell-box" id="snowBox" style="display:none;">
     <span>Schneemodus aktivieren</span>
     <input type="checkbox" id="snowmode">
@@ -278,12 +272,12 @@
 <script>
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-const checkbox = document.getElementById("manuell");
-const snowCheckbox = document.getElementById("snowmode");
+const manuellCb = document.getElementById("manuell");
+const snowCb = document.getElementById("snowmode");
 const snowBox = document.getElementById("snowBox");
 
-const motor1_strg = document.getElementById("motor1");
-const motor2_strg = document.getElementById("motor2");
+const motor1Controls = document.getElementById("motor1");
+const motor2Controls = document.getElementById("motor2");
 
 const motor1Current = document.getElementById("motor1-current");
 const motor2Current = document.getElementById("motor2-current");
@@ -294,39 +288,52 @@ const MOTOR_LIMITS = {
   2: { min: 14, max: 75 }
 };
 
-let uiInitialisiert = false;
-
 function formatISODateTime(value) {
   if (!value) return null;
 
   let d;
-
-  if (typeof value === "number") {
-    d = new Date(value * 1000);
-  } else if (/^\d+$/.test(value)) {
-    d = new Date(parseInt(value, 10) * 1000);
-  } else {
-    d = new Date(value);
-  }
+  if (typeof value === "number") d = new Date(value * 1000);
+  else if (/^\d+$/.test(value)) d = new Date(parseInt(value, 10) * 1000);
+  else d = new Date(value);
 
   if (isNaN(d.getTime())) return null;
 
-  const datum = d.toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-
-  const zeit = d.toLocaleTimeString("de-DE", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
-
+  const datum = d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const zeit  = d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   return `${datum} ${zeit}`;
 }
 
-/* ---------------- Backend-Daten laden ---------------- */
+/* ---------------- UI helpers ---------------- */
+function setManualUI(enabled) {
+  motor1Controls.style.display = enabled ? "block" : "none";
+  motor2Controls.style.display = enabled ? "block" : "none";
+  snowBox.style.display = enabled ? "flex" : "none";
+}
+
+async function postManuell(payload) {
+  const res = await fetch(`${API_BASE}/api/manuell`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+}
+
+/* ---------------- ✅ RESET on LOAD (damit F5 immer false ist) ---------------- */
+async function resetModesOnLoad() {
+  manuellCb.checked = false;
+  snowCb.checked = false;
+  setManualUI(false);
+
+  try {
+    await postManuell({ aktiv: false, snowmode: false });
+  } catch (e) {
+    // egal – UI bleibt trotzdem aus
+  }
+}
+resetModesOnLoad();
+
+/* ---------------- Backend-Daten laden (nur Werte anzeigen) ---------------- */
 async function ladeWetterdaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
@@ -339,102 +346,54 @@ async function ladeWetterdaten() {
 
     const letzterWert = daten[daten.length - 1];
 
-    // ✅ Zeitstempel
     if (letzterWert.zeit) {
       const formatted = formatISODateTime(letzterWert.zeit);
-      stampEl.innerText = formatted
-        ? `Daten vom: ${formatted}`
-        : "Keine gültige Zeitangabe empfangen";
+      stampEl.innerText = formatted ? `Daten vom: ${formatted}` : "Keine gültige Zeitangabe empfangen";
     } else {
       stampEl.innerText = "Keine gültige Zeitangabe empfangen";
     }
 
-    motor1Current.innerText =
-      letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
+    motor1Current.innerText = letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
+    motor2Current.innerText = letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
 
-    motor2Current.innerText =
-      letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
-
-    // UI-Zustand nur einmal initial übernehmen
-    if (!uiInitialisiert) {
-      const manuell = !!letzterWert.manuell;
-
-      checkbox.checked = manuell;
-
-      motor1_strg.style.display = manuell ? "block" : "none";
-      motor2_strg.style.display = manuell ? "block" : "none";
-      snowBox.style.display     = manuell ? "flex"  : "none";
-
-      // falls snowmode im /api/data mal enthalten ist:
-      if (typeof letzterWert.snowmode === "boolean") {
-        snowCheckbox.checked = letzterWert.snowmode;
-      } else {
-        snowCheckbox.checked = false;
-      }
-
-      uiInitialisiert = true;
-    }
-  }
-  catch {
+  } catch {
     stampEl.innerText = "Backend nicht erreichbar";
-    console.log("Backend nicht erreichbar");
   }
 }
 
 /* ---------------- Manuell Checkbox ---------------- */
-checkbox.addEventListener("change", async () => {
-  const manuell = checkbox.checked;
+manuellCb.addEventListener("change", async () => {
+  const manuell = manuellCb.checked;
+  setManualUI(manuell);
 
-  motor1_strg.style.display = manuell ? "block" : "none";
-  motor2_strg.style.display = manuell ? "block" : "none";
-  snowBox.style.display     = manuell ? "flex"  : "none";
-
-  // Wenn manuell AUS -> snowmode AUS (und ans Backend schicken)
+  // wenn manuell AUS -> snow AUS + senden
   if (!manuell) {
-    snowCheckbox.checked = false;
-    try {
-      await fetch(`${API_BASE}/api/manuell`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ snowmode: false })
-      });
-    } catch {
-      console.log("Backend nicht erreichbar (snowmode reset)");
-    }
+    snowCb.checked = false;
+    try { await postManuell({ snowmode: false }); } catch {}
   }
 
-  // manuell ans Backend
   try {
-    await fetch(`${API_BASE}/api/manuell`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ aktiv: manuell })
-    });
-  }
-  catch {
-    console.log("Backend nicht erreichbar");
+    await postManuell({ aktiv: manuell });
+  } catch {
+    // bei Fehler wieder zurückrollen
+    manuellCb.checked = !manuell;
+    setManualUI(manuellCb.checked);
   }
 });
 
 /* ---------------- Schneemodus Checkbox ---------------- */
-snowCheckbox.addEventListener("change", async () => {
-  // Schneemodus nur erlaubt wenn manuell aktiv
-  if (!checkbox.checked) {
-    snowCheckbox.checked = false;
+snowCb.addEventListener("change", async () => {
+  if (!manuellCb.checked) {
+    snowCb.checked = false;
     return;
   }
 
-  const snowmode = snowCheckbox.checked;
+  const snowmode = snowCb.checked;
 
   try {
-    await fetch(`${API_BASE}/api/manuell`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ snowmode })
-    });
-  }
-  catch {
-    console.log("Backend nicht erreichbar (snowmode)");
+    await postManuell({ snowmode });
+  } catch {
+    snowCb.checked = !snowmode; // rollback
   }
 });
 
@@ -442,17 +401,16 @@ snowCheckbox.addEventListener("change", async () => {
 async function sendMotorTargets() {
   const m1 = parseInt(document.getElementById("motor1-target").innerText);
   const m2 = parseInt(document.getElementById("motor2-target").innerText);
-
   if (isNaN(m1) || isNaN(m2)) return;
 
   try {
-    await fetch(`${API_BASE}/api/motor_targets`, {
+    const res = await fetch(`${API_BASE}/api/motor_targets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ motor1_target: m1, motor2_target: m2 })
     });
-  }
-  catch {
+    if (!res.ok) throw new Error("HTTP " + res.status);
+  } catch {
     console.log("Motor-Zielwerte konnten nicht gesendet werden");
   }
 }
@@ -472,13 +430,11 @@ function changeMotorValue(motor, delta) {
 
   const { min, max } = MOTOR_LIMITS[motor];
   value = Math.max(min, Math.min(max, value + delta));
-
   target.innerText = value + " °";
 }
 
 function startHold(motor, direction) {
   stopHold();
-
   holdMotor = motor;
   holdDirection = direction;
   holdStep = 1;
@@ -497,16 +453,13 @@ function stopHold() {
     holdTimer = null;
     sendMotorTargets();
   }
-
   holdMotor = null;
   holdDirection = 0;
   holdStep = 1;
 }
 
-/* ---------------- ✅ Pointer Events Binding ---------------- */
 function bindHoldButtons() {
   const buttons = document.querySelectorAll(".js-hold-btn");
-
   buttons.forEach((btn) => {
     btn.addEventListener("pointerdown", (e) => {
       e.preventDefault();
@@ -516,53 +469,39 @@ function bindHoldButtons() {
       startHold(motor, dir);
     });
 
-    btn.addEventListener("pointerup", (e) => {
-      e.preventDefault();
-      stopHold();
-    });
-
+    btn.addEventListener("pointerup", (e) => { e.preventDefault(); stopHold(); });
     btn.addEventListener("pointercancel", stopHold);
     btn.addEventListener("pointerleave", stopHold);
     btn.addEventListener("contextmenu", (e) => e.preventDefault());
   });
 }
-  function sendOnLeave(payload) {
-    try {
-      const url = `${API_BASE}/api/manuell`;
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
 
-      // 1) zuverlässig beim Verlassen
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(url, blob);
-        return;
-      }
+/* ---------------- Optional: false beim Verlassen senden ---------------- */
+function sendOnLeave(payload) {
+  try {
+    const url = `${API_BASE}/api/manuell`;
+    const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
 
-      // 2) Fallback
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(() => {});
-    } catch (e) {}
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, blob);
+      return;
+    }
+
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(() => {});
+  } catch {}
+}
+
+window.addEventListener("pagehide", () => {
+  if (manuellCb.checked || snowCb.checked) {
+    sendOnLeave({ aktiv: false, snowmode: false });
   }
+});
 
-  // Wenn Seite verlassen wird (auch Link-Klick, Reload, Tabwechsel)
-  window.addEventListener("pagehide", () => {
-    // nur senden, wenn überhaupt aktiviert war
-    if (checkbox.checked || snowCheckbox.checked) {
-      sendOnLeave({ aktiv: false, snowmode: false });
-    }
-  });
-
-  // Optional zusätzlich (manche Browser feuern eher visibilitychange)
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-      if (checkbox.checked || snowCheckbox.checked) {
-        sendOnLeave({ aktiv: false, snowmode: false });
-      }
-    }
-  });
 /* ---------------- Initial ---------------- */
 bindHoldButtons();
 ladeWetterdaten();
