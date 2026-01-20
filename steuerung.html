@@ -393,7 +393,7 @@ snowCheckbox.addEventListener("change", async () => {
   const snowmode = snowCheckbox.checked;
 
   try {
-    await fetch(`${API_BASE}/api/snowmode`, {
+    await fetch(`${API_BASE}/api/manuell`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ snowmode })
