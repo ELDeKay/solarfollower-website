@@ -334,6 +334,41 @@ async function resetModesOnLoad() {
 }
 resetModesOnLoad();
 
+  /* ---------------- ✅ AUTO-RESET bei Inaktivität ---------------- */
+const IDLE_TIMEOUT_MS = 2 * 60 * 1000; // 2 Minuten
+let idleTimer = null;
+
+async function autoResetBecauseIdle() {
+  // nur wenn überhaupt aktiv
+  if (!manuellCb.checked && !snowCb.checked) return;
+
+  // UI sofort aus
+  manuellCb.checked = false;
+  snowCb.checked = false;
+  setManualUI(false);
+
+  // Backend informieren (best effort)
+  try {
+    await postManuell({ aktiv: false, snowmode: false });
+  } catch (e) {
+    // ignorieren
+  }
+}
+
+function resetIdleTimer() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(autoResetBecauseIdle, IDLE_TIMEOUT_MS);
+}
+
+// Events, die "Aktivität" zählen (Desktop + Mobile)
+["pointerdown", "pointermove", "keydown", "scroll", "touchstart"].forEach((evt) => {
+  window.addEventListener(evt, resetIdleTimer, { passive: true });
+});
+
+// Timer starten
+resetIdleTimer();
+
+
 /* ---------------- Backend-Daten laden (nur Werte anzeigen) ---------------- */
 async function ladeWetterdaten() {
   try {
