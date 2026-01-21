@@ -90,5 +90,16 @@
       <a class="tile" href="einstellungen.html"><span>Einstellungen</span></a>
     </div>
   </div>
+  <script>
+    
+const API_BASE = "https://solar-backend-ljck.onrender.com";
+fetch(`${API_BASE}/api/manuell`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ aktiv: false, snowmode: false })
+}).catch(()=>{});
+    
+</script>
+
 </body>
 </html>
