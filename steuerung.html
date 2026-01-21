@@ -78,9 +78,7 @@
       text-align: center;
     }
 
-    .motor-box h2 {
-      margin: 0 0 20px 0;
-    }
+    .motor-box h2 { margin: 0 0 20px 0; }
 
     .value-box {
       border: 2px solid #000;
@@ -185,7 +183,6 @@
       }
 
       .motor-box { padding: 18px; }
-
       .controls { gap: 18px; }
 
       .btn {
@@ -206,14 +203,12 @@
 
   <div class="topbar">
     <h1>Steuerung</h1>
-  <a class="back-btn" id="backBtn" href="index.html">Zurück zum Hauptmenü</a>
-
+    <a class="back-btn" id="backBtn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
   <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
   <div class="motors">
-
     <div class="motor-box">
       <h2>Motor 1 – Drehen</h2>
 
@@ -255,7 +250,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- ✅ Schneemodus oben, erscheint nur wenn manuell aktiv -->
@@ -289,6 +283,13 @@ const MOTOR_LIMITS = {
   2: { min: 14, max: 75 }
 };
 
+/* ---------------- UI helpers ---------------- */
+function setManualUI(enabled) {
+  motor1Controls.style.display = enabled ? "block" : "none";
+  motor2Controls.style.display = enabled ? "block" : "none";
+  snowBox.style.display = enabled ? "flex" : "none";
+}
+
 function formatISODateTime(value) {
   if (!value) return null;
 
@@ -304,13 +305,6 @@ function formatISODateTime(value) {
   return `${datum} ${zeit}`;
 }
 
-/* ---------------- UI helpers ---------------- */
-function setManualUI(enabled) {
-  motor1Controls.style.display = enabled ? "block" : "none";
-  motor2Controls.style.display = enabled ? "block" : "none";
-  snowBox.style.display = enabled ? "flex" : "none";
-}
-
 async function postManuell(payload) {
   const res = await fetch(`${API_BASE}/api/manuell`, {
     method: "POST",
@@ -321,38 +315,30 @@ async function postManuell(payload) {
 }
 
 /* ---------------- ✅ RESET on LOAD (damit F5 immer false ist) ---------------- */
-async function resetModesOnLoad() {
+(async function resetModesOnLoad() {
   manuellCb.checked = false;
   snowCb.checked = false;
   setManualUI(false);
 
   try {
     await postManuell({ aktiv: false, snowmode: false });
-  } catch (e) {
-    // egal – UI bleibt trotzdem aus
-  }
-}
-resetModesOnLoad();
+  } catch {}
+})();
 
-  /* ---------------- ✅ AUTO-RESET bei Inaktivität ---------------- */
+/* ---------------- ✅ AUTO-RESET bei Inaktivität ---------------- */
 const IDLE_TIMEOUT_MS = 2 * 60 * 1000; // 2 Minuten
 let idleTimer = null;
 
 async function autoResetBecauseIdle() {
-  // nur wenn überhaupt aktiv
   if (!manuellCb.checked && !snowCb.checked) return;
 
-  // UI sofort aus
   manuellCb.checked = false;
   snowCb.checked = false;
   setManualUI(false);
 
-  // Backend informieren (best effort)
-  try {
-    await postManuell({ aktiv: false, snowmode: false });
-  } catch (e) {
-    // ignorieren
-  }
+  stopHeartbeat();
+
+  try { await postManuell({ aktiv: false, snowmode: false }); } catch {}
 }
 
 function resetIdleTimer() {
@@ -360,14 +346,36 @@ function resetIdleTimer() {
   idleTimer = setTimeout(autoResetBecauseIdle, IDLE_TIMEOUT_MS);
 }
 
-// Events, die "Aktivität" zählen (Desktop + Mobile)
-["pointerdown", "pointermove", "keydown", "scroll", "touchstart"].forEach((evt) => {
+["pointerdown","pointermove","keydown","scroll","touchstart"].forEach((evt) => {
   window.addEventListener(evt, resetIdleTimer, { passive: true });
 });
-
-// Timer starten
 resetIdleTimer();
 
+/* ---------------- ✅ Heartbeat (nur wenn manuell aktiv) ---------------- */
+let heartbeatTimer = null;
+
+async function sendHeartbeat() {
+  if (!manuellCb.checked) return;
+
+  try {
+    await fetch(`${API_BASE}/api/heartbeat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ page: "steuerung" })
+    });
+  } catch {}
+}
+
+function startHeartbeat() {
+  stopHeartbeat();
+  sendHeartbeat();
+  heartbeatTimer = setInterval(sendHeartbeat, 20000);
+}
+
+function stopHeartbeat() {
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  heartbeatTimer = null;
+}
 
 /* ---------------- Backend-Daten laden (nur Werte anzeigen) ---------------- */
 async function ladeWetterdaten() {
@@ -391,7 +399,6 @@ async function ladeWetterdaten() {
 
     motor1Current.innerText = letzterWert.motor1 !== undefined ? `${letzterWert.motor1} °` : "-- °";
     motor2Current.innerText = letzterWert.motor2 !== undefined ? `${letzterWert.motor2} °` : "-- °";
-
   } catch {
     stampEl.innerText = "Backend nicht erreichbar";
   }
@@ -402,18 +409,22 @@ manuellCb.addEventListener("change", async () => {
   const manuell = manuellCb.checked;
   setManualUI(manuell);
 
-  // wenn manuell AUS -> snow AUS + senden
-  if (!manuell) {
+  if (manuell) {
+    startHeartbeat();
+  } else {
+    // wenn manuell AUS -> snow AUS
     snowCb.checked = false;
+    stopHeartbeat();
     try { await postManuell({ snowmode: false }); } catch {}
   }
 
   try {
     await postManuell({ aktiv: manuell });
   } catch {
-    // bei Fehler wieder zurückrollen
+    // rollback
     manuellCb.checked = !manuell;
     setManualUI(manuellCb.checked);
+    if (manuellCb.checked) startHeartbeat(); else stopHeartbeat();
   }
 });
 
@@ -425,11 +436,10 @@ snowCb.addEventListener("change", async () => {
   }
 
   const snowmode = snowCb.checked;
-
   try {
     await postManuell({ snowmode });
   } catch {
-    snowCb.checked = !snowmode; // rollback
+    snowCb.checked = !snowmode;
   }
 });
 
@@ -512,7 +522,7 @@ function bindHoldButtons() {
   });
 }
 
-
+/* ---------------- Initial ---------------- */
 bindHoldButtons();
 ladeWetterdaten();
 setInterval(ladeWetterdaten, 5000);
