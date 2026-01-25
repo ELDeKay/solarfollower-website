@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>posteinstellungen</title>
+  <title>Einstellungen</title>
 
   <style>
     *,
@@ -23,7 +23,7 @@
       align-items: center;
     }
 
-    .kopfzeile {
+    .topbar {
       width: 100%;
       max-width: 800px;
       position: relative;
@@ -32,7 +32,7 @@
       margin-bottom: 30px;
     }
 
-    .ueberschrift {
+    .topbar h1 {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -40,7 +40,7 @@
       text-align: center;
     }
 
-    .zurueck-btn {
+    .back-btn {
       text-decoration: none;
       background: #007BFF;
       color: white;
@@ -52,7 +52,7 @@
       touch-action: manipulation;
     }
 
-    .hintergrund-box {
+    .box {
       width: 100%;
       max-width: 800px;
       background: white;
@@ -62,16 +62,22 @@
       margin: 0;
     }
 
-    .eingabefeld { margin-bottom: 20px; }
+    .box h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-    .eingabefeld label {
+    .field { margin-bottom: 20px; }
+
+    .field label {
       display: block;
       margin-bottom: 6px;
       font-weight: bold;
     }
 
-    .eingabefeld input[type="number"],
-    .eingabefeld input[type="text"] {
+    .field input[type="number"],
+    .field input[type="text"] {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -80,14 +86,14 @@
     }
 
     /* ✅ NEU: Button-Zeile (2 Buttons nebeneinander) */
-    .btn-reihe {
+    .btn-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
       margin-top: 10px;
     }
 
-    .btn {
+    .action-btn {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -100,7 +106,7 @@
       touch-action: manipulation;
     }
 
-    .btn:active {
+    .action-btn:active {
       transform: scale(0.99);
     }
 
@@ -118,31 +124,31 @@
         align-items: stretch;
       }
 
-      .kopfzeile {
+      .topbar {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         margin-bottom: 18px;
       }
 
-      .ueberschrift {
+      .topbar h1 {
         position: static;
         transform: none;
         text-align: center;
         order: 1;
       }
 
-      .zurueck-btn {
+      .back-btn {
         width: 100%;
         text-align: center;
         order: 2;
         margin-left: 0;
       }
 
-      .hintergrund-box { padding: 18px; }
+      .box { padding: 18px; }
 
       /* ✅ Mobile: Buttons untereinander */
-      .btn-reihe {
+      .btn-row {
         grid-template-columns: 1fr;
       }
     }
@@ -151,29 +157,29 @@
 
 <body>
 
-  <div class="kopfzeile">
-    <h1>posteinstellungen</h1>
-    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
+  <div class="topbar">
+    <h1>Einstellungen</h1>
+    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <div class=".hintergrund-box">
+  <div class="box">
     <h2>Standortdaten</h2>
 
-    <div class="eingabefeld">
+    <div class="field">
       <label for="latitude">Breitengrad (Latitude)</label>
       <input type="number" id="latitude" step="0.000001" placeholder="z. B. 48.137154" />
     </div>
 
-    <div class="eingabefeld">
+    <div class="field">
       <label for="longitude">Längengrad (Longitude)</label>
       <input type="number" id="longitude" step="0.000001" placeholder="z. B. 11.576124" />
     </div>
 
-    <div class="eingabefeld">
-      <label for="ipWLANschuko">IP-Adresse Leistungsmesser</label>
+    <div class="field">
+      <label for="powertracker">IP-Adresse Leistungsmesser</label>
       <input
         type="text"
-        id="ipWLANschuko"
+        id="powertracker"
         placeholder="z.B. 192.168.4.12"
         autocomplete="off"
         spellcheck="false"
@@ -181,20 +187,21 @@
     </div>
 
     <!-- ✅ HIER: zwei Buttons nebeneinander -->
-    <div class="btn-reihe">
-      <button id="sendGeoBtn" type="button" class="btn">Geo-Daten schicken</button>
-      <button id="sendIpBtn" type="button" class="btn">IP-Adresse schicken</button>
+    <div class="btn-row">
+      <button id="sendGeoBtn" type="button" class="action-btn">Geo-Daten schicken</button>
+      <button id="sendIpBtn" type="button" class="action-btn">IP-Adresse schicken</button>
     </div>
 
     <br>
 
-    <!-- "Klasse" Eingabefeld, da Btn über ganze "Box" Breite -->
-    <div class="eingabefeld">
-      <button id="factoryresetBtn" type="button" class="btn" style="width:100%;">
-        Werkseinstellungen wiederherstellen
+    <!-- Werkseinstellung Button (volle Breite) -->
+    <div class="field">
+      <button id="factoryBtn" type="button" class="action-btn" style="width:100%;">
+        Werkseinstellung
       </button>
 
       <div style="margin-top:10px; font-size:14px; color:#555; line-height:1.4; text-align:center;">
+        setzt den Geo-Daten, die IP-Adresse des Leistungsmessers und den WLAN Zugang zurück.
       </div>
     </div>
 
@@ -208,11 +215,11 @@ const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const latitudeInput = document.getElementById("latitude");
 const longitudeInput = document.getElementById("longitude");
-const ipWLANschukoInput = document.getElementById("ipWLANschuko");
+const powertrackerInput = document.getElementById("powertracker");
 
 const sendGeoBtn = document.getElementById("sendGeoBtn");
 const sendIpBtn = document.getElementById("sendIpBtn");
-const factoryresetBtn = document.getElementById("factoryresetBtn");
+const factoryBtn = document.getElementById("factoryBtn");
 const statusText = document.getElementById("statusText");
 
 function istGueltigeIPv4(ip) {
@@ -226,8 +233,8 @@ function istGueltigeIPv4(ip) {
   });
 }
 
-async function posteinstellungen(payload) {
-  const res = await fetch(`${API_BASE}/api/einstellungen`, {
+async function postCoordsCheck(payload) {
+  const res = await fetch(`${API_BASE}/api/coordscheck`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -244,14 +251,14 @@ sendGeoBtn.addEventListener("click", async () => {
   const longitude = parseFloat(longitudeInput.value);
 
   if (isNaN(latitude) || isNaN(longitude)) {
-    alert("Bitte geben Sie gültige Koordinaten ein");
+    alert("Bitte gültige Koordinaten eingeben");
     return;
   }
 
   try {
     statusText.innerText = "Übertragung läuft ...";
-    await posteinstellungen({ latitude, longitude });
-    statusText.innerText = "Daten werden an das System übertragen";
+    await postCoordsCheck({ latitude, longitude });
+    statusText.innerText = "Daten werden übertragen";
   } catch {
     statusText.innerText = "Übertragung fehlgeschlagen";
   }
@@ -261,17 +268,17 @@ sendGeoBtn.addEventListener("click", async () => {
    Button: IP senden
 ------------------------ */
 sendIpBtn.addEventListener("click", async () => {
-  const ipWLANschuko = (ipWLANschukoInput.value || "").trim();
+  const powertracker = (powertrackerInput.value || "").trim();
 
-  if (ipWLANschuko.length === 0 || !istGueltigeIPv4(ipWLANschuko)) {
-    alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.0.10)");
+  if (powertracker.length === 0 || !istGueltigeIPv4(powertracker)) {
+    alert("Bitte eine gültige IPv4-Adresse eingeben (z. B. 192.168.0.10)");
     return;
   }
 
   try {
     statusText.innerText = "Übertragung läuft ...";
-    await posteinstellungen({ ipWLANschuko });
-    statusText.innerText = "Daten werden an das System übertragen";
+    await postCoordsCheck({ powertracker });
+    statusText.innerText = "Daten werden übertragen";
   } catch {
     statusText.innerText = "Übertragung fehlgeschlagen";
   }
@@ -280,7 +287,7 @@ sendIpBtn.addEventListener("click", async () => {
 /* -----------------------
    Button: Werkseinstellung
 ------------------------ */
-factoryresetBtn.addEventListener("click", async () => {
+factoryBtn.addEventListener("click", async () => {
   const ok = confirm(
     "Werkseinstellung ausführen?\n\n" +
     "Dabei werden Geo-Daten, IP-Adresse des Leistungsmessers und WLAN-Zugang zurückgesetzt."
@@ -288,13 +295,13 @@ factoryresetBtn.addEventListener("click", async () => {
   if (!ok) return;
 
   try {
-    statusText.innerText = "Werkseinstellung werden wiederhergestellt ...";
-    await posteinstellungen({ factory_reset: true });
+    statusText.innerText = "Werkseinstellung läuft ...";
+    await postCoordsCheck({ factory_reset: true });
 
     // UI zurücksetzen
     latitudeInput.value = "";
     longitudeInput.value = "";
-    ipWLANschukoInput.value = "";
+    powertrackerInput.value = "";
 
     statusText.innerText = "Daten werden übertragen";
   } catch {
@@ -305,5 +312,3 @@ factoryresetBtn.addEventListener("click", async () => {
 
 </body>
 </html>
-
-
