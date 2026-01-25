@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" textfeld="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Anleitung</title>
 
   <style>
@@ -26,21 +26,21 @@
     }
 
     /* ✅ gleiche Breite wie deine anderen Seiten */
-    .kopfzeile,
-    .textfeld {
+    .topbar,
+    .content {
       width: 100%;
       max-width: 800px;
     }
 
     /* ✅ Desktop: Titel exakt mittig, Button rechts */
-    .kopfzeile {
+    .topbar {
       position: relative;
       display: flex;
       align-items: center;
       margin-bottom: 30px;
     }
 
-    .kopfzeile ueberschrift1 {
+    .topbar h1 {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -48,7 +48,7 @@
       text-align: center;
     }
 
-    .zurueck-btn {
+    .back-btn {
       text-decoration: none;
       background: #007BFF;
       color: white;
@@ -62,7 +62,7 @@
     }
 
     /* ✅ Inhalt-Karte (optional, aber sinnvoll für Anleitungstext) */
-    .textfeld {
+    .content {
       background: white;
       border-radius: 16px;
       padding: 20px;
@@ -70,16 +70,16 @@
       line-height: 1.55;
     }
 
-    .textfeld überschrift2 {
+    .content h2 {
       margin: 0 0 12px 0;
       font-size: 20px;
     }
 
-    .textfeld abstand Rand {
+    .content p {
       margin: 0 0 12px 0;
     }
 
-    .textfeld abstand links {
+    .content ul {
       margin: 0;
       padding-left: 18px;
     }
@@ -92,28 +92,28 @@
         align-items: stretch;
       }
 
-      .kopfzeile {
+      .topbar {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         margin-bottom: 18px;
       }
 
-      .kopfzeile ueberschrift1 {
+      .topbar h1 {
         position: static;
         transform: none;
         text-align: center;
         order: 1;
       }
 
-      .zurueck-btn {
+      .back-btn {
         width: 100%;
         text-align: center;
         order: 2;
         margin-left: 0;
       }
 
-      .textfeld {
+      .content {
         padding: 16px;
       }
     }
@@ -121,12 +121,12 @@
 </head>
 
 <body>
-  <div class="kopfzeile">
+  <div class="topbar">
     <h1>Anleitung</h1>
-    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <div class="textfeld">
+  <div class="content">
     <h2>So benutzt du das System</h2>
     <p>Hier kannst du deine Anleitung einfügen. Beispiel:</p>
     <ul>
