@@ -214,7 +214,7 @@
 
       <div class="gradAnzeige-box">
         aktueller Wert
-        <span id="motor1-drehen-aktueller-Werk">-- °</span>
+        <span id="motor1-drehen-aktueller-Wert">-- °</span>
       </div>
 
       <div class="manuelleMotorSteuerung" id="motor1">
@@ -235,7 +235,7 @@
 
       <div class="gradAnzeige-box">
         aktueller Wert
-        <span id="motor2-heb/senk-aktueller-Werk">-- °</span>
+        <span id="motor2-heb/senk-aktueller-Wert">-- °</span>
       </div>
 
       <div class="manuelleMotorSteuerung" id="motor2">
@@ -274,8 +274,8 @@ const schneeModusBox = document.getElementById("schneeModusBox");
 const motor1DrehSteuer = document.getElementById("motor1");
 const motor2Heb_SenkSteuer = document.getElementById("motor2");
 
-const motor1DrehAktuellerWert = document.getElementById("motor1-drehen-aktueller-Werk");
-const motor2Heb_SenkAktuellerWert = document.getElementById("motor2-heb/senk-aktueller-Werk");
+const motor1DrehAktuellerWert = document.getElementById("motor1-drehen-aktueller-Wert");
+const motor2Heb_SenkAktuellerWert = document.getElementById("motor2-heb/senk-aktueller-Wert");
 const stampEl = document.getElementById("dataStamp");
 
 const motorGrenzbereich = {
@@ -474,8 +474,8 @@ let holdStep = 1;
 function motorenWerteAendern(motor, delta) {
   const target = document.getElementById(`motor${motor}-Zielwert`);
   const current = motor === 1
-    ? document.getElementById("motor1-drehen-aktueller-Werk")
-    : document.getElementById("motor2-heb/senk-aktueller-Werk");
+    ? document.getElementById("motor1-drehen-aktueller-Wert")
+    : document.getElementById("motor2-heb/senk-aktueller-Wert");
 
   if (!target || !current) return;
 
