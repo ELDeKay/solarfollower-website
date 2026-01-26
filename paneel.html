@@ -20,22 +20,22 @@
       align-items: center;
     }
 
-    /* ✅ Topbar + Stamp + List gleiche Breite */
-    .topbar,
-    .stamp,
-    .list {
+    /* ✅ kopfzeile + zeitAbrufStatus + liste gleiche Breite */
+    .kopfzeile,
+    .zeitAbrufStatus,
+    .liste {
       width: 100%;
       max-width: 800px;
     }
 
-    .topbar {
+    .kopfzeile {
       position: relative;
       display: flex;
       align-items: center;
       margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
     }
 
-    .topbar h1 {
+    .kopfzeile h1 {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -43,7 +43,7 @@
       text-align: center;
     }
 
-    .back-btn {
+    .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
       color: white;
@@ -56,14 +56,14 @@
     }
 
     /* ✅ Statuszeile (Zeit) */
-    .stamp {
+    .zeitAbrufStatus {
       margin: 0 0 18px 0;
       font-size: 13px;
       color: #666;
       text-align: right;
     }
 
-    .list {
+    .liste {
       background: white;
       border-radius: 16px;
       padding: 20px;
@@ -72,7 +72,7 @@
     }
     
 
-    .row {
+    .reihe {
       display: grid;
       grid-template-columns: 120px 1fr 140px;
       align-items: center;
@@ -82,7 +82,7 @@
       min-height: 72px;
     }
 
-    .row:last-child { border-bottom: none; }
+    .reihe:last-child { border-bottom: none; }
 
     .icon {
       width: 100px;
@@ -100,13 +100,13 @@
       object-fit: contain;
     }
 
-    .name {
+    .messwerte {
       font-size: 18px;
       font-weight: bold;
       min-width: 0;
     }
 
-    .value {
+    .einheit {
       font-size: 20px;
       font-weight: bold;
       text-align: right;
@@ -120,87 +120,87 @@
         align-items: stretch;
       }
 
-      .topbar {
+      .kopfzeile {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         margin-bottom: 8px;
       }
 
-      .topbar h1 {
+      .kopfzeile h1 {
         position: static;
         transform: none;
         text-align: center;
         order: 1;
       }
 
-      .back-btn {
+      .zurueck-btn {
         width: 100%;
         text-align: center;
         order: 2;
         margin-left: 0;
       }
 
-      .stamp {
+      .zeitAbrufStatus {
         text-align: center;
         margin-bottom: 14px;
       }
 
-      .list { padding: 16px; }
+      .liste { padding: 16px; }
 
-      .row {
+      .reihe {
         grid-template-columns: 56px 1fr auto;
         padding: 12px 0;
         min-height: 64px;
       }
 
       .icon { width: 44px; height: 44px; }
-      .name { font-size: 16px; }
-      .value { font-size: 18px; }
+      .messwerte { font-size: 16px; }
+      .einheit { font-size: 18px; }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="topbar">
+  <div class="kopfzeile">
     <h1>Paneeldaten</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
   <!-- ✅ Statusanzeige Zeit -->
-  <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
+  <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
-  <div class="list">
+  <div class="liste">
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="tilt.png" alt="Neigung"></div>
-      <div class="name">Neigung</div>
-      <div class="value" id="tilt">-- °</div>
+      <div class="messwerte">Neigung</div>
+      <div class="einheit" id="tilt">-- °</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="turn.png" alt="Ausrichtung"></div>
-      <div class="name">Ausrichtung Modul</div>
-      <div class="value" id="orient">-- °</div>
+      <div class="messwerte">Ausrichtung Modul</div>
+      <div class="einheit" id="orient">-- °</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="volt.png" alt="Spannung"></div>
-      <div class="name">Spannung</div>
-      <div class="value" id="voltage">-- V</div>
+      <div class="messwerte">Spannung</div>
+      <div class="einheit" id="voltage">-- V</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="ampere.png" alt="Strom"></div>
-      <div class="name">Strom</div>
-      <div class="value" id="current">-- A</div>
+      <div class="messwerte">Strom</div>
+      <div class="einheit" id="current">-- A</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="watt.png" alt="Leistung"></div>
-      <div class="name">Leistung</div>
-      <div class="value" id="power">-- W</div>
+      <div class="messwerte">Leistung</div>
+      <div class="einheit" id="power">-- W</div>
     </div>
 
   </div>
@@ -211,7 +211,7 @@
     margin: 24px auto 0;
     text-align:center;
   ">
-      <button id="calibrationBtn"
+      <button id="kalibrierungBtn"
         type="button"
         style="
           padding:14px 22px;
@@ -268,7 +268,7 @@
   return `${datum} ${zeit}`;
 }
 
-    async function ladeWetterdaten() {
+    async function ladePaneelDaten() {
       try {
         const response = await fetch(`${API_BASE}/api/data`);
         const daten = await response.json();
@@ -306,9 +306,9 @@
       }
     }
     /* ---------------- Kalibrierung Panel ---------------- */
-    const calibrationBtn = document.getElementById("calibrationBtn");
+    const kalibrierungBtn = document.getElementById("kalibrierungBtn");
     
-    calibrationBtn.addEventListener("click", async () => {
+    kalibrierungBtn.addEventListener("click", async () => {
       const ok = confirm(
         "Panel-Kalibrierung starten?\n\n" +
         "Das Panel wird neu ausgerichtet."
@@ -330,8 +330,8 @@
     });
 
 
-    ladeWetterdaten();
-    setInterval(ladeWetterdaten, 15000);
+    ladePaneelDaten();
+    setInterval(ladePaneelDaten, 15000);
   </script>
 
 </body>
