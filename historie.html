@@ -24,24 +24,24 @@
     }
 
     /* Einheitliche Seitenbreite */
-    .topbar,
-    .stamp,
-    .list,
-    #chartButtons,
-    #wattChartContainer {
+    .kopfzeile,
+    .zeitabrufstatus,
+    .liste,
+    #auswahlGraphBtn,
+    #leistungsgraphbox {
       width: 100%;
       max-width: 800px;
     }
 
-    /* Topbar: Desktop Titel mittig, Button rechts */
-    .topbar {
+    /* kopfzeile: Desktop Titel mittig, Button rechts */
+    .kopfzeile {
       position: relative;
       display: flex;
       align-items: center;
       margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
     }
 
-    .topbar h1 {
+    .kopfzeile h1 {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -49,7 +49,7 @@
       text-align: center;
     }
 
-    .back-btn {
+    .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
       color: white;
@@ -62,14 +62,14 @@
     }
 
     /* ✅ Statuszeile (Zeit) */
-    .stamp {
+    .zeitabrufstatus {
       margin: 0 0 18px 0;
       font-size: 13px;
       color: #666;
       text-align: right;
     }
 
-    .list {
+    .liste {
       background: white;
       border-radius: 16px;
       padding: 20px;
@@ -77,7 +77,7 @@
       margin: 0 0 20px 0;
     }
 
-    .row {
+    .reihe {
       display: grid;
       grid-template-columns: 120px 1fr 160px;
       align-items: center;
@@ -87,7 +87,7 @@
       min-height: 72px;
     }
 
-    .row:last-child { border-bottom: none; }
+    .reihe:last-child { border-bottom: none; }
 
     .icon {
       width: 100px;
@@ -105,9 +105,9 @@
       object-fit: contain;
     }
 
-    .name { font-size: 18px; font-weight: bold; }
+    .messwerte { font-size: 18px; font-weight: bold; }
 
-    .value {
+    .einheit {
       font-size: 20px;
       font-weight: bold;
       text-align: right;
@@ -115,7 +115,7 @@
     }
 
     /* Buttons */
-    #chartButtons {
+    #auswahlGraphBtn {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
@@ -123,7 +123,7 @@
       margin: 0 0 20px 0;
     }
 
-    #chartButtons button {
+    #auswahlGraphBtn button {
       padding: 10px 16px;
       border-radius: 8px;
       border: none;
@@ -134,9 +134,9 @@
       touch-action: manipulation;
     }
 
-    #chartButtons button.active { background-color: #0056b3; }
+    #auswahlGraphBtn button.active { background-color: #0056b3; }
 
-    #wattChartContainer {
+    #leistungsgraphbox {
       background: white;
       border-radius: 16px;
       padding: 20px;
@@ -145,7 +145,7 @@
       height: 820px;
     }
 
-    #wattChart {
+    #leistungsgraph {
       display: block;
       width: 100% !important;
       height: 100% !important;
@@ -159,55 +159,55 @@
         align-items: stretch;
       }
 
-      .topbar {
+      .kopfzeile {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         margin-bottom: 8px;
       }
 
-      .topbar h1 {
+      .kopfzeile h1 {
         position: static;
         transform: none;
         text-align: center;
         order: 1;
       }
 
-      .back-btn {
+      .zurueck-btn {
         width: 100%;
         text-align: center;
         order: 2;
         margin-left: 0;
       }
 
-      .stamp {
+      .zeitabrufstatus {
         text-align: center;
         margin-bottom: 14px;
       }
 
-      .list { padding: 16px; }
+      .liste { padding: 16px; }
 
-      .row {
+      .reihe {
         grid-template-columns: 56px 1fr auto;
         padding: 12px 0;
         min-height: 64px;
       }
 
       .icon { width: 44px; height: 44px; }
-      .name { font-size: 16px; }
-      .value { font-size: 18px; }
+      .messwerte { font-size: 16px; }
+      .einheit { font-size: 18px; }
 
-      #chartButtons {
+      #auswahlGraphBtn {
         justify-content: space-between;
         gap: 8px;
       }
 
-      #chartButtons button {
+      #auswahlGraphBtn button {
         flex: 1 1 calc(50% - 8px);
         padding: 10px 10px;
       }
 
-      #wattChartContainer {
+      #leistungsgraphbox {
         padding: 16px;
         height: 560px;
       }
@@ -215,55 +215,55 @@
 
     /* Landscape */
     @media (max-width: 900px) and (orientation: landscape) {
-      #wattChartContainer { height: 340px; }
+      #leistungsgraphbox { height: 340px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="topbar">
+  <div class="kopfzeile">
     <h1>Analyse</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
   <!-- ✅ Statusanzeige Zeit -->
-  <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
+  <div class="zeitabrufstatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
-  <div class="list">
-    <div class="row">
+  <div class="liste">
+    <div class="reihe">
       <div class="icon"><img src="durchW.png" alt="Durchschnitt"></div>
-      <div class="name">Durchschnittl. Leistung</div>
-      <div class="value" id="avgLive">XX,XX Watt</div>
+      <div class="messwerte">Durchschnittl. Leistung</div>
+      <div class="einheit" id="durchW">XX,XX Watt</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="durch24h.png" alt="24h"></div>
-      <div class="name">Leistung 24h</div>
-      <div class="value" id="avg24h">XX,XX Watt</div>
+      <div class="messwerte">Leistung 24h</div>
+      <div class="einheit" id="durch24h">XX,XX Watt</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="durch7d.png" alt="7 Tage"></div>
-      <div class="name">Leistung 7d</div>
-      <div class="value" id="avg7d">XX,XX Watt</div>
+      <div class="messwerte">Leistung 7d</div>
+      <div class="einheit" id="durch7d">XX,XX Watt</div>
     </div>
 
-    <div class="row">
+    <div class="reihe">
       <div class="icon"><img src="durch30d.png" alt="30 Tage"></div>
-      <div class="name">Leistung 30d</div>
-      <div class="value" id="avg30d">XX,XX Watt</div>
+      <div class="messwerte">Leistung 30d</div>
+      <div class="einheit" id="durch30d">XX,XX Watt</div>
     </div>
   </div>
 
-  <div id="chartButtons">
+  <div id="auswahlGraphBtn">
     <button data-range="24h" class="active">24h</button>
     <button data-range="7d">7d</button>
     <button data-range="30d">30d</button>
     <button data-range="12m">12 Monate</button>
   </div>
 
-  <div id="wattChartContainer">
-    <canvas id="wattChart"></canvas>
+  <div id="leistungsgraphbox">
+    <canvas id="leistungsgraph"></canvas>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -272,7 +272,7 @@
     const API_BASE = "https://solarfollower-databank.onrender.com";
     const API_STATUS = "https://solar-backend-ljck.onrender.com"; // ✅ für Zeitstempel aus Steuerung
     const stampEl = document.getElementById("dataStamp");
-    let currentChart;
+    let graphen;
 
     function formatISODateTime(value) {
   if (!value) return null;
@@ -342,9 +342,9 @@
 
     async function ladeDurchschnittswerte() {
       const map = [
-        { endpoint: "/api/watt_24h", element: "avg24h" },
-        { endpoint: "/api/watt_7d",  element: "avg7d" },
-        { endpoint: "/api/watt_30d", element: "avg30d" }
+        { endpoint: "/api/watt_24h", element: "durch24h" },
+        { endpoint: "/api/watt_7d",  element: "durch7d" },
+        { endpoint: "/api/watt_30d", element: "durch30d" }
       ];
 
       for (const eintrag of map) {
@@ -366,7 +366,7 @@
       return zeit;
     }
 
-    async function ladeWattDaten(range) {
+    async function ladeLeistungsDaten(range) {
       let endpoint;
       switch(range) {
         case "24h": endpoint = "/api/watt_24h"; break;
@@ -379,24 +379,24 @@
       const daten = await response.json();
 
       const labels = daten.map(e => formatZeit(e.zeit, range));
-      const wattData = daten.map(e => e.watt);
+      const leistungsDaten = daten.map(e => e.watt);
 
       if (range === "24h" && daten.length > 0) {
         const letzterWert = daten[daten.length - 1].watt;
-        document.getElementById("avgLive").textContent =
+        document.getElementById("durchW").textContent =
           letzterWert.toFixed(2).replace(".", ",") + " Watt";
       }
 
-      const ctx = document.getElementById("wattChart").getContext("2d");
-      if (currentChart) currentChart.destroy();
+      const ctx = document.getElementById("leistungsgraph").getContext("2d");
+      if (graphen) graphen.destroy();
 
-      currentChart = new Chart(ctx, {
+      graphen = new Chart(ctx, {
         type: "line",
         data: {
           labels,
           datasets: [{
             label: "Leistung (Watt)",
-            data: wattData,
+            data: leistungsDaten,
             borderColor: "#007BFF",
             backgroundColor: "rgba(0,123,255,0.15)",
             fill: true,
@@ -428,12 +428,12 @@
       });
     }
 
-    document.querySelectorAll("#chartButtons button").forEach(btn => {
+    document.querySelectorAll("#auswahlGraphBtn button").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll("#chartButtons button")
+        document.querySelectorAll("#auswahlGraphBtn button")
           .forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        ladeWattDaten(btn.dataset.range);
+        ladeLeistungsDaten(btn.dataset.range);
       });
     });
 
@@ -441,7 +441,7 @@
     ladeZeitstempel();
     setInterval(ladeZeitstempel, 5000);
 
-    ladeWattDaten("24h");
+    ladeLeistungsDaten("24h");
     ladeDurchschnittswerte();
   </script>
 </body>
