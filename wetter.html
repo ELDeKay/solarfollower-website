@@ -174,25 +174,25 @@
   <div class="reihe">
     <div class="icon"><img src="windspeed.png" alt="Wind"></div>
     <div class="messwerte">Windstärke</div>
-    <div class="einheit" id="wind">--</div>
+    <div class="einheit"> <span id="wind">--</span><span class="unit">m/s</span>
   </div>
   
   <div class="reihe">
     <div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
     <div class="messwerte">Sonnenaufgang</div>
-    <div class="einheit" id="sunrise">--</div>
+    <div class="einheit"> <span id="wind">--</span><span class="unit">Uhr</span>
   </div>
   
   <div class="reihe">
     <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
     <div class="messwerte">Sonnenuntergang</div>
-    <div class="einheit" id="sunset">--</div>
+    <div class="einheit"> <span id="wind">--</span><span class="unit">Uhr</span>
   </div>
   
   <div class="reihe">
     <div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
     <div class="messwerte">Sonnenstunden</div>
-    <div class="einheit" id="sunhours">--</div>
+    <div class="einheit"> <span id="wind">--</span><span class="unit">h</span>
   </div>
 
 <script>
@@ -237,12 +237,6 @@ async function ladeWetterDaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
-    const einheiten = {
-      wind: " m/s",
-      sunrise: " Uhr",
-      sunset: " Uhr",
-      sunhours: " h"
-    };
 
     if (!daten.length) {
       document.getElementById("dataStamp").innerText =
@@ -262,17 +256,10 @@ async function ladeWetterDaten() {
 
 
 
-document.getElementById("wind").innerText =
-  (letzterWert.wind ?? "--") + einheiten.wind;
-
-document.getElementById("sunrise").innerText =
-  (letzterWert.sunrise ?? "--") + einheiten.sunrise;
-
-document.getElementById("sunset").innerText =
-  (letzterWert.sunset ?? "--") + einheiten.sunset;
-
-document.getElementById("sunhours").innerText =
-  (letzterWert.sunhours ?? "--") + einheiten.sunhours;
+document.getElementById("wind").innerText = letzterWert.wind ?? "--";
+document.getElementById("sunrise").innerText = letzterWert.sunrise ?? "--"; 
+document.getElementById("sunset").innerText = letzterWert.sunset ?? "--";
+document.getElementById("sunhours").innerText = letzterWert.sunhours ?? "--";
 
   } catch {
     document.getElementById("dataStamp").innerText =
