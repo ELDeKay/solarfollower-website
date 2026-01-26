@@ -237,6 +237,12 @@ async function ladeWetterDaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
+    const einheiten = {
+      wind: " m/s",
+      sunrise: " Uhr",
+      sunset: " Uhr",
+      sunhours: " h"
+    };
 
     if (!daten.length) {
       document.getElementById("dataStamp").innerText =
@@ -254,10 +260,19 @@ async function ladeWetterDaten() {
           : "Keine gültige Zeitangabe empfangen";
     }
 
-    document.getElementById("wind").innerText = letzterWert.wind ?? "--";
-    document.getElementById("sunrise").innerText = letzterWert.sunrise ?? "--";
-    document.getElementById("sunset").innerText = letzterWert.sunset ?? "--";
-    document.getElementById("sunhours").innerText = letzterWert.sunhours ?? "--";
+
+
+document.getElementById("wind").innerText =
+  (letzterWert.wind ?? "--") + einheiten.wind;
+
+document.getElementById("sunrise").innerText =
+  (letzterWert.sunrise ?? "--") + einheiten.sunrise;
+
+document.getElementById("sunset").innerText =
+  (letzterWert.sunset ?? "--") + einheiten.sunset;
+
+document.getElementById("sunhours").innerText =
+  (letzterWert.sunhours ?? "--") + einheiten.sunhours;
 
   } catch {
     document.getElementById("dataStamp").innerText =
