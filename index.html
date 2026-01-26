@@ -23,7 +23,7 @@
         padding: 20px;
       }
 
-    .grid 
+    .btnRaster 
       {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -31,7 +31,7 @@
         gap: 20px;
       }
 
-    .tile 
+    .btnRasterFeld 
       {
         position: relative;
         height: 160px;
@@ -49,7 +49,7 @@
         background: #555; /* Platzhalter – später durch Hintergrundbild ersetzen */
       }
 
-    .tile::after 
+    .btnRasterFeld::after 
       {
         content: "";
         position: absolute;
@@ -57,7 +57,7 @@
         background: rgba(0,0,0,0.35);
       }
 
-    .tile span 
+    .btnRasterFeld span 
       {
         position: relative;
         z-index: 1;
@@ -66,12 +66,12 @@
 
     @media (max-width: 480px) 
       {
-        .grid 
+        .btnRaster 
           {
             grid-template-columns: 1fr;
           }
 
-        .tile 
+        .btnRasterFeld 
           {
             height: 200px;
             font-size: 24px;
@@ -81,13 +81,13 @@
 </head>
 <body>
   <div class="container">
-    <div class="grid">
-      <a class="tile" href="wetter.html"><span>Aktuelle Wetterdaten</span></a>
-      <a class="tile" href="steuerung.html"><span>Steuerung Modul</span></a>
-      <a class="tile" href="historie.html"><span>Daten-Historie</span></a>
-      <a class="tile" href="paneel.html"><span>Aktuelle Paneeldaten</span></a>
-      <a class="tile" href="anleitung.html"><span>Anleitung</span></a>
-      <a class="tile" href="einstellungen.html"><span>Einstellungen</span></a>
+    <div class="btnRaster">
+      <a class="btnRasterFeld" href="wetter.html"><span>Aktuelle Wetterdaten</span></a>
+      <a class="btnRasterFeld" href="steuerung.html"><span>Steuerung Modul</span></a>
+      <a class="btnRasterFeld" href="historie.html"><span>Daten-Historie</span></a>
+      <a class="btnRasterFeld" href="paneel.html"><span>Aktuelle Paneeldaten</span></a>
+      <a class="btnRasterFeld" href="anleitung.html"><span>Anleitung</span></a>
+      <a class="btnRasterFeld" href="einstellungen.html"><span>Einstellungen</span></a>
     </div>
   </div>
   <script>
