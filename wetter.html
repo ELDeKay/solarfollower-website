@@ -21,7 +21,7 @@
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
-    .topbar {
+    .kopfzeile {
       position: relative;
       display: flex;
       align-items: center;
@@ -30,7 +30,7 @@
       max-width: 800px;
     }
 
-    .topbar h1 {
+    .kopfzeile h1 {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -38,7 +38,7 @@
       text-align: center;
     }
 
-    .back-btn {
+    .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
       color: white;
@@ -50,7 +50,7 @@
     }
 
     /* Statuszeile */
-    .stamp {
+    .zeitAbrufStatus {
       width: 100%;
       max-width: 800px;
       margin: 0 0 18px 0;
@@ -59,7 +59,7 @@
       text-align: right;
     }
 
-    .list {
+    .liste {
       width: 100%;
       max-width: 800px;
       background: white;
@@ -68,7 +68,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .row {
+    .reihe {
       display: grid;
       grid-template-columns: 120px 1fr auto;
       align-items: center;
@@ -78,7 +78,7 @@
       min-height: 72px;
     }
 
-    .row:last-child { border-bottom: none; }
+    .reihe:last-child { border-bottom: none; }
 
     .icon {
       width: 100px;
@@ -94,12 +94,12 @@
       object-fit: contain;
     }
 
-    .name {
+    .messwerte {
       font-size: 18px;
       font-weight: bold;
     }
 
-    .value {
+    .einheit {
       display: flex;
       justify-content: flex-end;
       align-items: baseline;
@@ -122,78 +122,77 @@
         padding-bottom: calc(14px + env(safe-area-inset-bottom));
       }
 
-      .topbar {
+      .kopfzeile {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         margin-bottom: 8px;
       }
 
-      .topbar h1 {
+      .kopfzeile h1 {
         position: static;
         transform: none;
         text-align: center;
       }
 
-      .back-btn {
+      .zurueck-btn {
         width: 100%;
         text-align: center;
         margin-left: 0;
       }
 
-      .stamp {
+      .zeitAbrufStatus {
         text-align: center;
         margin-bottom: 14px;
       }
 
-      .list { padding: 16px; }
+      .liste { padding: 16px; }
 
-      .row {
+      .reihe {
         grid-template-columns: 56px 1fr auto;
         padding: 12px 0;
       }
 
       .icon { width: 44px; height: 44px; }
-      .name { font-size: 16px; }
-      .value { font-size: 18px; }
+      .messwerte { font-size: 16px; }
+      .einheit { font-size: 18px; }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="topbar">
+  <div class="kopfzeile">
     <h1>Wetterdaten</h1>
-    <a class="back-btn" href="index.html">Zurück zum Hauptmenü</a>
+    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
   <!-- Statusanzeige -->
-  <div class="stamp" id="dataStamp">Keine Daten von Steuerung empfangen</div>
+  <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
-  <div class="list">
-    <div class="row">
-      <div class="icon"><img src="windspeed.png" alt="Wind"></div>
-      <div class="name">Windstärke</div>
-      <div class="value"><span id="wind">--</span><span class="unit">m/s</span></div>
-    </div>
-
-    <div class="row">
-      <div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
-      <div class="name">Sonnenaufgang</div>
-      <div class="value"><span id="sunrise">--</span><span class="unit">Uhr</span></div>
-    </div>
-
-    <div class="row">
-      <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
-      <div class="name">Sonnenuntergang</div>
-      <div class="value"><span id="sunset">--</span><span class="unit">Uhr</span></div>
-    </div>
-
-    <div class="row">
-      <div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
-      <div class="name">Sonnenstunden</div>
-      <div class="value"><span id="sunhours">--</span><span class="unit">h</span></div>
-    </div>
+  <div class="liste">
+  <div class="reihe">
+    <div class="icon"><img src="windspeed.png" alt="Wind"></div>
+    <div class="messwerte">Windstärke</div>
+    <div class="einheit" id="wind">--</div>
+  </div>
+  
+  <div class="reihe">
+    <div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
+    <div class="messwerte">Sonnenaufgang</div>
+    <div class="einheit" id="sunrise">--</div>
+  </div>
+  
+  <div class="reihe">
+    <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
+    <div class="messwerte">Sonnenuntergang</div>
+    <div class="einheit" id="sunset">--</div>
+  </div>
+  
+  <div class="reihe">
+    <div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
+    <div class="messwerte">Sonnenstunden</div>
+    <div class="einheit" id="sunhours">--</div>
   </div>
 
 <script>
@@ -234,7 +233,7 @@ function formatISODateTime(value) {
   return `${datum} ${zeit}`;
 }
 
-async function ladeWetterdaten() {
+async function ladeWetterDaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
@@ -266,8 +265,8 @@ async function ladeWetterdaten() {
   }
 }
 
-ladeWetterdaten();
-setInterval(ladeWetterdaten, 1000);
+ladeWetterDaten();
+setInterval(ladeWetterDaten, 1000);
 </script>
 
 </body>
