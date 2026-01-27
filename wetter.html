@@ -2,14 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Wetterdaten</title>
 
   <style>
+    /* =========================================================
+       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
+       ========================================================= */
     *,
     *::before,
     *::after { box-sizing: border-box; }
 
+    /* =========================================================
+       Grundlayout der Seite
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -21,6 +34,11 @@
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
+    /* =========================================================
+       Kopfzeile
+       - Desktop: Titel mittig, Zurück-Button rechts
+       - Platz für Status (margin nur 10px)
+       ========================================================= */
     .kopfzeile {
       position: relative;
       display: flex;
@@ -49,7 +67,10 @@
       touch-action: manipulation;
     }
 
-    /* Statuszeile */
+    /* =========================================================
+       Statuszeile (Zeitstempel)
+       - zeigt, wann zuletzt Daten empfangen wurden
+       ========================================================= */
     .zeitAbrufStatus {
       width: 100%;
       max-width: 800px;
@@ -59,6 +80,10 @@
       text-align: right;
     }
 
+    /* =========================================================
+       Auflistung Wettermesswerte
+       - enthält Wetterwerte aus dem letzten Eintrag von /api/data
+       ========================================================= */
     .liste {
       width: 100%;
       max-width: 800px;
@@ -68,6 +93,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
+    /* Eigenschaften einer Reihe in Auflistung */
     .reihe {
       display: grid;
       grid-template-columns: 120px 1fr auto;
@@ -80,6 +106,7 @@
 
     .reihe:last-child { border-bottom: none; }
 
+    /* Icon-Container (Bilder zur Visualisierung) */
     .icon {
       width: 100px;
       height: 100px;
@@ -99,6 +126,7 @@
       font-weight: bold;
     }
 
+     /* Eigenschaften Texte der Einheiten und Messwerte */
     .einheit {
       display: flex;
       justify-content: flex-end;
@@ -115,6 +143,10 @@
       color: #666;
     }
 
+    /* =========================================================
+       Mobile Anpassungen
+       - kompaktere Zeilen, kleinere Icons, andere Grid-Spalten
+       ========================================================= */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -162,46 +194,73 @@
 
 <body>
 
+  <!-- =========================================================
+       Titel + Navigation zurück ins Hauptmenü
+       ========================================================= -->
   <div class="kopfzeile">
     <h1>Wetterdaten</h1>
     <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- Statusanzeige -->
+  <!-- =========================================================
+       Zeitstempel: zeigt den Zeitpunkt der zuletzt vom Pico empfangenen Daten
+       ========================================================= -->
   <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
+  <!-- =========================================================
+       Werte-Liste: Wetterwerte aus /api/data (letzter Eintrag)
+       - "wind": Windstärke (m/s)
+       - "sonneauf": Uhrzeit Sonnenaufgang
+       - "sonneunter": Uhrzeit Sonnenuntergang
+       - "sonnenstunden": Tages-Sonnenstunden (h)
+       ========================================================= -->
   <div class="liste">
-  <div class="reihe">
-    <div class="icon"><img src="windspeed.png" alt="Wind"></div>
-    <div class="messwerte">Windstärke</div>
-    <div class="einheit"> <span id="wind">--</span><span class="einheitText">m/s</span>
+
+    <div class="reihe">
+      <div class="icon"><img src="windspeed.png" alt="Wind"></div>
+      <div class="messwerte">Windstärke</div>
+      <div class="einheit">
+        <span id="wind">--</span><span class="einheitText">m/s</span>
+      </div>
+    </div>
+
+    <div class="reihe">
+      <div class="icon"><img src="sonneauf.png" alt="Sonnenaufgang"></div>
+      <div class="messwerte">Sonnenaufgang</div>
+      <div class="einheit">
+        <span id="sonneauf">--</span><span class="einheitText">Uhr</span>
+      </div>
+    </div>
+
+    <div class="reihe">
+      <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
+      <div class="messwerte">Sonnenuntergang</div>
+      <div class="einheit">
+        <span id="sonneunter">--</span><span class="einheitText">Uhr</span>
+      </div>
+    </div>
+
+    <div class="reihe">
+      <div class="icon"><img src="sonnenstunden.png" alt="Sonnenstunden"></div>
+      <div class="messwerte">Sonnenstunden</div>
+      <div class="einheit">
+        <span id="sonnenstunden">--</span><span class="einheitText">h</span>
+      </div>
+    </div>
+
   </div>
-  </div>
-  
-  <div class="reihe">
-    <div class="icon"><img src="sonneauf.png" alt="Sonnenaufgang"></div>
-    <div class="messwerte">Sonnenaufgang</div>
-    <div class="einheit"> <span id="sonneauf">--</span><span class="einheitText">Uhr</span>
-  </div>
-  </div>
-  
-  <div class="reihe">
-    <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
-    <div class="messwerte">Sonnenuntergang</div>
-    <div class="einheit"> <span id="sunset">--</span><span class="einheitText">Uhr</span>
-  </div>
-  </div>
-    
-  <div class="reihe">
-    <div class="icon"><img src="sonnenstunden.png" alt="Sonnenstunden"></div>
-    <div class="messwerte">Sonnenstunden</div>
-    <div class="einheit"> <span id="sonnenstunden">--</span><span class="einheitText">h</span>
-  </div>
-  </div>
-    
+
 <script>
+/* =========================================================
+   "Key"Namen und Variablen Deklarationen
+   ========================================================= */
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
+/* =========================================================
+   Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
+   - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
+   - gibt null zurück, wenn nicht interpretierbar
+   ========================================================= */
 function formatISODateTime(value) {
   if (!value) return null;
 
@@ -237,40 +296,52 @@ function formatISODateTime(value) {
   return `${datum} ${zeit}`;
 }
 
+/* =========================================================
+   Funktion: Wetterdaten laden
+   - holt /api/data vom Backend
+   - nimmt den letzten Eintrag als aktuellsten Stand
+   - aktualisiert Zeitstempel + Wetterfelder (wind/sonneauf/sonneunter/sonnenstunden)
+   ========================================================= */
 async function ladeWetterDaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
     const daten = await response.json();
 
+    const stampEl = document.getElementById("dataStamp");
+
     if (!daten.length) {
-      document.getElementById("dataStamp").innerText =
-        "Keine Daten von Steuerung empfangen";
+      stampEl.innerText = "Keine Daten von Steuerung empfangen";
       return;
     }
 
     const letzterWert = daten[daten.length - 1];
 
+    // Zeitstempel aktualisieren (wenn vorhanden)
     if (letzterWert.zeit) {
       const formatted = formatISODateTime(letzterWert.zeit);
-      document.getElementById("dataStamp").innerText =
-        formatted
-          ? `Daten vom: ${formatted}`
-          : "Keine gültige Zeitangabe empfangen";
+      stampEl.innerText = formatted
+        ? `Daten vom: ${formatted}`
+        : "Keine gültige Zeitangabe empfangen";
+    } else {
+      stampEl.innerText = "Keine gültige Zeitangabe empfangen";
     }
 
-
-
-document.getElementById("wind").innerText = letzterWert.wind ?? "--";
-document.getElementById("sonneauf").innerText = letzterWert.sonneauf ?? "--"; 
-document.getElementById("sunset").innerText = letzterWert.sunset ?? "--";
-document.getElementById("sonnenstunden").innerText = letzterWert.sonnenstunden ?? "--";
+    // Wetterwerte anzeigen (fallback: "--" wenn Feld fehlt oder null/undefined ist)
+    document.getElementById("wind").innerText = letzterWert.wind ?? "--";
+    document.getElementById("sonneauf").innerText = letzterWert.sonneauf ?? "--";
+    document.getElementById("sonneunter").innerText = letzterWert.sonneunter ?? "--";
+    document.getElementById("sonnenstunden").innerText = letzterWert.sonnenstunden ?? "--";
 
   } catch {
-    document.getElementById("dataStamp").innerText =
-      "Backend nicht erreichbar";
+    document.getElementById("dataStamp").innerText = "Backend nicht erreichbar";
   }
 }
 
+/* =========================================================
+   Initialisierung
+   - Wetterdaten einmal sofort laden
+   - danach regelmäßig aktualisieren
+   ========================================================= */
 ladeWetterDaten();
 setInterval(ladeWetterDaten, 1000);
 </script>
