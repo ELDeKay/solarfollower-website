@@ -2,13 +2,26 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Paneeldaten</title>
 
   <style>
+    /* =========================================================
+       Globale Eigenschaften: Einheitliches Box-Modell für berechenbare Breiten/Höhen
+       ========================================================= */
     * , *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; }
 
+    /* =========================================================
+       Grundlayout der Website
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -20,7 +33,11 @@
       align-items: center;
     }
 
-    /* ✅ kopfzeile + zeitAbrufStatus + liste gleiche Breite */
+    /* =========================================================
+       Einheitliche Seitenbreite
+       - alle Hauptblöcke haben gleiche max. Breite damit auch 
+      auf mobilen Endgeräten alle Elemente eingesehen werden können
+       ========================================================= */
     .kopfzeile,
     .zeitAbrufStatus,
     .liste {
@@ -28,11 +45,17 @@
       max-width: 800px;
     }
 
+    /* =========================================================
+       Kopfzeile
+       - Titel mittig
+       - Zurück-Button rechts (Desktop)
+       - Platz für Status (margin nur 10px)
+       ========================================================= */
     .kopfzeile {
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
+      margin-bottom: 10px;
     }
 
     .kopfzeile h1 {
@@ -43,6 +66,7 @@
       text-align: center;
     }
 
+    /* Button zurück ins Hauptmenü */
     .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
@@ -55,7 +79,10 @@
       touch-action: manipulation;
     }
 
-    /* ✅ Statuszeile (Zeit) */
+    /* =========================================================
+       Statuszeile (Zeitstempel)
+       - zeigt, wann zuletzt Daten von der Steuerung angekommen sind
+       ========================================================= */
     .zeitAbrufStatus {
       margin: 0 0 18px 0;
       font-size: 13px;
@@ -63,6 +90,9 @@
       text-align: right;
     }
 
+    /* =========================================================
+       Aufzählung Paneelwerte
+       ========================================================= */
     .liste {
       background: white;
       border-radius: 16px;
@@ -70,8 +100,8 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       margin: 0;
     }
-    
 
+    /* Eigenschaften einer Reihe in Auflistung */
     .reihe {
       display: grid;
       grid-template-columns: 120px 1fr 140px;
@@ -84,6 +114,7 @@
 
     .reihe:last-child { border-bottom: none; }
 
+    /* Icon-Container (Bilder zur Visualisierung) */
     .icon {
       width: 100px;
       height: 100px;
@@ -94,12 +125,14 @@
       color: #555;
     }
 
+    /* Icon skalieren */
     .icon img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
 
+    /* Eigenschaften Texte der Einheiten und Messwerte */
     .messwerte {
       font-size: 18px;
       font-weight: bold;
@@ -113,6 +146,10 @@
       white-space: nowrap;
     }
 
+    /* =========================================================
+       Mobile Anpassungen
+       - kompaktere Zeilen, kleinere Icons, andere Grid-Spalten
+       ========================================================= */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -163,14 +200,25 @@
 
 <body>
 
+  <!-- =========================================================
+       Titel + Navigation zurück ins Hauptmenü
+       ========================================================= -->
   <div class="kopfzeile">
     <h1>Paneeldaten</h1>
     <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- ✅ Statusanzeige Zeit -->
+  <!-- =========================================================
+       Zeitstempel: zeigt den Zeitpunkt der zuletzt empfangenen Daten
+       ========================================================= -->
   <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
+  <!-- =========================================================
+       Werte-Liste: zeigt die letzten Messwerte aus /api/data (letzter Eintrag)
+       - "motor1"/"motor2": Ausrichtung/Neigung
+       - "spannung"/"ampere": elektrische Werte
+       - "power": Leistung (W)
+       ========================================================= -->
   <div class="liste">
 
     <div class="reihe">
@@ -204,70 +252,91 @@
     </div>
 
   </div>
-  <!-- ✅ Kalibrierung Button -->
+
+  <!-- =========================================================
+       Button: startet eine Paneel-Kalibrierung über das Backend
+       - sendet POST /api/calibra mit { kalibrierung: true }
+       ========================================================= -->
   <div style="
     width:100%;
     max-width:800px;
     margin: 24px auto 0;
     text-align:center;
   ">
-      <button id="kalibrierungBtn"
-        type="button"
-        style="
-          padding:14px 22px;
-          font-size:16px;
-          font-weight:bold;
-          border:none;
-          border-radius:12px;
-          background:#007BFF;
-          color:white;
-          cursor:pointer;
-          min-width:220px;
-        ">
-        Kalibrierung Paneel
-      </button>
-    </div>
-
+    <button id="kalibrierungBtn"
+      type="button"
+      style="
+        padding:14px 22px;
+        font-size:16px;
+        font-weight:bold;
+        border:none;
+        border-radius:12px;
+        background:#007BFF;
+        color:white;
+        cursor:pointer;
+        min-width:220px;
+      ">
+      Kalibrierung Paneel
+    </button>
+  </div>
 
   <script>
+    /* =========================================================
+     "Key"Namen und Variablen Deklarationen
+     ========================================================= */
+
+    // API_BASE: Steuerungs-Backend, liefert /api/data und nimmt /api/calibra an
     const API_BASE = "https://solar-backend-ljck.onrender.com";
+
+    // UI-Element für Zeitstempel-Anzeige
     const stampEl = document.getElementById("dataStamp");
 
+    /* =========================================================
+       Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
+       - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
+       - gibt null zurück, wenn nicht interpretierbar
+       ========================================================= */
     function formatISODateTime(value) {
-  if (!value) return null;
+      if (!value) return null;
 
-  let d;
+      let d;
 
-  // Fall 1: Unix Timestamp (Sekunden)
-  if (typeof value === "number") {
-    d = new Date(value * 1000);
-  }
-  // Fall 2: String-Zahl ("1768327581")
-  else if (/^\d+$/.test(value)) {
-    d = new Date(parseInt(value, 10) * 1000);
-  }
-  // Fall 3: ISO-String
-  else {
-    d = new Date(value);
-  }
+      // Fall 1: Unix Timestamp (Sekunden)
+      if (typeof value === "number") {
+        d = new Date(value * 1000);
+      }
+      // Fall 2: String-Zahl ("1768327581")
+      else if (/^\d+$/.test(value)) {
+        d = new Date(parseInt(value, 10) * 1000);
+      }
+      // Fall 3: ISO-String
+      else {
+        d = new Date(value);
+      }
 
-  if (isNaN(d.getTime())) return null;
+      if (isNaN(d.getTime())) return null;
 
-  const datum = d.toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
+      const datum = d.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
 
-  const zeit = d.toLocaleTimeString("de-DE", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
+      const zeit = d.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
 
-  return `${datum} ${zeit}`;
-}
+      return `${datum} ${zeit}`;
+    }
 
+    /* =========================================================
+       Function: Paneeldaten laden
+       - holt /api/data vom Backend
+       - nimmt den letzten Eintrag als "aktuellsten Stand"
+       - aktualisiert Zeitstempel + UI-Werte (motor/spannung/ampere/power)
+       ========================================================= */
     async function ladePaneelDaten() {
       try {
         const response = await fetch(`${API_BASE}/api/data`);
@@ -280,6 +349,7 @@
 
         const letzterWert = daten[daten.length - 1];
 
+        // Zeitstempel-Anzeige aktualisieren
         if (letzterWert.zeit) {
           const formatted = formatISODateTime(letzterWert.zeit);
           stampEl.innerText = formatted
@@ -289,6 +359,7 @@
           stampEl.innerText = "Keine gültige Zeitangabe empfangen";
         }
 
+        // Werte aktualisieren 
         document.getElementById("motor2").innerText =
           (letzterWert.motor2 ?? "--") + " °";
         document.getElementById("motor1").innerText =
@@ -305,31 +376,38 @@
         console.log("Backend nicht erreichbar");
       }
     }
-    /* ---------------- Kalibrierung Panel ---------------- */
+
+    /* =========================================================
+       Button: Paneel-Kalibrierung
+       - fragt per "confirm" alert nach (er erscheint ein PopUp)
+       - sendet POST an /api/calibra mit JSON { kalibrierung: true }
+       ========================================================= */
     const kalibrierungBtn = document.getElementById("kalibrierungBtn");
-    
+
     kalibrierungBtn.addEventListener("click", async () => {
       const ok = confirm(
         "Panel-Kalibrierung starten?\n\n" +
         "Das Panel wird neu ausgerichtet."
       );
       if (!ok) return;
-    
+
       try {
         await fetch(`${API_BASE}/api/calibra`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ kalibrierung: true })
         });
-    
-        
       } catch (e) {
         alert("Kalibrierung konnte nicht gesendet werden.");
         console.log(e);
       }
     });
 
-
+    /* =========================================================
+       Initialisierung
+       - Daten einmal sofort laden
+       - danach alle 15 Sekunden aktualisieren
+       ========================================================= */
     ladePaneelDaten();
     setInterval(ladePaneelDaten, 15000);
   </script>
