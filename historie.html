@@ -2,16 +2,30 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Analyse</title>
 
   <style>
+    /* =========================================================
+       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
+       ========================================================= */
     *,
     *::before,
     *::after { box-sizing: border-box; }
 
+    /* Seite soll mindestens volle Höhe haben */
     html, body { height: 100%; }
 
+    /* =========================================================
+       Grundlayout der Website
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -23,7 +37,11 @@
       align-items: center;
     }
 
-    /* Einheitliche Seitenbreite */
+    /* =========================================================
+       Einheitliche Seitenbreite
+       - alle Hauptblöcke haben gleiche max. Breite damit auch 
+      auf mobilen Endgeräten alle Elemente eingesehen werden können
+       ========================================================= */
     .kopfzeile,
     .zeitAbrufStatus,
     .liste,
@@ -33,12 +51,17 @@
       max-width: 800px;
     }
 
-    /* kopfzeile: Desktop Titel mittig, Button rechts */
+    /* =========================================================
+       Kopfzeile
+       - Titel mittig
+       - Zurück-Button rechts (Desktop)
+       - Platz für Status (margin nur 10px)
+       ========================================================= */
     .kopfzeile {
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 10px; /* kleiner, weil Statuszeile darunter */
+      margin-bottom: 10px;
     }
 
     .kopfzeile h1 {
@@ -49,6 +72,7 @@
       text-align: center;
     }
 
+    /* Button "Zurück zum Hauptmenü" */
     .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
@@ -61,7 +85,10 @@
       touch-action: manipulation;
     }
 
-    /* ✅ Statuszeile (Zeit) */
+    /* =========================================================
+       Statuszeile (Zeitstempel)
+       - zeigt, wann zuletzt Daten von der Steuerung angekommen sind
+       ========================================================= */
     .zeitAbrufStatus {
       margin: 0 0 18px 0;
       font-size: 13px;
@@ -69,6 +96,10 @@
       text-align: right;
     }
 
+    /* =========================================================
+       Auflistung Leistungsdurchschnitt
+       - enthält 4 Zeilen (Leistung aktuell, 24h, 7d, 30d)
+       ========================================================= */
     .liste {
       background: white;
       border-radius: 16px;
@@ -77,6 +108,7 @@
       margin: 0 0 20px 0;
     }
 
+    /* Eigenschaften einer Reihe in Auflistung */
     .reihe {
       display: grid;
       grid-template-columns: 120px 1fr 160px;
@@ -89,6 +121,7 @@
 
     .reihe:last-child { border-bottom: none; }
 
+    /* Icon-Container (Bilder zur Visualisierung) */
     .icon {
       width: 100px;
       height: 100px;
@@ -99,14 +132,17 @@
       color: #555;
     }
 
+    /* Icon Skalierung */
     .icon img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
-
+    
+    /* Eigenschaften Texte der Einheiten und Messwerte */
     .messwerte { font-size: 18px; font-weight: bold; }
 
+    
     .einheit {
       font-size: 20px;
       font-weight: bold;
@@ -114,7 +150,9 @@
       white-space: nowrap;
     }
 
-    /* Buttons */
+    /* =========================================================
+       Button-Leiste zur Auswahl des Graphen-Zeitraums
+       ========================================================= */
     #auswahlGraphBtn {
       display: flex;
       justify-content: center;
@@ -134,8 +172,12 @@
       touch-action: manipulation;
     }
 
+    /* Visuelle Hervorhebung des aktuell ausgewählten Buttons */
     #auswahlGraphBtn button.active { background-color: #0056b3; }
 
+    /* =========================================================
+       Graph-Box Eigenschaften
+       ========================================================= */
     #leistungsgraphbox {
       background: white;
       border-radius: 16px;
@@ -145,13 +187,17 @@
       height: 820px;
     }
 
+    /* Graph Eigenschaften */
     #leistungsgraph {
       display: block;
       width: 100% !important;
       height: 100% !important;
     }
 
-    /* Mobile */
+    /* =========================================================
+       Mobile Anpassungen
+       - kompaktere Zeilen, kleinere Icons, kleinere Graphhöhe
+       ========================================================= */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -213,7 +259,7 @@
       }
     }
 
-    /* Landscape */
+    /* Landscape: auf kleineren Geräten quer weniger Höhe für den Graphen */
     @media (max-width: 900px) and (orientation: landscape) {
       #leistungsgraphbox { height: 340px; }
     }
@@ -221,14 +267,23 @@
 </head>
 
 <body>
+  <!-- =========================================================
+       Titel + Navigation zurück ins Hauptmenü
+       ========================================================= -->
   <div class="kopfzeile">
     <h1>Analyse</h1>
     <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
-  <!-- ✅ Statusanzeige Zeit -->
+  <!-- =========================================================
+       Zeitstempel: zeigt den Zeitpunkt der zuletzt vom Pico empfangenen Daten 
+       ========================================================= -->
   <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
+  <!-- =========================================================
+       Kennzahlen-Liste:
+       - Durchschnuittliche Werte für den jeweiligen Zeitraum
+       ========================================================= -->
   <div class="liste">
     <div class="reihe">
       <div class="icon"><img src="durchW.png" alt="Durchschnitt"></div>
@@ -255,6 +310,11 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       Zeitraum-Auswahl für den Graphen
+       - data-range steuert, welche API-Route geladen wird
+       - active markiert den aktuell gewählten Button
+       ========================================================= -->
   <div id="auswahlGraphBtn">
     <button data-range="24h" class="active">24h</button>
     <button data-range="7d">7d</button>
@@ -262,53 +322,79 @@
     <button data-range="12m">12 Monate</button>
   </div>
 
+  <!-- =========================================================
+       Graph-Container: Chart.js zeichnet in das Canvas
+       ========================================================= -->
   <div id="leistungsgraphbox">
     <canvas id="leistungsgraph"></canvas>
   </div>
 
+  <!-- Chart.js wird über CDN geladen (muss vor der Chart-Nutzung verfügbar sein) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
+    /* =========================================================
+     "Key"Namen und Variablen Deklarationen
+     ========================================================= */
+
+    // API_BASE: Daten-Backend für Leistungswerte (24h/7d/30d/12m)
     const API_BASE = "https://solarfollower-databank.onrender.com";
-    const API_STATUS = "https://solar-backend-ljck.onrender.com"; // ✅ für Zeitstempel aus Steuerung
+
+    // API_STATUS: Steuerungs-Backend, aus dem der Zeitstempel (last.zeit) kommt
+    const API_STATUS = "https://solar-backend-ljck.onrender.com";
+
+    // UI-Element: Anzeige des Zeitstempels
     const stampEl = document.getElementById("dataStamp");
+
+    // graphen: Referenz auf die Chart.js Instanz (wird für destroy() benötigt)
     let graphen;
 
+    /* =========================================================
+       Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
+       - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
+       - gibt null zurück, wenn nicht interpretierbar
+       ========================================================= */
     function formatISODateTime(value) {
-  if (!value) return null;
+      if (!value) return null;
 
-  let d;
+      let d;
 
-  // Fall 1: Unix Timestamp (Sekunden)
-  if (typeof value === "number") {
-    d = new Date(value * 1000);
-  }
-  // Fall 2: String-Zahl ("1768327581")
-  else if (/^\d+$/.test(value)) {
-    d = new Date(parseInt(value, 10) * 1000);
-  }
-  // Fall 3: ISO-String
-  else {
-    d = new Date(value);
-  }
+      // Fall 1: Unix Timestamp (Sekunden)
+      if (typeof value === "number") {
+        d = new Date(value * 1000);
+      }
+      // Fall 2: String-Zahl ("1768327581")
+      else if (/^\d+$/.test(value)) {
+        d = new Date(parseInt(value, 10) * 1000);
+      }
+      // Fall 3: ISO-String (oder Date-kompatibel)
+      else {
+        d = new Date(value);
+      }
 
-  if (isNaN(d.getTime())) return null;
+      if (isNaN(d.getTime())) return null;
 
-  const datum = d.toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
+      const datum = d.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
 
-  const zeit = d.toLocaleTimeString("de-DE", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
+      const zeit = d.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
 
-  return `${datum} ${zeit}`;
-}
+      return `${datum} ${zeit}`;
+    }
 
+    /* =========================================================
+       Function: Zeitstempel laden
+       - holt /api/data vom Steuerungs-Backend
+       - nimmt den letzten Eintrag und liest last.zeit
+       - schreibt Ergebnis in die Statuszeile oben
+       ========================================================= */
     async function ladeZeitstempel() {
       try {
         const res = await fetch(`${API_STATUS}/api/data`);
@@ -334,38 +420,74 @@
       }
     }
 
+    /* =========================================================
+       Helper: Durchschnitt berechnen und als "0,00 Watt" formatieren
+       - erwartet Array mit Objekten { watt: Number, zeit: ... }
+       ========================================================= */
     function berechneDurchschnitt(daten) {
       if (!daten.length) return "0,00 Watt";
       const summe = daten.reduce((s, e) => s + e.watt, 0);
       return (summe / daten.length).toFixed(2).replace(".", ",") + " Watt";
     }
 
+    /* =========================================================
+       Function: Durchschnittswerte laden
+       - lädt Lesitung aktuell / 24h / 7d / 30d vom Daten-Backend
+       - schreibt je den Durchschnitt in die passenden UI-Felder
+       ========================================================= */
     async function ladeDurchschnittswerte() {
-      const map = [
-        { endpoint: "/api/watt_24h", element: "durch24h" },
-        { endpoint: "/api/watt_7d",  element: "durch7d" },
-        { endpoint: "/api/watt_30d", element: "durch30d" }
-      ];
-
-      for (const eintrag of map) {
-        const response = await fetch(`${API_BASE}${eintrag.endpoint}`);
-        const daten = await response.json();
-        document.getElementById(eintrag.element).textContent = berechneDurchschnitt(daten);
+    
+        // ✅ 24h-Daten nur einmal laden
+        const res24h = await fetch(`${API_BASE}/api/watt_24h`);
+        const daten24h = await res24h.json();
+      
+        // aktuelle Leistung (durchW)
+        if (daten24h.length > 0) {
+          const letzterWert = daten24h[daten24h.length - 1].watt;
+          document.getElementById("durchW").textContent =
+            letzterWert.toFixed(2).replace(".", ",") + " Watt";
+        }
+      
+        // ✅ Durchschnitt 24h direkt aus denselben Daten berechnen
+        document.getElementById("durch24h").textContent = berechneDurchschnitt(daten24h);
+      
+        // 7d
+        const res7d = await fetch(`${API_BASE}/api/watt_7d`);
+        const daten7d = await res7d.json();
+        document.getElementById("durch7d").textContent = berechneDurchschnitt(daten7d);
+      
+        // 30d
+        const res30d = await fetch(`${API_BASE}/api/watt_30d`);
+        const daten30d = await res30d.json();
+        document.getElementById("durch30d").textContent = berechneDurchschnitt(daten30d);
       }
-    }
-
-    function formatZeit(zeit, range) {
-      const d = new Date(zeit);
-      if (range === "24h") return d.getHours() + ":00";
-      if (range === "7d" || range === "30d") {
-        return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+  
+  
+      /* =========================================================
+         Helper: X-Achsen Labels je nach Zeitraum formatieren
+         - 24h: Stunden (z.B. "14:00")
+         - 7d/30d: Datum (z.B. "27.01")
+         - 12m: Monat/Jahr (z.B. "Jan. 2026")
+         ========================================================= */
+      function formatZeit(zeit, range) {
+        const d = new Date(zeit);
+        if (range === "24h") return d.getHours() + ":00";
+        if (range === "7d" || range === "30d") {
+          return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+        }
+        if (range === "12m") {
+          return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
+        }
+        return zeit;
       }
-      if (range === "12m") {
-        return d.toLocaleDateString("de-DE", { month: "short", year: "numeric" });
-      }
-      return zeit;
-    }
 
+    /* =========================================================
+       Function: Leistungsdaten laden und Graph zeichnen
+       - wählt je nach "range" den passenden Endpoint
+       - erstellt Labels + Datenreihe (Watt)
+       - aktualisiert zusätzlich bei "24h" den Wert in "durchW"
+       - zerstört alten Chart bevor ein neuer erstellt wird
+       ========================================================= */
     async function ladeLeistungsDaten(range) {
       let endpoint;
       switch(range) {
@@ -380,13 +502,9 @@
 
       const labels = daten.map(e => formatZeit(e.zeit, range));
       const leistungsDaten = daten.map(e => e.watt);
+    }
 
-      if (range === "24h" && daten.length > 0) {
-        const letzterWert = daten[daten.length - 1].watt;
-        document.getElementById("durchW").textContent =
-          letzterWert.toFixed(2).replace(".", ",") + " Watt";
-      }
-
+      // Chart.js Render: alte Instanz entfernen, neue zeichnen
       const ctx = document.getElementById("leistungsgraph").getContext("2d");
       if (graphen) graphen.destroy();
 
@@ -397,9 +515,13 @@
           datasets: [{
             label: "Leistung (Watt)",
             data: leistungsDaten,
+
+            // Farbauswahl
             borderColor: "#007BFF",
             backgroundColor: "rgba(0,123,255,0.15)",
             fill: true,
+
+            // glattere Linie und kleine Punkte
             tension: 0.25,
             pointRadius: 1,
             pointHoverRadius: 3
@@ -414,6 +536,7 @@
               mode: "nearest",
               intersect: false,
               callbacks: {
+                // Tooltip formatiert den Y-Wert auf 2 Dezimalstellen + Einheit
                 label: function(context) {
                   return context.parsed.y.toFixed(2) + " Watt";
                 }
@@ -421,28 +544,44 @@
             }
           },
           scales: {
+            // X-Achse: weniger Labels anzeigen, damit es nicht überfüllt (optimiert für mobile Endgeräte)
             x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
+
+            // Y-Achse: Einheit anzeigen
             y: { title: { display: true, text: "Watt" } }
           }
         }
       });
     }
 
+    /* =========================================================
+       UI-Events: Zeitraum-Buttons
+       - lädt die passenden Graphdaten
+       ========================================================= */
     document.querySelectorAll("#auswahlGraphBtn button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#auswahlGraphBtn button")
           .forEach(b => b.classList.remove("active"));
+
         btn.classList.add("active");
         ladeLeistungsDaten(btn.dataset.range);
       });
     });
 
-    // ✅ Initial + regelmäßiges Update
+    /* =========================================================
+       Initialisierung
+       - Zeitstempel sofort laden und alle 5s aktualisieren
+       - Graph initial mit 24h laden
+       - Kennzahlen (Durchschnitt 24h/7d/30d) laden
+       ========================================================= */
     ladeZeitstempel();
-    setInterval(ladeZeitstempel, 5000);
-
-    ladeLeistungsDaten("24h");
     ladeDurchschnittswerte();
+    ladeLeistungsDaten("24h");
+    
+    setInterval(() => {
+      ladeZeitstempel();
+      ladeDurchschnittswerte();
+    }, 5000);
   </script>
 </body>
 </html>
