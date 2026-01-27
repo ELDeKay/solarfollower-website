@@ -2,16 +2,29 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Steuerung</title>
 
   <style>
+    /* =========================================================
+       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
+       ========================================================= */
     *,
     *::before,
     *::after { box-sizing: border-box; }
 
     html, body { height: 100%; }
 
+    /* =========================================================
+       Grundlayout der Seite
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -23,6 +36,11 @@
       align-items: center;
     }
 
+    /* =========================================================
+       Kopfzeile
+       - Desktop: Titel mittig, Zurück-Button rechts
+       - Platz für Status (margin nur 10px)
+       ========================================================= */
     .kopfzeile {
       position: relative;
       display: flex;
@@ -52,6 +70,10 @@
       touch-action: manipulation;
     }
 
+    /* =========================================================
+       Statuszeile (Zeitstempel)
+       - zeigt, wann zuletzt Daten von der Steuerung angekommen sind
+       ========================================================= */
     .zeitAbrufStatus {
       width: 100%;
       max-width: 900px;
@@ -61,6 +83,11 @@
       text-align: right;
     }
 
+    /* =========================================================
+       Motoren-Grid
+       - Desktop: zwei Spalten (Motor 1 / Motor 2)
+       - Mobile: eine Spalte (via Media Query)
+       ========================================================= */
     .motoren {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -70,6 +97,7 @@
       margin: 0;
     }
 
+    /* Motoren-Box Eigneschaften*/
     .motor-box {
       background: white;
       border-radius: 16px;
@@ -80,6 +108,7 @@
 
     .motor-box h2 { margin: 0 0 20px 0; }
 
+    /* Anzeige-Box für aktuellen Wert / Zielwert */
     .gradAnzeige-box {
       border: 2px solid #000;
       padding: 15px;
@@ -94,14 +123,17 @@
       font-size: 24px;
     }
 
+    /* Manuelle Motorsteuerung ist standardmäßig versteckt (erst bei "manuell" sichtbar) */
     .manuelleMotorSteuerung { display: none; }
 
+    /* Plus/Minus Button-Zeile */
     .motorSteuerung {
       display: flex;
       justify-content: center;
       gap: 30px;
     }
 
+    /* Button-Design für + / − */
     .btn {
       width: 60px;
       height: 60px;
@@ -121,6 +153,10 @@
 
     .btn:active { transform: scale(0.95); }
 
+    /* =========================================================
+       Manuell-/Schneemodus Checkboxen
+       - Schneemodus wird nur angezeigt, wenn manuell aktiv ist
+       ========================================================= */
     .manuell-box {
       width: 100%;
       max-width: 900px;
@@ -144,6 +180,11 @@
       flex: 0 0 auto;
     }
 
+    /* =========================================================
+       Mobile Anpassungen
+       - 1 Spalte statt 2 für Motoren
+       - Buttons / Abstände etwas kompakter
+       ========================================================= */
     @media (max-width: 700px) {
       body {
         padding: 14px;
@@ -201,13 +242,24 @@
 
 <body>
 
+  <!-- =========================================================
+       Titel + Navigation zurück ins Hauptmenü
+       ========================================================= -->
   <div class="kopfzeile">
     <h1>Steuerung</h1>
     <a class="zurueck-btn" id="backBtn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
+  <!-- =========================================================
+       Statuszeile: zeigt Zeitstempel der zuletzt empfangenen Daten
+       ========================================================= -->
   <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
+  <!-- =========================================================
+       Motor-Box:
+       - oben: aktueller Wert (nur Anzeige)
+       - unten: Zielwert + +/− Buttons (nur sichtbar in manuellem Modus)
+       ========================================================= -->
   <div class="motoren">
     <div class="motor-box">
       <h2>Motor 1 – Drehen</h2>
@@ -252,19 +304,29 @@
     </div>
   </div>
 
-  <!-- ✅ Schneemodus oben, erscheint nur wenn manuell aktiv -->
+  <!-- =========================================================
+       Schneemodus nur sichtbar, wenn manuelle Steuerung aktiv ist
+       und kann nur dann Daten (bool) an das Backend schicken
+       ========================================================= -->
   <div class="manuell-box" id="schneeModusBox" style="display:none;">
     <span>Schneemodus aktivieren</span>
     <input type="checkbox" id="schneeModus">
   </div>
 
-  <!-- ✅ Manuell unten -->
+  <!-- =========================================================
+       Manuellmodus
+       - blendet die Zielwert- und Steuer-UI ein/aus
+       - aktiviert den Heartbeat, solange manuell aktiv ist
+       ========================================================= -->
   <div class="manuell-box">
     <span>manuelle Steuerung</span>
     <input type="checkbox" id="manuell">
   </div>
 
 <script>
+  /* =========================================================
+     "Key"Namen und Variablen Deklarationen
+     ========================================================= */
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
 const manuellCb = document.getElementById("manuell");
@@ -278,18 +340,30 @@ const motor1DrehAktuellerWert = document.getElementById("motor1-drehen-aktueller
 const motor2Heb_SenkAktuellerWert = document.getElementById("motor2-heb/senk-aktueller-Wert");
 const stampEl = document.getElementById("dataStamp");
 
+/* =========================================================
+   Grenzen für Zielwerte (damit keine unzulässigen Winkel gesendet werden)
+   - Motor 1: 0..300 Grad
+   - Motor 2: 14..75 Grad
+   ========================================================= */
 const motorGrenzbereich = {
   1: { min: 0,  max: 300 },
   2: { min: 14, max: 75 }
 };
 
-/* ---------------- UI helpers ---------------- */
+/* =========================================================
+   UI helper: Manuell-UI ein-/ausblenden
+   - zeigt Motor-Zielwert-Boxen und Schneemodus nur bei enabled=true
+   ========================================================= */
 function setManuellUI(enabled) {
   motor1DrehSteuer.style.display = enabled ? "block" : "none";
   motor2Heb_SenkSteuer.style.display = enabled ? "block" : "none";
   schneeModusBox.style.display = enabled ? "flex" : "none";
 }
 
+/* =========================================================
+   Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
+   - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
+   ========================================================= */
 function formatISODateTime(value) {
   if (!value) return null;
 
@@ -305,6 +379,11 @@ function formatISODateTime(value) {
   return `${datum} ${zeit}`;
 }
 
+/* =========================================================
+   Funktion: /api/manuell Status ans Backend senden
+   - payload enthält Checkbox-Zustände (manuell/schnee bool)
+   - wirft Fehler, wenn HTTP nicht ok ist
+   ========================================================= */
 async function postManuell(payload) {
   const res = await fetch(`${API_BASE}/api/manuell`, {
     method: "POST",
@@ -314,7 +393,12 @@ async function postManuell(payload) {
   if (!res.ok) throw new Error("HTTP " + res.status);
 }
 
-/* ---------------- ✅ RESET on LOAD (damit F5 immer false ist) ---------------- */
+/* =========================================================
+   Initialisierung: Modi beim Laden zurücksetzen
+   - setzt Checkboxen auf false
+   - versteckt Manuell-UI
+   - sendet Reset an Backend
+   ========================================================= */
 (async function resetModiBeimLaden() {
   manuellCb.checked = false;
   schneeModusCb.checked = false;
@@ -325,7 +409,12 @@ async function postManuell(payload) {
   } catch {}
 })();
 
-/* ---------------- ✅ AUTO-RESET bei Inaktivität ---------------- */
+/* =========================================================
+   Auto-Reset bei Inaktivität (Frontend)
+   - nach 2 Minuten ohne Nutzeraktionen wird manuell/schnee abgeschaltet
+   - stoppt Heartbeat
+   - sendet Reset ans Backend
+   ========================================================= */
 const IDLE_TIMEOUT_MS = 2 * 60 * 1000; // 2 Minuten
 let idleTimer = null;
 
@@ -351,7 +440,11 @@ function resetIdleTimer() {
 });
 resetIdleTimer();
 
-/* ---------------- ✅ Heartbeat (nur wenn manuell aktiv) ---------------- */
+/* =========================================================
+   Heartbeat: nur wenn manuell aktiv
+   - sendet alle 20s ein Lebenszeichen ans Backend
+   - Backend kann damit erkennen, ob die Steuerungsseite noch offen ist
+   ========================================================= */
 let heartbeatTimer = null;
 
 async function sendHeartbeat() {
@@ -377,7 +470,12 @@ function stopHeartbeat() {
   heartbeatTimer = null;
 }
 
-/* ---------------- Backend-Daten laden (nur Werte anzeigen) ---------------- */
+/* =========================================================
+   Function: Motor-Daten laden (nur Anzeige der aktuellen Werte)
+   - holt /api/data
+   - nimmt den letzten Eintrag als aktuellsten Stand
+   - aktualisiert Zeitstempel + aktuelle Motorwinkel
+   ========================================================= */
 async function ladeMotorDaten() {
   try {
     const response = await fetch(`${API_BASE}/api/data`);
@@ -404,7 +502,12 @@ async function ladeMotorDaten() {
   }
 }
 
-/* ---------------- Manuell Checkbox ---------------- */
+/* =========================================================
+   Checkbox: manuelle Steuerung
+   - blendet Zielwert-Steuerung ein/aus
+   - startet/stopt Heartbeat
+   - schaltet bei "aus" den Schneemodus automatisch ab
+   ========================================================= */
 manuellCb.addEventListener("change", async () => {
   const manuell = manuellCb.checked;
   setManuellUI(manuell);
@@ -412,7 +515,6 @@ manuellCb.addEventListener("change", async () => {
   if (manuell) {
     startHeartbeat();
   } else {
-    // wenn manuell AUS -> snow AUS
     schneeModusCb.checked = false;
     stopHeartbeat();
     try { await postManuell({ schneeModus: false }); } catch {}
@@ -421,14 +523,18 @@ manuellCb.addEventListener("change", async () => {
   try {
     await postManuell({ manuellModus: manuell });
   } catch {
-    // rollback
+    // rollback, wenn Backend-Request fehlschlägt
     manuellCb.checked = !manuell;
     setManuellUI(manuellCb.checked);
     if (manuellCb.checked) startHeartbeat(); else stopHeartbeat();
   }
 });
 
-/* ---------------- Schneemodus Checkbox ---------------- */
+/* =========================================================
+   Checkbox: Schneemodus
+   - kann nur aktiviert werden, wenn manuell aktiv ist
+   - sendet Zustand ans Backend
+   ========================================================= */
 schneeModusCb.addEventListener("change", async () => {
   if (!manuellCb.checked) {
     schneeModusCb.checked = false;
@@ -443,7 +549,11 @@ schneeModusCb.addEventListener("change", async () => {
   }
 });
 
-/* ---------------- Motor Target senden ---------------- */
+/* =========================================================
+   Funktion: Motor-Zielwerte ans Backend senden
+   - liest Zielwerte aus dem UI (motor1-Zielwert/motor2-Zielwert)
+   - sendet POST /api/motor_Zielwert mit nur den gesetzten Werten
+   ========================================================= */
 async function motorZielwertSenden() {
   const m1 = parseInt(document.getElementById("motor1-Zielwert").innerText, 10);
   const m2 = parseInt(document.getElementById("motor2-Zielwert").innerText, 10);
@@ -465,7 +575,13 @@ async function motorZielwertSenden() {
     console.log("Motor-Zielwerte konnten nicht gesendet werden");
   }
 }
-/* ---------------- Button-Hold-Logik ---------------- */
+
+/* =========================================================
+   Button-Hold-Logik (+ / − gedrückt halten)
+   - pointerdown: startet wiederholtes Ändern des Zielwerts
+   - pointerup/cancel/leave: stoppt und sendet Zielwert ans Backend
+   - holdStep erhöht sich, damit längeres Halten schneller wird
+   ========================================================= */
 let holdTimer = null;
 let holdMotor = null;
 let holdDirection = 0;
@@ -530,7 +646,12 @@ function bindHoldButtons() {
   });
 }
 
-/* ---------------- Initial ---------------- */
+/* =========================================================
+   Initialisierung
+   - Hold-Buttons aktivieren
+   - aktuelle Daten sofort laden
+   - danach alle 5 Sekunden aktualisieren
+   ========================================================= */
 bindHoldButtons();
 ladeMotorDaten();
 setInterval(ladeMotorDaten, 5000);
