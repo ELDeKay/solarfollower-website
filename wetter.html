@@ -179,9 +179,9 @@
   </div>
   
   <div class="reihe">
-    <div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
+    <div class="icon"><img src="sonneauf.png" alt="Sonnenaufgang"></div>
     <div class="messwerte">Sonnenaufgang</div>
-    <div class="einheit"> <span id="sunrise">--</span><span class="einheitText">Uhr</span>
+    <div class="einheit"> <span id="sonneauf">--</span><span class="einheitText">Uhr</span>
   </div>
   </div>
   
@@ -193,9 +193,9 @@
   </div>
     
   <div class="reihe">
-    <div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
+    <div class="icon"><img src="sonnenstunden.png" alt="Sonnenstunden"></div>
     <div class="messwerte">Sonnenstunden</div>
-    <div class="einheit"> <span id="sunhours">--</span><span class="einheitText">h</span>
+    <div class="einheit"> <span id="sonnenstunden">--</span><span class="einheitText">h</span>
   </div>
   </div>
     
@@ -261,9 +261,9 @@ async function ladeWetterDaten() {
 
 
 document.getElementById("wind").innerText = letzterWert.wind ?? "--";
-document.getElementById("sunrise").innerText = letzterWert.sunrise ?? "--"; 
+document.getElementById("sonneauf").innerText = letzterWert.sonneauf ?? "--"; 
 document.getElementById("sunset").innerText = letzterWert.sunset ?? "--";
-document.getElementById("sunhours").innerText = letzterWert.sunhours ?? "--";
+document.getElementById("sonnenstunden").innerText = letzterWert.sonnenstunden ?? "--";
 
   } catch {
     document.getElementById("dataStamp").innerText =
