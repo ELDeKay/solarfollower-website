@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- Viewport: Mobile-Optimierung + Safe-Area (z.B. iPhone Notch) -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Einstellungen</title>
 
   <style>
     /* =========================================================
-       GLOBAL: Einheitliches Box-Modell für alle Elemente
+       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
        ========================================================= */
     *, *::before, *::after { box-sizing: border-box; }
 
@@ -18,24 +22,20 @@
     html, body { height: 100%; }
 
     /* =========================================================
-       GRUNDLAYOUT DER SEITE
-       - zentrierter Inhalt
-       - hellgrauer Hintergrund
-       - mobiles Padding mit Safe-Area unten
+       Grundlayout der Website
        ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
       margin: 0;
       padding: 20px;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
     /* =========================================================
-       KOPFZEILE
+       Kopfzeile
        - Titel mittig
        - Zurück-Button rechts (Desktop)
        ========================================================= */
@@ -70,8 +70,7 @@
     }
 
     /* =========================================================
-       HAUPTBOX (CARD)
-       - enthält alle Eingaben und Buttons
+       Hauptbox Eigenschaften
        ========================================================= */
     .box {
       width: 100%;
@@ -90,8 +89,7 @@
     }
 
     /* =========================================================
-       EINGABEFELDER
-       - Label + Input im einheitlichen Stil
+       Eingabefelder
        ========================================================= */
     .eingabefeld { margin-bottom: 20px; }
 
@@ -111,7 +109,7 @@
     }
 
     /* =========================================================
-       BUTTON-LAYOUT
+       Button-Layout
        - Desktop: 2 Buttons nebeneinander
        - Mobile: untereinander
        ========================================================= */
@@ -139,7 +137,7 @@
     .btns:active { transform: scale(0.99); }
 
     /* =========================================================
-       STATUS-ANZEIGE
+       Status-Anzeige
        - zeigt aktuellen Zustand der Datenübertragung
        ========================================================= */
     .status {
@@ -150,7 +148,7 @@
     }
 
     /* =========================================================
-       MOBILE ANPASSUNGEN
+       Mobile Anpassungen
        ========================================================= */
     @media (max-width: 600px) {
       body {
@@ -193,7 +191,7 @@
 <body>
 
   <!-- =========================================================
-       HEADER: Titel + Navigation zurück zur Startseite
+       Titel + Navigation zurück zur Startseite
        ========================================================= -->
   <div class="kopfzeile">
     <h1>Einstellungen</h1>
@@ -201,7 +199,7 @@
   </div>
 
   <!-- =========================================================
-       HAUPTBEREICH: Eingabe und Übertragung von Einstellungen
+       Inhalt der Hauptbox: IP-Adresse, GEO-Daten, Werkseinstellung
        ========================================================= -->
   <div class="box">
     <h2>Standortdaten</h2>
@@ -253,7 +251,7 @@
 
 <script>
   /* =========================================================
-     KONFIGURATION & DOM-REFERENZEN
+     "Key"Namen und Variablen Deklarationen
      ========================================================= */
 
   // Backend-URL (Render API)
@@ -273,7 +271,7 @@
   const statusText = document.getElementById("statusText");
 
   /* =========================================================
-     VALIDIERUNG: IPv4-Adresse prüfen
+     Überprüfung: IPv4-Adresse gültig?
      ========================================================= */
   function istGueltigeIPv4(ip) {
     const parts = ip.split(".");
@@ -287,7 +285,7 @@
   }
 
   /* =========================================================
-     HELFERFUNKTION: Einstellungen an Backend senden
+     Funktion: Einstellungen an Backend senden
      ========================================================= */
   async function posteinstellungen(payload) {
     const res = await fetch(`${API_BASE}/api/einstellungen`, {
@@ -300,7 +298,7 @@
   }
 
   /* =========================================================
-     BUTTON: Geo-Daten senden (Latitude & Longitude)
+     Button: Geo-Daten senden (Latitude & Longitude)
      ========================================================= */
   sendeGeoDatenBtn.addEventListener("click", async () => {
     const latitude = parseFloat(latitudeInput.value);
@@ -322,7 +320,7 @@
   });
 
   /* =========================================================
-     BUTTON: IP-Adresse senden
+     Button: IP-Adresse senden
      ========================================================= */
   sendeIpBtn.addEventListener("click", async () => {
     const ipWLANschuko = (ipWLANschukoInput.value || "").trim();
@@ -343,7 +341,7 @@
   });
 
   /* =========================================================
-     BUTTON: Werkseinstellung (Factory Reset)
+     Button: Werkseinstellung (Factory Reset)
      ========================================================= */
   werkseinstellungBtn.addEventListener("click", async () => {
     const ok = confirm(
@@ -370,3 +368,4 @@
 
 </body>
 </html>
+
