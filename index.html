@@ -3,13 +3,21 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- Responsive Darstellung: Seite passt sich der Gerätebreite an -->
+  <!-- =========================================================
+        Eigenschaften der Website
+       - width=device-width: Layout passt sich der Gerätebreite an
+       - initial-scale=1.0: Start-Zoom = 100%
+       ========================================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Kachelmenü – Mobil optimiert</title>
 
   <style>
-    /* ===== Grundlayout der Seite (zentrierter Inhalt, neutraler Hintergrund) ===== */
+    /* =========================================================
+       Grundlayout der Website
+       - Seite füllt den Bildschirm (min-height: 100vh)
+       - Inhalt wird mittig zentriert (Flexbox)
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -20,14 +28,20 @@
       background: #f0f0f0;
     }
 
-    /* ===== Container begrenzt die maximale Breite der Seite ===== */
+    /* =========================================================
+       Container
+       - begrenzt die maximale Breite auf großen Bildschirmen
+       ========================================================= */
     .container {
       width: 100%;
       max-width: 900px;
       padding: 20px;
     }
 
-    /* ===== Kachelraster: 3 Spalten x 2 Reihen (Desktop/Tablet) ===== */
+    /* =========================================================
+       Kachelraster (Desktop/Tablet)
+       - 3 Spalten, 2 Reihen
+       ========================================================= */
     .btnRaster {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -35,25 +49,37 @@
       gap: 20px;
     }
 
-    /* ===== Design einer einzelnen Kachel (Button-Link) ===== */
+    /* =========================================================
+       Kachel-Design (Link zu weiteren Websites als "Button")
+       - mit zentrierten Text
+       - hat abgerundete Ecken und Schatten 
+       - Hintergrund mit Farbcode (#555)
+       ========================================================= */
     .btnRasterFeld {
       position: relative;
       height: 160px;
       border-radius: 16px;
       overflow: hidden;
+
       text-decoration: none;
+
       display: flex;
       justify-content: center;
       align-items: center;
+
       font-size: 20px;
       font-weight: bold;
       color: white;
       text-align: center;
+
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
       background: #555;
     }
 
-    /* ===== Dunkles Overlay für bessere Lesbarkeit des Textes ===== */
+    /* =========================================================
+       Overlay (dunkle Schicht über dem Hintergrund)
+       ========================================================= */
     .btnRasterFeld::after {
       content: "";
       position: absolute;
@@ -61,14 +87,20 @@
       background: rgba(0,0,0,0.35);
     }
 
-    /* ===== Text über dem Overlay ===== */
+    /* =========================================================
+       Text über Overlay
+       ========================================================= */
     .btnRasterFeld span {
       position: relative;
       z-index: 1;
       padding: 10px;
     }
 
-    /* ===== Mobile Layout: Kacheln untereinander ===== */
+    /* =========================================================
+       Mobile Layout (kleine Bildschirme aller Art)
+       - Kacheln untereinander (1 Spalte)
+       - Layoutanpassung
+       ========================================================= */
     @media (max-width: 480px) {
       .btnRaster {
         grid-template-columns: 1fr;
@@ -83,7 +115,10 @@
 </head>
 
 <body>
-  <!-- ===== Kachelmenü als Navigation zu den Unterseiten ===== -->
+  <!-- =========================================================
+       Hauptmenü
+       - Kachelraster mit Links zu den Unterseiten
+       ========================================================= -->
   <div class="container">
     <div class="btnRaster">
       <a class="btnRasterFeld" href="wetter.html"><span>Aktuelle Wetterdaten</span></a>
@@ -96,14 +131,19 @@
   </div>
 
   <script>
-    /* ===== Backend-Aufruf: setzt beim Laden der Startseite den manuellen Modus zurück ===== */
+    /* =========================================================
+       Backend-Informationen
+       - zentrale Basis-URL für alle API-Requests
+       ========================================================= */
     const API_BASE = "https://solar-backend-ljck.onrender.com";
 
+    /* =========================================================
+       - Beim Laden der Startseite wird ein POST gesendet um manuell/Schnee-Modus auszuschalten
+       ========================================================= */
     fetch(`${API_BASE}/api/manuell`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // Hinweis: Backend erwartet "schneeModus" statt "snowmode"
-      body: JSON.stringify({ aktiv: false, snowmode: false })
+      body: JSON.stringify({ manuellModus: false, schneeModus: false })
     }).catch(() => {});
   </script>
 
