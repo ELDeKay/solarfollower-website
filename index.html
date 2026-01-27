@@ -2,84 +2,88 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- Responsive Darstellung: Seite passt sich der Gerätebreite an -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Kachelmenü – Mobil optimiert</title>
+
   <style>
-    body 
-      {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f0f0f0;
+    /* ===== Grundlayout der Seite (zentrierter Inhalt, neutraler Hintergrund) ===== */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f0f0f0;
+    }
+
+    /* ===== Container begrenzt die maximale Breite der Seite ===== */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+    }
+
+    /* ===== Kachelraster: 3 Spalten x 2 Reihen (Desktop/Tablet) ===== */
+    .btnRaster {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    /* ===== Design einer einzelnen Kachel (Button-Link) ===== */
+    .btnRasterFeld {
+      position: relative;
+      height: 160px;
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: #555;
+    }
+
+    /* ===== Dunkles Overlay für bessere Lesbarkeit des Textes ===== */
+    .btnRasterFeld::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+    }
+
+    /* ===== Text über dem Overlay ===== */
+    .btnRasterFeld span {
+      position: relative;
+      z-index: 1;
+      padding: 10px;
+    }
+
+    /* ===== Mobile Layout: Kacheln untereinander ===== */
+    @media (max-width: 480px) {
+      .btnRaster {
+        grid-template-columns: 1fr;
       }
 
-    .container 
-      {
-        width: 100%;
-        max-width: 900px;
-        padding: 20px;
+      .btnRasterFeld {
+        height: 200px;
+        font-size: 24px;
       }
-
-    .btnRaster 
-      {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        gap: 20px;
-      }
-
-    .btnRasterFeld 
-      {
-        position: relative;
-        height: 160px;
-        border-radius: 16px;
-        overflow: hidden;
-        text-decoration: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 20px;
-        font-weight: bold;
-        color: white;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        background: #555; /* Platzhalter – später durch Hintergrundbild ersetzen */
-      }
-
-    .btnRasterFeld::after 
-      {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(0,0,0,0.35);
-      }
-
-    .btnRasterFeld span 
-      {
-        position: relative;
-        z-index: 1;
-        padding: 10px;
-      }
-
-    @media (max-width: 480px) 
-      {
-        .btnRaster 
-          {
-            grid-template-columns: 1fr;
-          }
-
-        .btnRasterFeld 
-          {
-            height: 200px;
-            font-size: 24px;
-          }
-      }
+    }
   </style>
 </head>
+
 <body>
+  <!-- ===== Kachelmenü als Navigation zu den Unterseiten ===== -->
   <div class="container">
     <div class="btnRaster">
       <a class="btnRasterFeld" href="wetter.html"><span>Aktuelle Wetterdaten</span></a>
@@ -90,16 +94,18 @@
       <a class="btnRasterFeld" href="einstellungen.html"><span>Einstellungen</span></a>
     </div>
   </div>
+
   <script>
-    
-const API_BASE = "https://solar-backend-ljck.onrender.com";
-fetch(`${API_BASE}/api/manuell`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ aktiv: false, snowmode: false })
-}).catch(()=>{});
-    
-</script>
+    /* ===== Backend-Aufruf: setzt beim Laden der Startseite den manuellen Modus zurück ===== */
+    const API_BASE = "https://solar-backend-ljck.onrender.com";
+
+    fetch(`${API_BASE}/api/manuell`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // Hinweis: Backend erwartet "schneeModus" statt "snowmode"
+      body: JSON.stringify({ aktiv: false, snowmode: false })
+    }).catch(() => {});
+  </script>
 
 </body>
 </html>
