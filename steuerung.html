@@ -321,7 +321,7 @@ async function postManuell(payload) {
   setManuellUI(false);
 
   try {
-    await postManuell({ aktiv: false, schneeModus: false });
+    await postManuell({ manuellModus: false, schneeModus: false });
   } catch {}
 })();
 
@@ -338,7 +338,7 @@ async function autoResetBecauseIdle() {
 
   stopHeartbeat();
 
-  try { await postManuell({ aktiv: false, schneeModus: false }); } catch {}
+  try { await postManuell({ manuellModus: false, schneeModus: false }); } catch {}
 }
 
 function resetIdleTimer() {
@@ -419,7 +419,7 @@ manuellCb.addEventListener("change", async () => {
   }
 
   try {
-    await postManuell({ aktiv: manuell });
+    await postManuell({ manuellModus: manuell });
   } catch {
     // rollback
     manuellCb.checked = !manuell;
