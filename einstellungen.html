@@ -2,16 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- Viewport: Mobile-Optimierung + Safe-Area (z.B. iPhone Notch) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Einstellungen</title>
 
   <style>
-    *,
-    *::before,
-    *::after { box-sizing: border-box; }
+    /* =========================================================
+       GLOBAL: Einheitliches Box-Modell für alle Elemente
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
 
+    /* Seite soll mindestens Bildschirmhöhe haben */
     html, body { height: 100%; }
 
+    /* =========================================================
+       GRUNDLAYOUT DER SEITE
+       - zentrierter Inhalt
+       - hellgrauer Hintergrund
+       - mobiles Padding mit Safe-Area unten
+       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -23,6 +34,11 @@
       align-items: center;
     }
 
+    /* =========================================================
+       KOPFZEILE
+       - Titel mittig
+       - Zurück-Button rechts (Desktop)
+       ========================================================= */
     .kopfzeile {
       width: 100%;
       max-width: 800px;
@@ -40,6 +56,7 @@
       text-align: center;
     }
 
+    /* Button "Zurück zum Hauptmenü" */
     .zurueck-btn {
       text-decoration: none;
       background: #007BFF;
@@ -52,6 +69,10 @@
       touch-action: manipulation;
     }
 
+    /* =========================================================
+       HAUPTBOX (CARD)
+       - enthält alle Eingaben und Buttons
+       ========================================================= */
     .box {
       width: 100%;
       max-width: 800px;
@@ -68,6 +89,10 @@
       text-align: center;
     }
 
+    /* =========================================================
+       EINGABEFELDER
+       - Label + Input im einheitlichen Stil
+       ========================================================= */
     .eingabefeld { margin-bottom: 20px; }
 
     .eingabefeld label {
@@ -85,7 +110,11 @@
       border: 1px solid #ccc;
     }
 
-    /* ✅ NEU: Button-Zeile (2 Buttons nebeneinander) */
+    /* =========================================================
+       BUTTON-LAYOUT
+       - Desktop: 2 Buttons nebeneinander
+       - Mobile: untereinander
+       ========================================================= */
     .btn-reihe {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -93,6 +122,7 @@
       margin-top: 10px;
     }
 
+    /* Gemeinsames Design aller Buttons */
     .btns {
       width: 100%;
       padding: 12px;
@@ -106,10 +136,12 @@
       touch-action: manipulation;
     }
 
-    .btns:active {
-      transform: scale(0.99);
-    }
+    .btns:active { transform: scale(0.99); }
 
+    /* =========================================================
+       STATUS-ANZEIGE
+       - zeigt aktuellen Zustand der Datenübertragung
+       ========================================================= */
     .status {
       margin-top: 20px;
       font-size: 14px;
@@ -117,6 +149,9 @@
       color: #555;
     }
 
+    /* =========================================================
+       MOBILE ANPASSUNGEN
+       ========================================================= */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -147,7 +182,7 @@
 
       .box { padding: 18px; }
 
-      /* ✅ Mobile: Buttons untereinander */
+      /* Mobile: Buttons untereinander */
       .btn-reihe {
         grid-template-columns: 1fr;
       }
@@ -157,24 +192,33 @@
 
 <body>
 
+  <!-- =========================================================
+       HEADER: Titel + Navigation zurück zur Startseite
+       ========================================================= -->
   <div class="kopfzeile">
     <h1>Einstellungen</h1>
     <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
   </div>
 
+  <!-- =========================================================
+       HAUPTBEREICH: Eingabe und Übertragung von Einstellungen
+       ========================================================= -->
   <div class="box">
     <h2>Standortdaten</h2>
 
+    <!-- Koordinaten: Latitude -->
     <div class="eingabefeld">
       <label for="latitude">Breitengrad (Latitude)</label>
       <input type="number" id="latitude" step="0.000001" placeholder="z. B. 48.137154" />
     </div>
 
+    <!-- Koordinaten: Longitude -->
     <div class="eingabefeld">
       <label for="longitude">Längengrad (Longitude)</label>
       <input type="number" id="longitude" step="0.000001" placeholder="z. B. 11.576124" />
     </div>
 
+    <!-- IP-Adresse des Leistungsmessers -->
     <div class="eingabefeld">
       <label for="ipWLANschuko">IP-Adresse Leistungsmesser</label>
       <input
@@ -186,7 +230,7 @@
       />
     </div>
 
-    <!-- ✅ HIER: zwei Buttons nebeneinander -->
+    <!-- Aktionen: Geo-Daten senden / IP senden -->
     <div class="btn-reihe">
       <button id="sendeGeoDatenBtn" type="button" class="btns">Geo-Daten schicken</button>
       <button id="sendeIpBtn" type="button" class="btns">IP-Adresse schicken</button>
@@ -194,121 +238,135 @@
 
     <br>
 
-    <!-- class ist Eingabefeld, da Button über ganze Feld -->
+    <!-- Werkseinstellung (Factory Reset) -->
     <div class="eingabefeld">
       <button id="werkseinstellungBtn" type="button" class="btns" style="width:100%;">
         Werkseinstellung wiederherstellen
       </button>
-
-      <div style="margin-top:10px; font-size:14px; color:#555; line-height:1.4; text-align:center;">
-      </div>
     </div>
 
+    <!-- Statusanzeige für den Benutzer -->
     <div class="status" id="statusText">
       Daten werden nicht übertragen
     </div>
   </div>
 
 <script>
-const API_BASE = "https://solar-backend-ljck.onrender.com";
+  /* =========================================================
+     KONFIGURATION & DOM-REFERENZEN
+     ========================================================= */
 
-const latitudeInput = document.getElementById("latitude");
-const longitudeInput = document.getElementById("longitude");
-const ipWLANschukoInput = document.getElementById("ipWLANschuko");
+  // Backend-URL (Render API)
+  const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-const sendeGeoDatenBtn = document.getElementById("sendeGeoDatenBtn");
-const sendeIpBtn = document.getElementById("sendeIpBtn");
-const werkseinstellungBtn = document.getElementById("werkseinstellungBtn");
-const statusText = document.getElementById("statusText");
+  // Input-Felder
+  const latitudeInput = document.getElementById("latitude");
+  const longitudeInput = document.getElementById("longitude");
+  const ipWLANschukoInput = document.getElementById("ipWLANschuko");
 
-function istGueltigeIPv4(ip) {
-  const parts = ip.split(".");
-  if (parts.length !== 4) return false;
-  return parts.every(p => {
-    if (p.trim() === "") return false;
-    if (!/^\d+$/.test(p)) return false;
-    const n = Number(p);
-    return n >= 0 && n <= 255;
+  // Buttons
+  const sendeGeoDatenBtn = document.getElementById("sendeGeoDatenBtn");
+  const sendeIpBtn = document.getElementById("sendeIpBtn");
+  const werkseinstellungBtn = document.getElementById("werkseinstellungBtn");
+
+  // Statusanzeige
+  const statusText = document.getElementById("statusText");
+
+  /* =========================================================
+     VALIDIERUNG: IPv4-Adresse prüfen
+     ========================================================= */
+  function istGueltigeIPv4(ip) {
+    const parts = ip.split(".");
+    if (parts.length !== 4) return false;
+    return parts.every(p => {
+      if (p.trim() === "") return false;
+      if (!/^\d+$/.test(p)) return false;
+      const n = Number(p);
+      return n >= 0 && n <= 255;
+    });
+  }
+
+  /* =========================================================
+     HELFERFUNKTION: Einstellungen an Backend senden
+     ========================================================= */
+  async function posteinstellungen(payload) {
+    const res = await fetch(`${API_BASE}/api/einstellungen`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json().catch(() => ({}));
+  }
+
+  /* =========================================================
+     BUTTON: Geo-Daten senden (Latitude & Longitude)
+     ========================================================= */
+  sendeGeoDatenBtn.addEventListener("click", async () => {
+    const latitude = parseFloat(latitudeInput.value);
+    const longitude = parseFloat(longitudeInput.value);
+
+    // Eingabe prüfen
+    if (isNaN(latitude) || isNaN(longitude)) {
+      alert("Bitte geben Sie gültige Koordinaten ein");
+      return;
+    }
+
+    try {
+      statusText.innerText = "Übertragung läuft ...";
+      await posteinstellungen({ latitude, longitude });
+      statusText.innerText = "Daten werden übertragen";
+    } catch {
+      statusText.innerText = "Übertragung fehlgeschlagen";
+    }
   });
-}
 
-async function posteinstellungen(payload) {
-  const res = await fetch(`${API_BASE}/api/einstellungen`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+  /* =========================================================
+     BUTTON: IP-Adresse senden
+     ========================================================= */
+  sendeIpBtn.addEventListener("click", async () => {
+    const ipWLANschuko = (ipWLANschukoInput.value || "").trim();
+
+    // Eingabe prüfen
+    if (ipWLANschuko.length === 0 || !istGueltigeIPv4(ipWLANschuko)) {
+      alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.0.10)");
+      return;
+    }
+
+    try {
+      statusText.innerText = "Übertragung läuft ...";
+      await posteinstellungen({ ipWLANschuko });
+      statusText.innerText = "Daten werden übertragen";
+    } catch {
+      statusText.innerText = "Übertragung fehlgeschlagen";
+    }
   });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return res.json().catch(() => ({}));
-}
 
-/* -----------------------
-   Button: Geo senden
------------------------- */
-sendeGeoDatenBtn.addEventListener("click", async () => {
-  const latitude = parseFloat(latitudeInput.value);
-  const longitude = parseFloat(longitudeInput.value);
+  /* =========================================================
+     BUTTON: Werkseinstellung (Factory Reset)
+     ========================================================= */
+  werkseinstellungBtn.addEventListener("click", async () => {
+    const ok = confirm(
+      "Werkseinstellung ausführen?\n\n" +
+      "Druch drücken von 'OK' werden Geo-Daten, IP-Adresse des Leistungsmessers und WLAN-Zugang zurückgesetzt."
+    );
+    if (!ok) return;
 
-  if (isNaN(latitude) || isNaN(longitude)) {
-    alert("Bitte geben Sie gültige Koordinaten ein");
-    return;
-  }
+    try {
+      statusText.innerText = "Werkseinstellung wird wiederhergestellt ...";
+      await posteinstellungen({ werkseinstellungbool: true });
 
-  try {
-    statusText.innerText = "Übertragung läuft ...";
-    await posteinstellungen({ latitude, longitude });
-    statusText.innerText = "Daten werden übertragen";
-  } catch {
-    statusText.innerText = "Übertragung fehlgeschlagen";
-  }
-});
+      // UI zurücksetzen (nur Frontend)
+      latitudeInput.value = "";
+      longitudeInput.value = "";
+      ipWLANschukoInput.value = "";
 
-/* -----------------------
-   Button: IP senden
------------------------- */
-sendeIpBtn.addEventListener("click", async () => {
-  const ipWLANschuko = (ipWLANschukoInput.value || "").trim();
-
-  if (ipWLANschuko.length === 0 || !istGueltigeIPv4(ipWLANschuko)) {
-    alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.0.10)");
-    return;
-  }
-
-  try {
-    statusText.innerText = "Übertragung läuft ...";
-    await posteinstellungen({ ipWLANschuko });
-    statusText.innerText = "Daten werden übertragen";
-  } catch {
-    statusText.innerText = "Übertragung fehlgeschlagen";
-  }
-});
-
-/* -----------------------
-   Button: Werkseinstellung
------------------------- */
-werkseinstellungBtn.addEventListener("click", async () => {
-  const ok = confirm(
-    "Werkseinstellung ausführen?\n\n" +
-    "Druch drücken von 'OK' werden Geo-Daten, IP-Adresse des Leistungsmessers und WLAN-Zugang zurückgesetzt."
-  );
-  if (!ok) return;
-
-  try {
-    statusText.innerText = "Werkseinstellung wird wiederhergestellt ...";
-    await posteinstellungen({ werkseinstellungbool: true });
-
-    // UI zurücksetzen
-    latitudeInput.value = "";
-    longitudeInput.value = "";
-    ipWLANschukoInput.value = "";
-
-    statusText.innerText = "Daten werden übertragen";
-  } catch {
-    statusText.innerText = "Werkseinstellung fehlgeschlagen";
-  }
-});
+      statusText.innerText = "Daten werden übertragen";
+    } catch {
+      statusText.innerText = "Werkseinstellung fehlgeschlagen";
+    }
+  });
 </script>
 
 </body>
 </html>
-
