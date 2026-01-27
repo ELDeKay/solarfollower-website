@@ -176,25 +176,25 @@
     <div class="reihe">
       <div class="icon"><img src="tilt.png" alt="Neigung"></div>
       <div class="messwerte">Neigung</div>
-      <div class="einheit" id="tilt">-- °</div>
+      <div class="einheit" id="motor2">-- °</div>
     </div>
 
     <div class="reihe">
       <div class="icon"><img src="turn.png" alt="Ausrichtung"></div>
       <div class="messwerte">Ausrichtung Modul</div>
-      <div class="einheit" id="orient">-- °</div>
+      <div class="einheit" id="motor1">-- °</div>
     </div>
 
     <div class="reihe">
       <div class="icon"><img src="volt.png" alt="Spannung"></div>
       <div class="messwerte">Spannung</div>
-      <div class="einheit" id="voltage">-- V</div>
+      <div class="einheit" id="spannung">-- V</div>
     </div>
 
     <div class="reihe">
       <div class="icon"><img src="ampere.png" alt="Strom"></div>
       <div class="messwerte">Strom</div>
-      <div class="einheit" id="current">-- A</div>
+      <div class="einheit" id="ampere">-- A</div>
     </div>
 
     <div class="reihe">
@@ -289,14 +289,14 @@
           stampEl.innerText = "Keine gültige Zeitangabe empfangen";
         }
 
-        document.getElementById("tilt").innerText =
+        document.getElementById("motor2").innerText =
           (letzterWert.motor2 ?? "--") + " °";
-        document.getElementById("orient").innerText =
+        document.getElementById("motor1").innerText =
           (letzterWert.motor1 ?? "--") + " °";
-        document.getElementById("voltage").innerText =
-          (letzterWert.voltage ?? "--") + " V";
-        document.getElementById("current").innerText =
-          (letzterWert.current ?? "--") + " A";
+        document.getElementById("spannung").innerText =
+          (letzterWert.spannung ?? "--") + " V";
+        document.getElementById("ampere").innerText =
+          (letzterWert.ampere ?? "--") + " A";
         document.getElementById("power").innerText =
           (letzterWert.power ?? "--") + " W";
 
