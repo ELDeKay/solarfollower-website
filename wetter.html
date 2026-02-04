@@ -144,6 +144,41 @@
     }
 
     /* =========================================================
+       NEU: Eingabefelder + Button (unter Liste)
+       ========================================================= */
+    .eingabefeld { margin-top: 16px; }
+
+    .eingabefeld label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .eingabefeld input[type="number"],
+    .eingabefeld input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .btns {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .btns:active { transform: scale(0.99); }
+
+    /* =========================================================
        Mobile Anpassungen
        - kompaktere Zeilen, kleinere Icons, andere Grid-Spalten
        ========================================================= */
@@ -209,10 +244,6 @@
 
   <!-- =========================================================
        Werte-Liste: Wetterwerte aus /api/data (letzter Eintrag)
-       - "wind": Windstärke (m/s)
-       - "sonneauf": Uhrzeit Sonnenaufgang
-       - "sonneunter": Uhrzeit Sonnenuntergang
-       - "": Tages- (h)
        ========================================================= -->
   <div class="liste">
 
@@ -248,6 +279,31 @@
       </div>
     </div>
 
+    <!-- =========================================================
+         NEU: Eingabefelder + Button (unter der Liste)
+         ========================================================= -->
+    <div class="eingabefeld">
+      <label for="laufzeitSchuko">Laufzeit Schuko</label>
+      <input type="number" id="laufzeitSchuko" step="1" placeholder="z.B. 3" />
+    </div>
+
+    <div class="eingabefeld">
+      <label for="ipSchuko">IP-Adresse Schuko</label>
+      <input
+        type="text"
+        id="ipSchuko"
+        placeholder="z.B. 192.168.17.2"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
+    <div class="eingabefeld">
+      <button id="sendeSchukoBtn" type="button" class="btns">
+        Sende WLAN Steckdose Einstellungen
+      </button>
+    </div>
+
   </div>
 
 <script>
@@ -255,6 +311,34 @@
    "Key"Namen und Variablen Deklarationen
    ========================================================= */
 const API_BASE = "https://solar-backend-ljck.onrender.com";
+
+/* =========================================================
+   Überprüfung: IPv4-Adresse gültig?
+   (aus der ersten Website übernommen)
+   ========================================================= */
+function istGueltigeIPv4(ip) {
+  const parts = ip.split(".");
+  if (parts.length !== 4) return false;
+  return parts.every(p => {
+    if (p.trim() === "") return false;
+    if (!/^\d+$/.test(p)) return false;
+    const n = Number(p);
+    return n >= 0 && n <= 255;
+  });
+}
+
+/* =========================================================
+   Funktion: Einstellungen an Backend senden
+   ========================================================= */
+async function posteinstellungen(payload) {
+  const res = await fetch(`${API_BASE}/api/einstellungen`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json().catch(() => ({}));
+}
 
 /* =========================================================
    Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
@@ -300,7 +384,7 @@ function formatISODateTime(value) {
    Funktion: Wetterdaten laden
    - holt /api/data vom Backend
    - nimmt den letzten Eintrag als aktuellsten Stand
-   - aktualisiert Zeitstempel + Wetterfelder (wind/sonneauf/sonneunter/sonnenstunden)
+   - aktualisiert Zeitstempel + Wetterfelder
    ========================================================= */
 async function ladeWetterDaten() {
   try {
@@ -336,6 +420,39 @@ async function ladeWetterDaten() {
     document.getElementById("dataStamp").innerText = "Backend nicht erreichbar";
   }
 }
+
+/* =========================================================
+   NEU: Button -> WLAN-Steckdose Einstellungen senden
+   Variablen-Namen: ipSchuko, laufzeitSchuko
+   ========================================================= */
+const laufzeitSchukoInput = document.getElementById("laufzeitSchuko");
+const ipSchukoInput = document.getElementById("ipSchuko");
+const sendeSchukoBtn = document.getElementById("sendeSchukoBtn");
+
+sendeSchukoBtn.addEventListener("click", async () => {
+  const laufzeitSchukoRaw = (laufzeitSchukoInput.value || "").trim();
+  const ipSchuko = (ipSchukoInput.value || "").trim();
+
+  // Ganze Zahl (0 erlaubt)
+  const laufzeitSchuko = Number(laufzeitSchukoRaw);
+  if (laufzeitSchukoRaw === "" || !Number.isInteger(laufzeitSchuko)) {
+    alert("Bitte eine gültige ganze Zahl eingeben (z. B. 3).");
+    return;
+  }
+
+  // IPv4 prüfen
+  if (!istGueltigeIPv4(ipSchuko)) {
+    alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.17.2).");
+    return;
+  }
+
+  try {
+    await posteinstellungen({ laufzeitSchuko, ipSchuko });
+    alert("WLAN Steckdose Einstellungen wurden gesendet.");
+  } catch {
+    alert("Übertragung fehlgeschlagen.");
+  }
+});
 
 /* =========================================================
    Initialisierung
