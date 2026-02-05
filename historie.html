@@ -385,7 +385,7 @@
     const daten24h = await res24h.json();
 
     // ✅ 24h Durchschnitt direkt aus diesen Daten n
-    document.getElementById("durch24h").textContent = berechneDurchschnitt(daten24h);
+    document.getElementById("durch24h").textContent = berechneSumme(daten24h);
 
     // 7d (Summe)
     const res7d = await fetch(`${API_BASE}/api/watt_7d`);
