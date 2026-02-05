@@ -251,203 +251,303 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <script>
-    const API_BASE = "https://solarfollower-databank.onrender.com";
-    const API_STATUS = "https://solar-backend-ljck.onrender.com";
+<script>
+  /* =========================================================
+     "Key"Namen und Variablen Deklarationen
+     ========================================================= */
 
-    const stampEl = document.getElementById("dataStamp");
-    let graphen;
+  // API_BASE: Daten-Backend für Leistungswerte (24h/7d/30d/12m) + watt_now
+  const API_BASE = "https://solarfollower-databank.onrender.com";
 
-    function formatISODateTime(value) {
-      if (!value) return null;
+  // API_STATUS: Steuerungs-Backend, aus dem der Zeitstempel (last.zeit) kommt
+  const API_STATUS = "https://solar-backend-ljck.onrender.com";
 
-      let d;
-      if (typeof value === "number") d = new Date(value * 1000);
-      else if (/^\d+$/.test(value)) d = new Date(parseInt(value, 10) * 1000);
-      else d = new Date(value);
+  // UI-Element: Anzeige des Zeitstempels
+  const stampEl = document.getElementById("dataStamp");
 
-      if (isNaN(d.getTime())) return null;
+  // graphen: Referenz auf die Chart.js Instanz (wird für destroy() benötigt)
+  let graphen;
 
-      const datum = d.toLocaleDateString("de-DE", {
-        day: "2-digit", month: "2-digit", year: "numeric"
-      });
+  /* =========================================================
+     Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
+     - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
+     - gibt null zurück, wenn nicht interpretierbar
+     ========================================================= */
+  function formatISODateTime(value) {
+    if (!value) return null;
 
-      const zeit = d.toLocaleTimeString("de-DE", {
-        hour: "2-digit", minute: "2-digit", second: "2-digit"
-      });
+    let d;
 
-      return `${datum} ${zeit}`;
+    // Fall 1: Unix Timestamp (Sekunden)
+    if (typeof value === "number") {
+      d = new Date(value * 1000);
+    }
+    // Fall 2: String-Zahl ("1768327581")
+    else if (/^\d+$/.test(value)) {
+      d = new Date(parseInt(value, 10) * 1000);
+    }
+    // Fall 3: ISO-String (oder Date-kompatibel)
+    else {
+      d = new Date(value);
     }
 
-    async function ladeZeitstempel() {
-      try {
-        const res = await fetch(`${API_STATUS}/api/data`);
-        const arr = await res.json();
+    if (isNaN(d.getTime())) return null;
 
-        if (!arr.length) {
-          stampEl.innerText = "Keine Daten von Steuerung empfangen";
-          return;
-        }
+    const datum = d.toLocaleDateString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
 
-        const last = arr[arr.length - 1];
-        if (!last.zeit) {
-          stampEl.innerText = "Keine gültige Zeitangabe empfangen";
-          return;
-        }
+    const zeit = d.toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
 
-        const formatted = formatISODateTime(last.zeit);
-        stampEl.innerText = formatted
-          ? `Daten vom: ${formatted}`
-          : "Keine gültige Zeitangabe empfangen";
-      } catch {
-        stampEl.innerText = "Backend nicht erreichbar";
+    return `${datum} ${zeit}`;
+  }
+
+  /* =========================================================
+     Function: Zeitstempel laden
+     - holt /api/data vom Steuerungs-Backend
+     - nimmt den letzten Eintrag und liest last.zeit
+     - schreibt Ergebnis in die Statuszeile oben
+     ========================================================= */
+  async function ladeZeitstempel() {
+    try {
+      const res = await fetch(`${API_STATUS}/api/data`);
+      const arr = await res.json();
+
+      if (!arr.length) {
+        stampEl.innerText = "Keine Daten von Steuerung empfangen";
+        return;
       }
+
+      const last = arr[arr.length - 1];
+      if (!last.zeit) {
+        stampEl.innerText = "Keine gültige Zeitangabe empfangen";
+        return;
+      }
+
+      const formatted = formatISODateTime(last.zeit);
+      stampEl.innerText = formatted
+        ? `Daten vom: ${formatted}`
+        : "Keine gültige Zeitangabe empfangen";
+    } catch {
+      stampEl.innerText = "Backend nicht erreichbar";
     }
+  }
 
-    // 24h lassen wir bewusst so: Durchschnitt aus der 24h-Reihe
-    function berechneDurchschnitt(daten) {
-      if (!daten || !daten.length) return "0,00 Watt";
-      const werte = daten.map(e => Number(e.watt)).filter(v => Number.isFinite(v));
-      if (!werte.length) return "0,00 Watt";
-      const summe = werte.reduce((s, v) => s + v, 0);
-      return (summe / werte.length).toFixed(2).replace(".", ",") + " Watt";
-    }
+  /* =========================================================
+     Helper: Durchschnitt berechnen und als "0,00 Watt" formatieren
+     - erwartet Array mit Objekten { watt: Number, zeit: ... }
+     ========================================================= */
+  function berechneDurchschnitt(daten) {
+    if (!daten || !daten.length) return "0,00 Watt";
 
-    // 7d/30d/12m: Summe (weil Backend dort Summen liefert)
-    function berechneSumme(daten) {
-      if (!daten || !daten.length) return "0,00 Watt";
-      const summe = daten.reduce((s, e) => s + (Number(e.watt) || 0), 0);
-      return summe.toFixed(2).replace(".", ",") + " Watt";
-    }
+    // robuste Filterung (falls null/undefined vorkommt)
+    const werte = daten
+      .map(e => Number(e.watt))
+      .filter(v => Number.isFinite(v));
 
-    async function ladeDurchschnittswerte() {
-      // 24h Daten
-      const res24h = await fetch(`${API_BASE}/api/watt_24h`);
-      const daten24h = await res24h.json();
+    if (!werte.length) return "0,00 Watt";
 
-      // durchW: wir lassen es so wie du es aktuell machst
-      // (Achtung: je nach Backend ist das "letzter Punkt" der 24h-Reihe)
-      if (daten24h.length > 0) {
-        const letzterWert = Number(daten24h[daten24h.length - 1].watt) || 0;
+    const summe = werte.reduce((s, v) => s + v, 0);
+    return (summe / werte.length).toFixed(2).replace(".", ",") + " Watt";
+  }
+
+  /* =========================================================
+     Helper: Summe berechnen und als "0,00 Watt" formatieren
+     - erwartet Array mit Objekten { watt: Number, zeit: ... }
+     ========================================================= */
+  function berechneSumme(daten) {
+    if (!daten || !daten.length) return "0,00 Watt";
+    const summe = daten.reduce((s, e) => s + (Number(e.watt) || 0), 0);
+    return summe.toFixed(2).replace(".", ",") + " Watt";
+  }
+
+  /* =========================================================
+     NEU: Aktueller Leistungswert laden
+     - holt /api/watt_now vom Daten-Backend
+     - schreibt den Wert in "Durchschnittl. Leistung" (durchW)
+     ========================================================= */
+  async function ladeAktuelleLeistung() {
+    try {
+      const res = await fetch(`${API_BASE}/api/watt_now`);
+      const data = await res.json();
+
+      const w = Number(data?.watt);
+      if (Number.isFinite(w)) {
         document.getElementById("durchW").textContent =
-          letzterWert.toFixed(2).replace(".", ",") + " Watt";
+          w.toFixed(2).replace(".", ",") + " Watt";
+      } else {
+        document.getElementById("durchW").textContent = "0,00 Watt";
       }
+    } catch {
+      document.getElementById("durchW").textContent = "-- Watt";
+    }
+  }
 
-      // 24h: Durchschnitt (wie bei dir)
-      document.getElementById("durch24h").textContent = berechneDurchschnitt(daten24h);
+  /* =========================================================
+     Function: Durchschnittswerte laden
+     - lädt Leistung 24h / 7d / 30d vom Daten-Backend
+     - schreibt je den Wert in die passenden UI-Felder
+     - WICHTIG: "Durchschnittl. Leistung" (durchW) kommt jetzt aus /api/watt_now
+     ========================================================= */
+  async function ladeDurchschnittswerte() {
 
-      // 7d: Summe
-      const res7d = await fetch(`${API_BASE}/api/watt_7d`);
-      const daten7d = await res7d.json();
-      document.getElementById("durch7d").textContent = berechneSumme(daten7d);
+    // ✅ 24h-Daten nur einmal laden
+    const res24h = await fetch(`${API_BASE}/api/watt_24h`);
+    const daten24h = await res24h.json();
 
-      // 30d: Summe
-      const res30d = await fetch(`${API_BASE}/api/watt_30d`);
-      const daten30d = await res30d.json();
-      document.getElementById("durch30d").textContent = berechneSumme(daten30d);
+    // ✅ 24h Durchschnitt direkt aus diesen Daten berechnen
+    document.getElementById("durch24h").textContent = berechneDurchschnitt(daten24h);
+
+    // 7d (Summe)
+    const res7d = await fetch(`${API_BASE}/api/watt_7d`);
+    const daten7d = await res7d.json();
+    document.getElementById("durch7d").textContent = berechneSumme(daten7d);
+
+    // 30d (Summe)
+    const res30d = await fetch(`${API_BASE}/api/watt_30d`);
+    const daten30d = await res30d.json();
+    document.getElementById("durch30d").textContent = berechneSumme(daten30d);
+  }
+
+  /* =========================================================
+     Helper: X-Achsen Labels je nach Zeitraum formatieren
+     - 24h: Stunden (z.B. "14:00")
+     - 7d/30d: Datum (z.B. "27.01")
+     - 12m: Monatsname (z.B. "Januar")
+     ========================================================= */
+  function formatZeit(zeit, range) {
+    if (range === "12m") {
+      // erwartet "YYYY-MM-1" oder "YYYY-MM-2"
+      if (typeof zeit === "string" && /^\d{4}-\d{2}-[12]$/.test(zeit)) {
+        const [year, month] = zeit.split("-");
+        const d = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 1);
+
+        // Monatsname auf Deutsch
+        return d.toLocaleDateString("de-DE", { month: "long" });
+      }
+      return zeit;
     }
 
-    // Zeitformatierung für X-Achse
-    function formatZeit(zeit, range) {
-  if (range === "12m") {
-    // erwartet "YYYY-MM-1" oder "YYYY-MM-2"
-    if (typeof zeit === "string" && /^\d{4}-\d{2}-[12]$/.test(zeit)) {
-      const [year, month] = zeit.split("-");
-      const d = new Date(year, parseInt(month, 10) - 1, 1);
+    const d = new Date(zeit);
+    if (isNaN(d.getTime())) return String(zeit);
 
-      // Monatsname auf Deutsch
-      return d.toLocaleDateString("de-DE", { month: "long" });
+    if (range === "24h") return String(d.getHours()).padStart(2, "0") + ":00";
+    if (range === "7d" || range === "30d") {
+      return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
     }
     return zeit;
   }
 
-  const d = new Date(zeit);
-  if (isNaN(d.getTime())) return String(zeit);
-
-  if (range === "24h") return String(d.getHours()).padStart(2, "0") + ":00";
-  if (range === "7d" || range === "30d") {
-    return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
-  }
-  return zeit;
-}
-
-
-    // Graph laden & zeichnen
-    async function ladeLeistungsDaten(range) {
-      let endpoint;
-      switch(range) {
-        case "24h": endpoint = "/api/watt_24h"; break;
-        case "7d":  endpoint = "/api/watt_7d"; break;
-        case "30d": endpoint = "/api/watt_30d"; break;
-        case "12m": endpoint = "/api/watt_12monate"; break;
-        default: endpoint = "/api/watt_24h";
-      }
-
-      const response = await fetch(`${API_BASE}${endpoint}`);
-      const daten = await response.json();
-
-      const labels = daten.map(e => formatZeit(e.zeit, range));
-      const leistungsDaten = daten.map(e => Number(e.watt) || 0);
-
-      const ctx = document.getElementById("leistungsgraph").getContext("2d");
-      if (graphen) graphen.destroy();
-
-      // Label bleibt "Leistung (Watt)" wie bei dir (Watt/kWh Umstellung kommt später im Backend)
-      graphen = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [{
-            label: "Leistung (Watt)",
-            data: leistungsDaten,
-            borderColor: "#007BFF",
-            backgroundColor: "rgba(0,123,255,0.15)",
-            fill: true,
-            tension: 0.25,
-            pointRadius: 1,
-            pointHoverRadius: 3
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            tooltip: {
-              enabled: true,
-              mode: "nearest",
-              intersect: false,
-              callbacks: {
-                label: (context) => (context.parsed.y.toFixed(2) + " Watt")
-              }
-            }
-          },
-          scales: {
-            x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
-            y: { title: { display: true, text: "Watt" } }
-          }
-        }
-      });
+  /* =========================================================
+     Function: Leistungsdaten laden und Graph zeichnen
+     - wählt je nach "range" den passenden Endpoint
+     - erstellt Labels + Datenreihe (Watt)
+     - zerstört alten Chart bevor ein neuer erstellt wird
+     ========================================================= */
+  async function ladeLeistungsDaten(range) {
+    let endpoint;
+    switch (range) {
+      case "24h": endpoint = "/api/watt_24h"; break;
+      case "7d":  endpoint = "/api/watt_7d"; break;
+      case "30d": endpoint = "/api/watt_30d"; break;
+      case "12m": endpoint = "/api/watt_12monate"; break;
+      default:    endpoint = "/api/watt_24h";
     }
 
-    document.querySelectorAll("#auswahlGraphBtn button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#auswahlGraphBtn button")
-          .forEach(b => b.classList.remove("active"));
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    const daten = await response.json();
 
-        btn.classList.add("active");
-        ladeLeistungsDaten(btn.dataset.range);
-      });
+    const labels = daten.map(e => formatZeit(e.zeit, range));
+    const leistungsDaten = daten.map(e => Number(e.watt) || 0);
+
+    // Chart.js Render: alte Instanz entfernen, neue zeichnen
+    const ctx = document.getElementById("leistungsgraph").getContext("2d");
+    if (graphen) graphen.destroy();
+
+    graphen = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Leistung (Watt)",
+          data: leistungsDaten,
+
+          // Farbauswahl
+          borderColor: "#007BFF",
+          backgroundColor: "rgba(0,123,255,0.15)",
+          fill: true,
+
+          // glattere Linie und kleine Punkte
+          tension: 0.25,
+          pointRadius: 1,
+          pointHoverRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            enabled: true,
+            mode: "nearest",
+            intersect: false,
+            callbacks: {
+              // Tooltip formatiert den Y-Wert auf 2 Dezimalstellen + Einheit
+              label: function (context) {
+                return context.parsed.y.toFixed(2) + " Watt";
+              }
+            }
+          }
+        },
+        scales: {
+          // X-Achse: weniger Labels anzeigen, damit es nicht überfüllt (optimiert für mobile Endgeräte)
+          x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
+
+          // Y-Achse: Einheit anzeigen
+          y: { title: { display: true, text: "Watt" } }
+        }
+      }
     });
+  }
 
-    // Init
+  /* =========================================================
+     UI-Events: Zeitraum-Buttons
+     - lädt die passenden Graphdaten
+     ========================================================= */
+  document.querySelectorAll("#auswahlGraphBtn button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#auswahlGraphBtn button")
+        .forEach(b => b.classList.remove("active"));
+
+      btn.classList.add("active");
+      ladeLeistungsDaten(btn.dataset.range);
+    });
+  });
+
+  /* =========================================================
+     Initialisierung
+     - Zeitstempel sofort laden und alle 5s aktualisieren
+     - Graph initial mit 24h laden
+     - Kennzahlen laden
+     - Aktuelle Leistung (durchW) kommt jetzt aus /api/watt_now
+     ========================================================= */
+  ladeZeitstempel();
+  ladeAktuelleLeistung();
+  ladeDurchschnittswerte();
+  ladeLeistungsDaten("24h");
+
+  setInterval(() => {
     ladeZeitstempel();
+    ladeAktuelleLeistung();
     ladeDurchschnittswerte();
-    ladeLeistungsDaten("24h");
+  }, 5000);
+</script>
 
-    setInterval(() => {
-      ladeZeitstempel();
-      ladeDurchschnittswerte();
-    }, 5000);
-  </script>
 </body>
 </html>
