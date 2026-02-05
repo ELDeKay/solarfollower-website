@@ -311,15 +311,10 @@
     <!-- =========================================================
          NEU: Zeitzone (Basis UTC + Offset)
          ========================================================= -->
-    <div class="eingabefeld">
-      <label for="tzBase">Zeitzonen-Basis</label>
-      <select id="tzBase">
-        <option value="UTC" selected>UTC</option>
-      </select>
-    </div>
+
 
     <div class="eingabefeld">
-      <label for="tzOffset">Abweichung (Offset)</label>
+      <label for="tzOffset">UTC-Abweichung (Offset) auswählen</label>
       <select id="tzOffset">
         <option value="-12:00">-12:00</option>
         <option value="-11:00">-11:00</option>
@@ -483,7 +478,6 @@ async function ladeWetterDaten() {
    ========================================================= */
 const laufzeitSchukoInput = document.getElementById("laufzeitSchuko");
 const ipSchukoInput = document.getElementById("ipSchuko");
-const tzBaseSelect = document.getElementById("tzBase");
 const tzOffsetSelect = document.getElementById("tzOffset");
 const sendeSchukoBtn = document.getElementById("sendeSchukoBtn");
 
@@ -504,12 +498,11 @@ sendeSchukoBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Zeitzone (Basis UTC + Offset)
-  const tzBase = (tzBaseSelect.value || "UTC").trim();
+  // Zeitzone ( Offset)
   const tzOffset = (tzOffsetSelect.value || "+01:00").trim();
 
   try {
-    await posteinstellungen({ laufzeitSchuko, ipSchuko, tzBase, tzOffset });
+    await posteinstellungen({ laufzeitSchuko, ipSchuko, tzOffset });
     alert("WLAN Steckdose Einstellungen wurden gesendet.");
   } catch {
     alert("Übertragung fehlgeschlagen.");
