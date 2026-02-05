@@ -222,19 +222,19 @@
     <div class="reihe">
       <div class="icon"><img src="durch24h.png" alt="24h"></div>
       <div class="messwerte">Leistung 24h</div>
-      <div class="einheit" id="durch24h">XX,XX Watt</div>
+      <div class="einheit" id="durch24h">XX,XX kWh</div>
     </div>
 
     <div class="reihe">
       <div class="icon"><img src="durch7d.png" alt="7 Tage"></div>
       <div class="messwerte">Leistung 7d</div>
-      <div class="einheit" id="durch7d">XX,XX Watt</div>
+      <div class="einheit" id="durch7d">XX,XX kWh</div>
     </div>
 
     <div class="reihe">
       <div class="icon"><img src="durch30d.png" alt="30 Tage"></div>
       <div class="messwerte">Leistung 30d</div>
-      <div class="einheit" id="durch30d">XX,XX Watt</div>
+      <div class="einheit" id="durch30d">XX,XX kWh</div>
     </div>
   </div>
 
@@ -339,23 +339,6 @@
     }
   }
 
-  /* =========================================================
-     Helper: Durchschnitt berechnen und als "0,00 Watt" formatieren
-     - erwartet Array mit Objekten { watt: Number, zeit: ... }
-     ========================================================= */
-  function berechneDurchschnitt(daten) {
-    if (!daten || !daten.length) return "0,00 Watt";
-
-    // robuste Filterung (falls null/undefined vorkommt)
-    const werte = daten
-      .map(e => Number(e.watt))
-      .filter(v => Number.isFinite(v));
-
-    if (!werte.length) return "0,00 Watt";
-
-    const summe = werte.reduce((s, v) => s + v, 0);
-    return (summe / werte.length).toFixed(2).replace(".", ",") + " Watt";
-  }
 
   /* =========================================================
      Helper: Summe berechnen und als "0,00 Watt" formatieren
@@ -475,7 +458,7 @@
       data: {
         labels,
         datasets: [{
-          label: "Leistung (Watt)",
+          label: "Leistung (kWh)",
           data: leistungsDaten,
 
           // Farbauswahl
@@ -500,7 +483,7 @@
             callbacks: {
               // Tooltip formatiert den Y-Wert auf 2 Dezimalstellen + Einheit
               label: function (context) {
-                return context.parsed.y.toFixed(2) + " Watt";
+                return context.parsed.y.toFixed(2) + " kWh";
               }
             }
           }
@@ -510,7 +493,7 @@
           x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
 
           // Y-Achse: Einheit anzeigen
-          y: { title: { display: true, text: "Watt" } }
+          y: { title: { display: true, text: "kWh" } }
         }
       }
     });
@@ -539,13 +522,11 @@
      ========================================================= */
   ladeZeitstempel();
   ladeAktuelleLeistung();
-  ladeDurchschnittswerte();
   ladeLeistungsDaten("24h");
 
   setInterval(() => {
     ladeZeitstempel();
     ladeAktuelleLeistung();
-    ladeDurchschnittswerte();
   }, 5000);
 </script>
 
