@@ -339,15 +339,14 @@
     }
   }
 
-
   /* =========================================================
-     Helper: Summe n und als "0,00 Watt" formatieren
+     Helper: Summe berechnen und als "0,00 kWh" formatieren
      - erwartet Array mit Objekten { watt: Number, zeit: ... }
      ========================================================= */
-  function Summe(daten) {
-    if (!daten || !daten.length) return "0,00 Watt";
+  function berechneSumme(daten) {
+    if (!daten || !daten.length) return "0,00 kWh";
     const summe = daten.reduce((s, e) => s + (Number(e.watt) || 0), 0);
-    return summe.toFixed(2).replace(".", ",") + " Watt";
+    return summe.toFixed(2).replace(".", ",") + " kWh";
   }
 
   /* =========================================================
@@ -373,26 +372,24 @@
   }
 
   /* =========================================================
-     Function: Durchschnittswerte laden
-     - lädt Leistung 24h / 7d / 30d vom Daten-Backend
-     - schreibt je den Wert in die passenden UI-Felder
-     - WICHTIG: "Durchschnittl. Leistung" (durchW) kommt jetzt aus /api/watt_now
+     Function: Kennzahlen laden
+     - lädt 24h / 7d / 30d vom Daten-Backend
+     - schreibt je die Summe (kWh) in die passenden UI-Felder
+     - WICHTIG: "Durchschnittl. Leistung" (durchW) kommt aus /api/watt_now
      ========================================================= */
   async function ladeDurchschnittswerte() {
 
-    // ✅ 24h-Daten nur einmal laden
+    // ✅ 24h-Daten laden (kWh pro Stunde)
     const res24h = await fetch(`${API_BASE}/api/watt_24h`);
     const daten24h = await res24h.json();
-
-    // ✅ 24h Durchschnitt direkt aus diesen Daten n
     document.getElementById("durch24h").textContent = berechneSumme(daten24h);
 
-    // 7d (Summe)
+    // ✅ 7d (kWh pro Tag)
     const res7d = await fetch(`${API_BASE}/api/watt_7d`);
     const daten7d = await res7d.json();
     document.getElementById("durch7d").textContent = berechneSumme(daten7d);
 
-    // 30d (Summe)
+    // ✅ 30d (kWh pro Tag)
     const res30d = await fetch(`${API_BASE}/api/watt_30d`);
     const daten30d = await res30d.json();
     document.getElementById("durch30d").textContent = berechneSumme(daten30d);
@@ -430,7 +427,7 @@
   /* =========================================================
      Function: Leistungsdaten laden und Graph zeichnen
      - wählt je nach "range" den passenden Endpoint
-     - erstellt Labels + Datenreihe (Watt)
+     - erstellt Labels + Datenreihe (kWh)
      - zerstört alten Chart bevor ein neuer erstellt wird
      ========================================================= */
   async function ladeLeistungsDaten(range) {
@@ -458,7 +455,7 @@
       data: {
         labels,
         datasets: [{
-          label: "Leistung (kWh)",
+          label: "Energie (kWh)",
           data: leistungsDaten,
 
           // Farbauswahl
@@ -518,7 +515,7 @@
      - Zeitstempel sofort laden und alle 5s aktualisieren
      - Graph initial mit 24h laden
      - Kennzahlen laden
-     - Aktuelle Leistung (durchW) kommt jetzt aus /api/watt_now
+     - Aktuelle Leistung (durchW) kommt aus /api/watt_now
      ========================================================= */
   ladeZeitstempel();
   ladeAktuelleLeistung();
@@ -531,6 +528,7 @@
     ladeDurchschnittswerte();
   }, 5000);
 </script>
+
 
 </body>
 </html>
