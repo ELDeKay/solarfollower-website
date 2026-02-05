@@ -341,10 +341,10 @@
 
 
   /* =========================================================
-     Helper: Summe berechnen und als "0,00 Watt" formatieren
+     Helper: Summe n und als "0,00 Watt" formatieren
      - erwartet Array mit Objekten { watt: Number, zeit: ... }
      ========================================================= */
-  function berechneSumme(daten) {
+  function Summe(daten) {
     if (!daten || !daten.length) return "0,00 Watt";
     const summe = daten.reduce((s, e) => s + (Number(e.watt) || 0), 0);
     return summe.toFixed(2).replace(".", ",") + " Watt";
@@ -384,7 +384,7 @@
     const res24h = await fetch(`${API_BASE}/api/watt_24h`);
     const daten24h = await res24h.json();
 
-    // ✅ 24h Durchschnitt direkt aus diesen Daten berechnen
+    // ✅ 24h Durchschnitt direkt aus diesen Daten n
     document.getElementById("durch24h").textContent = berechneDurchschnitt(daten24h);
 
     // 7d (Summe)
@@ -522,11 +522,13 @@
      ========================================================= */
   ladeZeitstempel();
   ladeAktuelleLeistung();
+  ladeDurchschnittswerte();
   ladeLeistungsDaten("24h");
 
   setInterval(() => {
     ladeZeitstempel();
     ladeAktuelleLeistung();
+    ladeDurchschnittswerte();
   }, 5000);
 </script>
 
