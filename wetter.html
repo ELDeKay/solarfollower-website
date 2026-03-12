@@ -3,26 +3,15 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- =========================================================
-        Eigenschaften der Website
-       - width=device-width: Layout passt sich der Gerätebreite an
-       - initial-scale=1.0: Start-Zoom = 100%
-       ========================================================= -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <title>Wetterdaten</title>
 
   <style>
-    /* =========================================================
-       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
-       ========================================================= */
     *,
     *::before,
     *::after { box-sizing: border-box; }
 
-    /* =========================================================
-       Grundlayout der Seite
-       ========================================================= */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -34,11 +23,6 @@
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
-    /* =========================================================
-       Kopfzeile
-       - Desktop: Titel mittig, Zurück-Button rechts
-       - Platz für Status (margin nur 10px)
-       ========================================================= */
     .kopfzeile {
       position: relative;
       display: flex;
@@ -67,10 +51,6 @@
       touch-action: manipulation;
     }
 
-    /* =========================================================
-       Statuszeile (Zeitstempel)
-       - zeigt, wann zuletzt Daten empfangen wurden
-       ========================================================= */
     .zeitAbrufStatus {
       width: 100%;
       max-width: 800px;
@@ -80,10 +60,6 @@
       text-align: right;
     }
 
-    /* =========================================================
-       Auflistung Wettermesswerte
-       - enthält Wetterwerte aus dem letzten Eintrag von /api/data
-       ========================================================= */
     .liste {
       width: 100%;
       max-width: 800px;
@@ -93,7 +69,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    /* Eigenschaften einer Reihe in Auflistung */
     .reihe {
       display: grid;
       grid-template-columns: 120px 1fr auto;
@@ -106,7 +81,6 @@
 
     .reihe:last-child { border-bottom: none; }
 
-    /* Icon-Container (Bilder zur Visualisierung) */
     .icon {
       width: 100px;
       height: 100px;
@@ -126,7 +100,6 @@
       font-weight: bold;
     }
 
-     /* Eigenschaften Texte der Einheiten und Messwerte */
     .einheit {
       display: flex;
       justify-content: flex-end;
@@ -143,9 +116,6 @@
       color: #666;
     }
 
-    /* =========================================================
-       NEU: Eingabefelder + Button (unter Liste)
-       ========================================================= */
     .eingabefeld { margin-top: 16px; }
 
     .eingabefeld label {
@@ -163,7 +133,6 @@
       border: 1px solid #ccc;
     }
 
-    /* NEU: Select Styling (Zeitzone) */
     .eingabefeld select {
       width: 100%;
       padding: 12px;
@@ -188,10 +157,6 @@
 
     .btns:active { transform: scale(0.99); }
 
-    /* =========================================================
-       Mobile Anpassungen
-       - kompaktere Zeilen, kleinere Icons, andere Grid-Spalten
-       ========================================================= */
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -239,283 +204,268 @@
 
 <body>
 
-  <!-- =========================================================
-       Titel + Navigation zurück ins Hauptmenü
-       ========================================================= -->
-  <div class="kopfzeile">
-    <h1>Wetterdaten</h1>
-    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
-  </div>
+<div class="kopfzeile">
+  <h1>Wetterdaten</h1>
+  <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
+</div>
 
-  <!-- =========================================================
-       Zeitstempel: zeigt den Zeitpunkt der zuletzt vom Pico empfangenen Daten
-       ========================================================= -->
-  <div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
+<div class="zeitAbrufStatus" id="dataStamp">Keine Daten von Steuerung empfangen</div>
 
-  <!-- =========================================================
-       Werte-Liste: Wetterwerte aus /api/data (letzter Eintrag)
-       ========================================================= -->
-  <div class="liste">
+<div class="liste">
 
-    <div class="reihe">
-      <div class="icon"><img src="windspeed.png" alt="Wind"></div>
-      <div class="messwerte">Windstärke</div>
-      <div class="einheit">
-        <span id="wind">--</span><span class="einheitText">m/s</span>
-      </div>
-    </div>
+<div class="reihe">
+<div class="icon"><img src="windspeed.png" alt="Wind"></div>
+<div class="messwerte">Windstärke</div>
+<div class="einheit">
+<span id="wind">--</span><span class="einheitText">m/s</span>
+</div>
+</div>
 
-    <div class="reihe">
-      <div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
-      <div class="messwerte">Sonnenaufgang</div>
-      <div class="einheit">
-        <span id="sonneauf">--</span><span class="einheitText">Uhr</span>
-      </div>
-    </div>
+<div class="reihe">
+<div class="icon"><img src="sunrise.png" alt="Sonnenaufgang"></div>
+<div class="messwerte">Sonnenaufgang</div>
+<div class="einheit">
+<span id="sonneauf">--</span><span class="einheitText">Uhr</span>
+</div>
+</div>
 
-    <div class="reihe">
-      <div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
-      <div class="messwerte">Sonnenuntergang</div>
-      <div class="einheit">
-        <span id="sonneunter">--</span><span class="einheitText">Uhr</span>
-      </div>
-    </div>
+<div class="reihe">
+<div class="icon"><img src="sunset.png" alt="Sonnenuntergang"></div>
+<div class="messwerte">Sonnenuntergang</div>
+<div class="einheit">
+<span id="sonneunter">--</span><span class="einheitText">Uhr</span>
+</div>
+</div>
 
-    <div class="reihe">
-      <div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
-      <div class="messwerte">Sonnenstunden</div>
-      <div class="einheit">
-        <span id="sonnenstunden">--</span><span class="einheitText">h</span>
-      </div>
-    </div>
+<div class="reihe">
+<div class="icon"><img src="sunhours.png" alt="Sonnenstunden"></div>
+<div class="messwerte">Sonnenstunden</div>
+<div class="einheit">
+<span id="sonnenstunden">--</span><span class="einheitText">h</span>
+</div>
+</div>
 
-    <!-- =========================================================
-         Eingabefelder + Button (unter der Liste)
-         ========================================================= -->
-    <div class="eingabefeld">
-      <label for="laufzeitSchuko">Laufzeit WLAN Steckdosen in Stunden</label>
-      <input type="number" id="laufzeitSchuko" step="1" placeholder="z.B. 3" />
-    </div>
+<div class="eingabefeld">
+<label for="laufzeitSchuko">Laufzeit WLAN Steckdosen in Stunden</label>
+<input type="number" id="laufzeitSchuko" step="1" placeholder="z.B. 3" />
+</div>
 
-    <div class="eingabefeld">
-      <label for="ipSchuko">IP-Adresse WLAN Steckdose</label>
-      <input
-        type="text"
-        id="ipSchuko"
-        placeholder="z.B. 192.168.17.2"
-        autocomplete="off"
-        spellcheck="false"
-      />
-    </div>
+<div class="eingabefeld">
+<label for="ipSchuko">IP-Adresse WLAN Steckdose</label>
+<input type="text" id="ipSchuko" placeholder="z.B. 192.168.17.2" autocomplete="off" spellcheck="false"/>
+</div>
 
-    <!-- =========================================================
-         NEU: Zeitzone (Basis UTC + Offset)
-         ========================================================= -->
+<div class="eingabefeld">
+<label for="tzOffset">UTC-Abweichung (Offset) auswählen</label>
+<select id="tzOffset">
+<option value="+01:00" selected>+01:00</option>
+<option value="+02:00">+02:00</option>
+</select>
+</div>
 
+<div class="eingabefeld">
+<button id="sendeSchukoBtn" type="button" class="btns">
+Sende WLAN Steckdose Einstellungen
+</button>
+</div>
 
-    <div class="eingabefeld">
-      <label for="tzOffset">UTC-Abweichung (Offset) auswählen</label>
-      <select id="tzOffset">
-        <option value="-12:00">-12:00</option>
-        <option value="-11:00">-11:00</option>
-        <option value="-10:00">-10:00</option>
-        <option value="-09:00">-09:00</option>
-        <option value="-08:00">-08:00</option>
-        <option value="-07:00">-07:00</option>
-        <option value="-06:00">-06:00</option>
-        <option value="-05:00">-05:00</option>
-        <option value="-04:00">-04:00</option>
-        <option value="-03:00">-03:00</option>
-        <option value="-02:00">-02:00</option>
-        <option value="-01:00">-01:00</option>
-
-        <option value="+00:00">+00:00</option>
-
-        <option value="+01:00" selected>+01:00</option>
-        <option value="+02:00">+02:00</option>
-        <option value="+03:00">+03:00</option>
-        <option value="+04:00">+04:00</option>
-        <option value="+05:00">+05:00</option>
-        <option value="+06:00">+06:00</option>
-        <option value="+07:00">+07:00</option>
-        <option value="+08:00">+08:00</option>
-        <option value="+09:00">+09:00</option>
-        <option value="+10:00">+10:00</option>
-        <option value="+11:00">+11:00</option>
-        <option value="+12:00">+12:00</option>
-        <option value="+13:00">+13:00</option>
-        <option value="+14:00">+14:00</option>
-      </select>
-    </div>
-
-    <div class="eingabefeld">
-      <button id="sendeSchukoBtn" type="button" class="btns">
-        Sende WLAN Steckdose Einstellungen
-      </button>
-    </div>
-
-  </div>
+</div>
 
 <script>
-/* =========================================================
-   "Key"Namen und Variablen Deklarationen
-   ========================================================= */
+
 const API_BASE = "https://solar-backend-ljck.onrender.com";
 
-/* =========================================================
-   Überprüfung: IPv4-Adresse gültig?
-   (aus der ersten Website übernommen)
-   ========================================================= */
 function istGueltigeIPv4(ip) {
-  const parts = ip.split(".");
-  if (parts.length !== 4) return false;
-  return parts.every(p => {
-    if (p.trim() === "") return false;
-    if (!/^\d+$/.test(p)) return false;
-    const n = Number(p);
-    return n >= 0 && n <= 255;
-  });
+const parts = ip.split(".");
+if (parts.length !== 4) return false;
+return parts.every(p => {
+if (p.trim() === "") return false;
+if (!/^\d+$/.test(p)) return false;
+const n = Number(p);
+return n >= 0 && n <= 255;
+});
 }
 
-/* =========================================================
-   Funktion: Einstellungen an Backend senden
-   ========================================================= */
 async function posteinstellungen(payload) {
-  const res = await fetch(`${API_BASE}/api/einstellungen`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return res.json().catch(() => ({}));
+const res = await fetch(`${API_BASE}/api/einstellungen`, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify(payload)
+});
+if (!res.ok) throw new Error("HTTP " + res.status);
+return res.json().catch(() => ({}));
 }
 
-/* =========================================================
-   Helper: Zeit aus verschiedenen Formaten in "DD.MM.YYYY HH:MM:SS"
-   - akzeptiert Unix-Timestamp (Sekunden), String-Zahl oder ISO-String
-   - gibt null zurück, wenn nicht interpretierbar
-   ========================================================= */
 function formatISODateTime(value) {
-  if (!value) return null;
 
-  let d;
+if (!value) return null;
 
-  // Fall 1: Unix Timestamp (Sekunden)
-  if (typeof value === "number") {
-    d = new Date(value * 1000);
-  }
-  // Fall 2: String-Zahl ("1768327581")
-  else if (/^\d+$/.test(value)) {
-    d = new Date(parseInt(value, 10) * 1000);
-  }
-  // Fall 3: ISO-String
-  else {
-    d = new Date(value);
-  }
+let d;
 
-  if (isNaN(d.getTime())) return null;
-
-  const datum = d.toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-
-  const zeit = d.toLocaleTimeString("de-DE", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
-
-  return `${datum} ${zeit}`;
+if (typeof value === "number") {
+d = new Date(value * 1000);
+}
+else if (/^\d+$/.test(value)) {
+d = new Date(parseInt(value, 10) * 1000);
+}
+else {
+d = new Date(value);
 }
 
-/* =========================================================
-   Funktion: Wetterdaten laden
-   - holt /api/data vom Backend
-   - nimmt den letzten Eintrag als aktuellsten Stand
-   - aktualisiert Zeitstempel + Wetterfelder
-   ========================================================= */
-async function ladeWetterDaten() {
-  try {
-    const response = await fetch(`${API_BASE}/api/data`);
-    const daten = await response.json();
+if (isNaN(d.getTime())) return null;
 
-    const stampEl = document.getElementById("dataStamp");
-
-    if (!daten.length) {
-      stampEl.innerText = "Keine Daten von Steuerung empfangen";
-      return;
-    }
-
-    const letzterWert = daten[daten.length - 1];
-
-    // Zeitstempel aktualisieren (wenn vorhanden)
-    if (letzterWert.zeit) {
-      const formatted = formatISODateTime(letzterWert.zeit);
-      stampEl.innerText = formatted
-        ? `Daten vom: ${formatted}`
-        : "Keine gültige Zeitangabe empfangen";
-    } else {
-      stampEl.innerText = "Keine gültige Zeitangabe empfangen";
-    }
-
-    // Wetterwerte anzeigen (fallback: "--" wenn Feld fehlt oder null/undefined ist)
-    document.getElementById("wind").innerText = letzterWert.wind ?? "--";
-    document.getElementById("sonneauf").innerText = letzterWert.sonneauf ?? "--";
-    document.getElementById("sonneunter").innerText = letzterWert.sonneunter ?? "--";
-    document.getElementById("sonnenstunden").innerText = letzterWert.sonnenstunden ?? "--";
-
-  } catch {
-    document.getElementById("dataStamp").innerText = "Backend nicht erreichbar";
-  }
-}
-
-/* =========================================================
-   Button -> WLAN-Steckdose Einstellungen senden
-   Variablen-Namen: ipSchuko, laufzeitSchuko
-   NEU: tzBase, tzOffset
-   ========================================================= */
-const laufzeitSchukoInput = document.getElementById("laufzeitSchuko");
-const ipSchukoInput = document.getElementById("ipSchuko");
-const tzOffsetSelect = document.getElementById("tzOffset");
-const sendeSchukoBtn = document.getElementById("sendeSchukoBtn");
-
-sendeSchukoBtn.addEventListener("click", async () => {
-  const laufzeitSchukoRaw = (laufzeitSchukoInput.value || "").trim();
-  const ipSchuko = (ipSchukoInput.value || "").trim();
-
-  // Ganze Zahl (0 erlaubt)
-  const laufzeitSchuko = Number(laufzeitSchukoRaw);
-  if (laufzeitSchukoRaw === "" || !Number.isInteger(laufzeitSchuko)) {
-    alert("Bitte eine gültige ganze Zahl eingeben (z. B. 3).");
-    return;
-  }
-
-  // IPv4 prüfen
-  if (!istGueltigeIPv4(ipSchuko)) {
-    alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.17.2).");
-    return;
-  }
-
-  // Zeitzone ( Offset)
-  const tzOffset = (tzOffsetSelect.value || "+01:00").trim();
-
-  try {
-    await posteinstellungen({ laufzeitSchuko, ipSchuko, tzOffset });
-    alert("WLAN Steckdose Einstellungen wurden gesendet.");
-  } catch {
-    alert("Übertragung fehlgeschlagen.");
-  }
+const datum = d.toLocaleDateString("de-DE", {
+day: "2-digit",
+month: "2-digit",
+year: "numeric"
 });
 
-/* =========================================================
-   Initialisierung
-   - Wetterdaten einmal sofort laden
-   - danach regelmäßig aktualisieren
-   ========================================================= */
+const zeit = d.toLocaleTimeString("de-DE", {
+hour: "2-digit",
+minute: "2-digit",
+second: "2-digit"
+});
+
+return `${datum} ${zeit}`;
+}
+
+/* NEU: Zeitwert 630 → 6:30 formatieren */
+
+function formatiereUhrzeitWert(value) {
+
+if (value === null || value === undefined || value === "") return "--";
+
+const num = Number(value);
+
+if (isNaN(num)) return "--";
+
+const stunden = Math.floor(num / 100);
+
+const minuten = num % 100;
+
+return `${stunden}:${String(minuten).padStart(2,"0")}`;
+
+}
+
+async function ladeWetterDaten() {
+
+try {
+
+const response = await fetch(`${API_BASE}/api/data`);
+
+const daten = await response.json();
+
+const stampEl = document.getElementById("dataStamp");
+
+if (!daten.length) {
+
+stampEl.innerText = "Keine Daten von Steuerung empfangen";
+
+return;
+
+}
+
+const letzterWert = daten[daten.length - 1];
+
+if (letzterWert.zeit) {
+
+const formatted = formatISODateTime(letzterWert.zeit);
+
+stampEl.innerText = formatted
+? `Daten vom: ${formatted}`
+: "Keine gültige Zeitangabe empfangen";
+
+}
+
+document.getElementById("wind").innerText = letzterWert.wind ?? "--";
+
+document.getElementById("sonneauf").innerText =
+formatiereUhrzeitWert(letzterWert.sonneauf);
+
+document.getElementById("sonneunter").innerText =
+formatiereUhrzeitWert(letzterWert.sonneunter);
+
+document.getElementById("sonnenstunden").innerText =
+letzterWert.sonnenstunden ?? "--";
+
+}
+
+catch {
+
+document.getElementById("dataStamp").innerText =
+"Backend nicht erreichbar";
+
+}
+
+}
+
+const laufzeitSchukoInput =
+document.getElementById("laufzeitSchuko");
+
+const ipSchukoInput =
+document.getElementById("ipSchuko");
+
+const tzOffsetSelect =
+document.getElementById("tzOffset");
+
+const sendeSchukoBtn =
+document.getElementById("sendeSchukoBtn");
+
+sendeSchukoBtn.addEventListener("click", async () => {
+
+const laufzeitSchukoRaw =
+(laufzeitSchukoInput.value || "").trim();
+
+const ipSchuko =
+(ipSchukoInput.value || "").trim();
+
+const laufzeitSchuko =
+Number(laufzeitSchukoRaw);
+
+if (laufzeitSchukoRaw === "" ||
+!Number.isInteger(laufzeitSchuko)) {
+
+alert("Bitte eine gültige ganze Zahl eingeben (z. B. 3).");
+
+return;
+
+}
+
+if (!istGueltigeIPv4(ipSchuko)) {
+
+alert("Bitte geben Sie eine gültige IPv4-Adresse ein.");
+
+return;
+
+}
+
+const tzOffset =
+(tzOffsetSelect.value || "+01:00").trim();
+
+try {
+
+await posteinstellungen({
+laufzeitSchuko,
+ipSchuko,
+tzOffset
+});
+
+alert("WLAN Steckdose Einstellungen wurden gesendet.");
+
+}
+
+catch {
+
+alert("Übertragung fehlgeschlagen.");
+
+}
+
+});
+
 ladeWetterDaten();
+
 setInterval(ladeWetterDaten, 1000);
+
 </script>
 
 </body>
