@@ -1,4 +1,4 @@
-```html id="8z4dqw"
+```html id="9v2lqf"
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -28,19 +28,26 @@ body {
 ========================================================= */
 
 .kopfzeile {
+
   width: 100%;
   max-width: 900px;
+
   margin: 0 auto 10px auto;
 
   position: relative;
+
   display: flex;
   align-items: center;
 }
 
 .kopfzeile h1 {
+
   position: absolute;
+
   left: 50%;
+
   transform: translateX(-50%);
+
   margin: 0;
 }
 
@@ -49,12 +56,19 @@ body {
 ========================================================= */
 
 .zurueck-btn {
+
   text-decoration: none;
+
   background: #007BFF;
+
   color: white;
+
   padding: 10px 16px;
+
   border-radius: 10px;
+
   font-weight: bold;
+
   margin-left: auto;
 }
 
@@ -63,13 +77,16 @@ body {
 ========================================================= */
 
 .zeitAbrufStatus {
+
   width: 100%;
   max-width: 900px;
 
   margin: 0 auto 20px auto;
 
   text-align: right;
+
   color: #666;
+
   font-size: 13px;
 }
 
@@ -78,16 +95,19 @@ body {
 ========================================================= */
 
 .container {
+
   width: 100%;
   max-width: 900px;
+
   margin: auto;
 }
 
 /* =========================================================
-   Kachelraster
+   Raster
 ========================================================= */
 
 .btnRaster {
+
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
@@ -103,15 +123,11 @@ body {
 
 .btnRasterFeld {
 
-  position: relative;
-
-  height: 220px;
+  background: white;
 
   border-radius: 20px;
 
-  overflow: hidden;
-
-  background: white;
+  height: 240px;
 
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
@@ -124,6 +140,8 @@ body {
   align-items: center;
 
   padding: 20px;
+
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -131,84 +149,156 @@ body {
 ========================================================= */
 
 .icon {
+
   width: 90px;
+
   height: 90px;
 
   margin-bottom: 14px;
 
   display: flex;
+
   justify-content: center;
+
   align-items: center;
 }
 
 .icon img {
+
   width: 100%;
+
   height: 100%;
+
   object-fit: contain;
 }
 
 /* =========================================================
-   Titel
+   Texte
 ========================================================= */
 
 .kachelTitel {
+
   font-size: 18px;
+
   font-weight: bold;
+
   text-align: center;
 
   margin-bottom: 10px;
 }
 
-/* =========================================================
-   Werte
-========================================================= */
-
 .kachelWert {
+
   font-size: 28px;
+
   font-weight: bold;
 }
 
 /* =========================================================
-   Animationen
+   Luftfeuchtigkeit Animation
 ========================================================= */
 
-/* Luftfeuchtigkeit */
 #humidityIcon {
+
   transition: transform 0.5s ease;
 }
 
-/* Temperatur */
+/* =========================================================
+   Temperatur Animation
+========================================================= */
+
 #temperatur {
+
   transition: color 0.5s ease;
 }
 
-/* Tag Nacht */
+/* =========================================================
+   Minecraft Tag/Nacht
+========================================================= */
+
+.skyBox {
+
+  position: relative;
+
+  width: 120px;
+
+  height: 120px;
+
+  overflow: hidden;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+}
+
+/* Umlaufbahn */
+
+#orbit {
+
+  position: absolute;
+
+  width: 160px;
+
+  height: 160px;
+
+  animation: orbitRotation 120s linear infinite;
+}
+
+/* Sonne / Mond */
+
 #tagNachtIcon {
-  animation: drehen 120s linear infinite;
+
+  position: absolute;
+
+  top: 0;
+
+  left: 50%;
+
+  width: 55px;
+
+  height: 55px;
+
+  transform: translateX(-50%);
 }
 
-/* Stallbewegung */
-#stallStatusBild.bewegung {
-  animation: wackeln 0.5s infinite;
-}
+/* Kreisbewegung */
 
-@keyframes drehen {
+@keyframes orbitRotation {
 
   from {
+
     transform: rotate(0deg);
+
   }
 
   to {
+
     transform: rotate(360deg);
+
   }
+}
+
+/* =========================================================
+   Stall Bewegung
+========================================================= */
+
+#stallStatusBild.bewegung {
+
+  animation: wackeln 0.5s infinite;
 }
 
 @keyframes wackeln {
 
   0%   { transform: rotate(0deg); }
+
   25%  { transform: rotate(2deg); }
+
   50%  { transform: rotate(-2deg); }
+
   75%  { transform: rotate(2deg); }
+
   100% { transform: rotate(0deg); }
 
 }
@@ -222,13 +312,11 @@ body {
   .btnRaster {
 
     grid-template-columns: 1fr;
-
   }
 
   .btnRasterFeld {
 
-    height: 200px;
-
+    height: 220px;
   }
 
   .kopfzeile {
@@ -305,11 +393,15 @@ body {
   <div class="btnRasterFeld">
 
     <div class="icon">
+
       <img src="clock.png">
+
     </div>
 
     <div class="kachelTitel">
+
       Aktuelle Zeit
+
     </div>
 
     <div class="kachelWert"
@@ -325,11 +417,15 @@ body {
   <div class="btnRasterFeld">
 
     <div class="icon">
+
       <img src="lux.png">
+
     </div>
 
     <div class="kachelTitel">
+
       Lichthelligkeit
+
     </div>
 
     <div class="kachelWert"
@@ -345,11 +441,15 @@ body {
   <div class="btnRasterFeld">
 
     <div class="icon">
+
       <img src="temperature.png">
+
     </div>
 
     <div class="kachelTitel">
+
       Raumtemperatur
+
     </div>
 
     <div class="kachelWert"
@@ -365,12 +465,16 @@ body {
   <div class="btnRasterFeld">
 
     <div class="icon">
+
       <img src="humidity.png"
            id="humidityIcon">
+
     </div>
 
     <div class="kachelTitel">
+
       Luftfeuchtigkeit
+
     </div>
 
     <div class="kachelWert"
@@ -385,13 +489,21 @@ body {
   <!-- Tag Nacht -->
   <div class="btnRasterFeld">
 
-    <div class="icon">
-      <img src="sunmoon.png"
-           id="tagNachtIcon">
+    <div class="skyBox">
+
+      <div id="orbit">
+
+        <img src="sunmoon.png"
+             id="tagNachtIcon">
+
+      </div>
+
     </div>
 
     <div class="kachelTitel">
+
       Status Tag/Nacht
+
     </div>
 
     <div class="kachelWert"
@@ -414,7 +526,9 @@ body {
     </div>
 
     <div class="kachelTitel">
+
       Status Hühnerstall
+
     </div>
 
     <div class="kachelWert"
@@ -445,7 +559,9 @@ function updateDaten() {
   document.getElementById("zeit").innerText =
     zeit;
 
-  /* Beispielwerte */
+  /* =========================================================
+     Beispielwerte
+  ========================================================= */
 
   const lux = 420;
 
@@ -453,17 +569,19 @@ function updateDaten() {
 
   const luftfeuchte = 61;
 
-  /* Lux */
+  /* =========================================================
+     Lux
+  ========================================================= */
 
   document.getElementById("lux").innerText =
     lux + " lx";
 
-  /* Temperatur */
+  /* =========================================================
+     Temperatur
+  ========================================================= */
 
   document.getElementById("temperatur").innerText =
     temperatur + " °C";
-
-  /* Temperaturfarbe */
 
   const tempEl =
     document.getElementById("temperatur");
@@ -486,10 +604,11 @@ function updateDaten() {
   else {
 
     tempEl.style.color = "#F44336";
-
   }
 
-  /* Luftfeuchtigkeit */
+  /* =========================================================
+     Luftfeuchtigkeit
+  ========================================================= */
 
   document.getElementById("luftfeuchtigkeit").innerText =
     luftfeuchte + " %";
@@ -500,7 +619,9 @@ function updateDaten() {
   document.getElementById("humidityIcon").style.transform =
     `scale(${scale})`;
 
-  /* Tag/Nacht */
+  /* =========================================================
+     Tag/Nacht
+  ========================================================= */
 
   const stunde =
     jetzt.getHours();
@@ -515,10 +636,11 @@ function updateDaten() {
 
     document.getElementById("tagNachtStatus").innerText =
       "Nacht";
-
   }
 
-  /* Stallstatus */
+  /* =========================================================
+     Stallstatus
+  ========================================================= */
 
   const stallStatus = "bewegung";
   // offen | bewegung | geschlossen
@@ -554,16 +676,19 @@ function updateDaten() {
     stallText.innerText = "Geschlossen";
 
     stallBild.classList.remove("bewegung");
-
   }
 
-  /* Aktualisierung */
+  /* =========================================================
+     Aktualisierung
+  ========================================================= */
 
   document.getElementById("dataStamp").innerText =
     "Letzte Aktualisierung: " + zeit;
 }
 
-/* Initialisierung */
+/* =========================================================
+   Initialisierung
+========================================================= */
 
 updateDaten();
 
