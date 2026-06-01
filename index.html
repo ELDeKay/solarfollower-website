@@ -1,306 +1,517 @@
+```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 
-  <!-- Responsive Darstellung -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Hühnerstall Projekt</title>
+<title>Hühnerstall Projekt</title>
 
-  <style>
+<style>
 
-    * , *::before, *::after { 
-      box-sizing: border-box; 
-    }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-    html, body { 
-      height: 100%; 
-    }
+html,
+body {
+  height: 100%;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 20px;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom));
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .kopfzeile,
-    .zeitAbrufStatus,
-    .liste {
-      width: 100%;
-      max-width: 800px;
-    }
+.kopfzeile,
+.zeitAbrufStatus,
+.liste {
+  width: 100%;
+  max-width: 800px;
+}
 
-    /* Kopfzeile */
-    .kopfzeile {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+/* Kopfzeile */
+.kopfzeile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
 
-    .kopfzeile h1 {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      text-align: center;
-    }
+.kopfzeile h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  text-align: center;
+}
 
-    /* Zurück Button */
-    .zurueck-btn {
-      text-decoration: none;
-      background: #007BFF;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: bold;
-      margin-left: auto;
-      display: inline-block;
-      touch-action: manipulation;
-    }
+/* Zurück Button */
+.zurueck-btn {
+  text-decoration: none;
+  background: #007BFF;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin-left: auto;
+  display: inline-block;
+  touch-action: manipulation;
+}
 
-    /* Statusanzeige */
-    .zeitAbrufStatus {
-      margin: 0 0 18px 0;
-      font-size: 13px;
-      color: #666;
-      text-align: right;
-    }
+/* Statuszeile */
+.zeitAbrufStatus {
+  margin: 0 0 18px 0;
+  font-size: 13px;
+  color: #666;
+  text-align: right;
+}
 
-    /* Werte-Liste */
-    .liste {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      margin: 0;
-    }
+/* Werte-Liste */
+.liste {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin: 0;
+}
 
-    /* Einzelne Zeile */
-    .reihe {
-      display: grid;
-      grid-template-columns: 120px 1fr 140px;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid #e0e0e0;
-      gap: 12px;
-      min-height: 72px;
-    }
+/* Einzelne Reihe */
+.reihe {
+  display: grid;
+  grid-template-columns: 120px 1fr 140px;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 12px;
+  min-height: 72px;
+}
 
-    .reihe:last-child { 
-      border-bottom: none; 
-    }
+.reihe:last-child {
+  border-bottom: none;
+}
 
-    /* Icons */
-    .icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #555;
-    }
+/* Icons */
+.icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    .icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
-    /* Texte */
-    .messwerte {
-      font-size: 18px;
-      font-weight: bold;
-      min-width: 0;
-    }
+/* Texte */
+.messwerte {
+  font-size: 18px;
+  font-weight: bold;
+}
 
-    .einheit {
-      font-size: 20px;
-      font-weight: bold;
-      text-align: right;
-      white-space: nowrap;
-    }
+.einheit {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+}
 
-    /* Mobile Ansicht */
-    @media (max-width: 600px) {
+/* =========================================================
+   Animationen
+========================================================= */
 
-      body {
-        padding: 14px;
-        padding-bottom: calc(14px + env(safe-area-inset-bottom));
-        align-items: stretch;
-      }
+/* Luftfeuchtigkeit */
+#humidityIcon {
+  transition: transform 0.5s ease;
+}
 
-      .kopfzeile {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        margin-bottom: 8px;
-      }
+/* Temperatur */
+#temperatur {
+  transition: color 0.5s ease;
+}
 
-      .kopfzeile h1 {
-        position: static;
-        transform: none;
-        text-align: center;
-        order: 1;
-      }
+/* Tag/Nacht */
+.tagNachtContainer {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+}
 
-      .zurueck-btn {
-        width: 100%;
-        text-align: center;
-        order: 2;
-        margin-left: 0;
-      }
+#tagNachtIcon {
+  animation: drehen 12s linear infinite;
+}
 
-      .zeitAbrufStatus {
-        text-align: center;
-        margin-bottom: 14px;
-      }
+/* Stall Bewegung */
+#stallStatusBild.bewegung {
+  animation: wackeln 0.5s infinite;
+}
 
-      .liste { 
-        padding: 16px; 
-      }
+/* Animationen */
 
-      .reihe {
-        grid-template-columns: 56px 1fr auto;
-        padding: 12px 0;
-        min-height: 64px;
-      }
+@keyframes drehen {
+  from {
+    transform: rotate(0deg);
+  }
 
-      .icon { 
-        width: 44px; 
-        height: 44px; 
-      }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-      .messwerte { 
-        font-size: 16px; 
-      }
+@keyframes wackeln {
 
-      .einheit { 
-        font-size: 18px; 
-      }
-    }
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(2deg); }
+  50%  { transform: rotate(-2deg); }
+  75%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
 
-  </style>
+}
+
+/* Mobile Ansicht */
+@media (max-width: 600px) {
+
+  body {
+    padding: 14px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    align-items: stretch;
+  }
+
+  .kopfzeile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .kopfzeile h1 {
+    position: static;
+    transform: none;
+    text-align: center;
+    order: 1;
+  }
+
+  .zurueck-btn {
+    width: 100%;
+    text-align: center;
+    order: 2;
+    margin-left: 0;
+  }
+
+  .zeitAbrufStatus {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .liste {
+    padding: 16px;
+  }
+
+  .reihe {
+    grid-template-columns: 56px 1fr auto;
+    padding: 12px 0;
+    min-height: 64px;
+  }
+
+  .icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .messwerte {
+    font-size: 16px;
+  }
+
+  .einheit {
+    font-size: 18px;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-  <!-- Kopfbereich -->
-  <div class="kopfzeile">
-    <h1>Hühnerstall Projekt</h1>
-    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
-  </div>
+<!-- Kopfbereich -->
+<div class="kopfzeile">
+  <h1>Hühnerstall Projekt</h1>
+  <a class="zurueck-btn" href="index.html">
+    Zurück zum Hauptmenü
+  </a>
+</div>
 
-  <!-- Status -->
-  <div class="zeitAbrufStatus" id="dataStamp">
-    Letzte Aktualisierung: --
-  </div>
+<!-- Status -->
+<div class="zeitAbrufStatus" id="dataStamp">
+  Letzte Aktualisierung: --
+</div>
 
-  <!-- Werte-Liste -->
-  <div class="liste">
+<!-- Werte-Liste -->
+<div class="liste">
 
-    <!-- Uhrzeit -->
-    <div class="reihe">
-      <div class="icon">
-        <img src="clock.png" alt="Zeit">
-      </div>
+  <!-- Uhrzeit -->
+  <div class="reihe">
 
-      <div class="messwerte">
-        Aktuelle Zeit
-      </div>
-
-      <div class="einheit" id="zeit">
-        --:--:--
-      </div>
+    <div class="icon">
+      <img src="clock.png" alt="Zeit">
     </div>
 
-    <!-- Lux -->
-    <div class="reihe">
-      <div class="icon">
-        <img src="lux.png" alt="Licht">
-      </div>
-
-      <div class="messwerte">
-        Lichthelligkeit
-      </div>
-
-      <div class="einheit" id="lux">
-        -- lx
-      </div>
+    <div class="messwerte">
+      Aktuelle Zeit
     </div>
 
-    <!-- Temperatur -->
-    <div class="reihe">
-      <div class="icon">
-        <img src="temperature.png" alt="Temperatur">
-      </div>
-
-      <div class="messwerte">
-        Raumtemperatur
-      </div>
-
-      <div class="einheit" id="temperatur">
-        -- °C
-      </div>
-    </div>
-
-    <!-- Luftfeuchtigkeit -->
-    <div class="reihe">
-      <div class="icon">
-        <img src="humidity.png" alt="Luftfeuchtigkeit">
-      </div>
-
-      <div class="messwerte">
-        Luftfeuchtigkeit
-      </div>
-
-      <div class="einheit" id="luftfeuchtigkeit">
-        -- %
-      </div>
+    <div class="einheit" id="zeit">
+      --:--:--
     </div>
 
   </div>
 
-  <script>
+  <!-- Lux -->
+  <div class="reihe">
 
-    /* =========================================================
-       Beispielwerte
-       Diese Werte später durch Backend/API ersetzen
-       ========================================================= */
+    <div class="icon">
+      <img src="lux.png" alt="Lux">
+    </div>
 
-    function updateDaten() {
+    <div class="messwerte">
+      Lichthelligkeit
+    </div>
 
-      // Aktuelle Uhrzeit
-      const jetzt = new Date();
+    <div class="einheit" id="lux">
+      -- lx
+    </div>
 
-      const zeit = jetzt.toLocaleTimeString("de-DE");
+  </div>
 
-      document.getElementById("zeit").innerText = zeit;
+  <!-- Temperatur -->
+  <div class="reihe">
 
-      // Beispielwerte
-      document.getElementById("lux").innerText = "420 lx";
-      document.getElementById("temperatur").innerText = "22.5 °C";
-      document.getElementById("luftfeuchtigkeit").innerText = "61 %";
+    <div class="icon">
+      <img src="temperature.png" alt="Temperatur">
+    </div>
 
-      // Statuszeile
-      document.getElementById("dataStamp").innerText =
-        "Letzte Aktualisierung: " + zeit;
-    }
+    <div class="messwerte">
+      Raumtemperatur
+    </div>
 
-    // Sofort laden
-    updateDaten();
+    <div class="einheit" id="temperatur">
+      -- °C
+    </div>
 
-    // Jede Sekunde aktualisieren
-    setInterval(updateDaten, 1000);
+  </div>
 
-  </script>
+  <!-- Luftfeuchtigkeit -->
+  <div class="reihe">
+
+    <div class="icon">
+      <img src="humidity.png"
+           id="humidityIcon"
+           alt="Luftfeuchtigkeit">
+    </div>
+
+    <div class="messwerte">
+      Luftfeuchtigkeit
+    </div>
+
+    <div class="einheit" id="luftfeuchtigkeit">
+      -- %
+    </div>
+
+  </div>
+
+  <!-- Tag Nacht -->
+  <div class="reihe">
+
+    <div class="icon">
+
+      <div class="tagNachtContainer">
+
+        <img src="sunmoon.png"
+             id="tagNachtIcon"
+             alt="Tag Nacht">
+
+      </div>
+
+    </div>
+
+    <div class="messwerte">
+      Status Tag/Nacht
+    </div>
+
+    <div class="einheit" id="tagNachtStatus">
+      Tag
+    </div>
+
+  </div>
+
+  <!-- Stallstatus -->
+  <div class="reihe">
+
+    <div class="icon">
+
+      <img src="stall_offen.png"
+           id="stallStatusBild"
+           alt="Hühnerstall">
+
+    </div>
+
+    <div class="messwerte">
+      Status Hühnerstall
+    </div>
+
+    <div class="einheit" id="stallStatus">
+      Offen
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   DATEN UPDATE
+========================================================= */
+
+function updateDaten() {
+
+  /* Uhrzeit */
+  const jetzt = new Date();
+
+  const zeit = jetzt.toLocaleTimeString("de-DE");
+
+  document.getElementById("zeit").innerText = zeit;
+
+  /* Beispielwerte */
+  const lux = 420;
+  const temperatur = 22.5;
+  const luftfeuchte = 61;
+
+  /* Lux */
+  document.getElementById("lux").innerText =
+    lux + " lx";
+
+  /* Temperatur */
+  document.getElementById("temperatur").innerText =
+    temperatur + " °C";
+
+  /* Temperatur Farbe */
+
+  const tempEl =
+    document.getElementById("temperatur");
+
+  if (temperatur < 10) {
+
+    tempEl.style.color = "#2196F3";
+
+  }
+  else if (temperatur < 22) {
+
+    tempEl.style.color = "#4CAF50";
+
+  }
+  else if (temperatur < 30) {
+
+    tempEl.style.color = "#FF9800";
+
+  }
+  else {
+
+    tempEl.style.color = "#F44336";
+
+  }
+
+  /* Luftfeuchtigkeit */
+  document.getElementById("luftfeuchtigkeit").innerText =
+    luftfeuchte + " %";
+
+  /* Tropfen skalieren */
+  const scale = 0.6 + (luftfeuchte / 100);
+
+  document.getElementById("humidityIcon").style.transform =
+    `scale(${scale})`;
+
+  /* Tag / Nacht */
+
+  const stunde = jetzt.getHours();
+
+  if (stunde >= 7 && stunde < 20) {
+
+    document.getElementById("tagNachtStatus").innerText =
+      "Tag";
+
+  }
+  else {
+
+    document.getElementById("tagNachtStatus").innerText =
+      "Nacht";
+
+  }
+
+  /* Stallstatus */
+
+  const stallStatus = "bewegung";
+  // offen | bewegung | geschlossen
+
+  const stallBild =
+    document.getElementById("stallStatusBild");
+
+  const stallText =
+    document.getElementById("stallStatus");
+
+  if (stallStatus === "offen") {
+
+    stallBild.src = "stall_offen.png";
+
+    stallText.innerText = "Offen";
+
+    stallBild.classList.remove("bewegung");
+
+  }
+  else if (stallStatus === "bewegung") {
+
+    stallBild.src = "stall_bewegung.gif";
+
+    stallText.innerText = "In Bewegung";
+
+    stallBild.classList.add("bewegung");
+
+  }
+  else {
+
+    stallBild.src = "stall_geschlossen.png";
+
+    stallText.innerText = "Geschlossen";
+
+    stallBild.classList.remove("bewegung");
+
+  }
+
+  /* Statuszeile */
+  document.getElementById("dataStamp").innerText =
+    "Letzte Aktualisierung: " + zeit;
+}
+
+/* Initialisierung */
+
+updateDaten();
+
+setInterval(updateDaten, 1000);
+
+</script>
 
 </body>
 </html>
