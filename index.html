@@ -15,10 +15,15 @@
 ========================================================= */
 
 body {
+
   font-family: Arial, sans-serif;
+
   margin: 0;
+
   background: #f0f0f0;
+
   padding: 20px;
+
   min-height: 100vh;
 }
 
@@ -126,7 +131,7 @@ body {
 
   border-radius: 20px;
 
-  height: 240px;
+  height: 260px;
 
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
@@ -215,8 +220,6 @@ body {
    Minecraft Tag/Nacht Uhr
 ========================================================= */
 
-/* Sichtfenster */
-
 .skyWindow {
 
   position: relative;
@@ -241,17 +244,15 @@ body {
   align-items: center;
 }
 
-/* Bewegendes Panorama */
-
 #skyScroller {
 
   position: absolute;
 
-  top: 0;
+  top: -20px;
   left: 0;
 
-  width: 500px;
-  height: 150px;
+  width: 900px;
+  height: 190px;
 
   background-image: url("tagNachtStatus.png");
 
@@ -259,10 +260,8 @@ body {
 
   background-repeat: no-repeat;
 
-  animation: minecraftTagNacht 120s linear infinite;
+  animation: minecraftTagNacht 180s linear infinite;
 }
-
-/* Bewegung */
 
 @keyframes minecraftTagNacht {
 
@@ -274,7 +273,7 @@ body {
 
   to {
 
-    transform: translateX(-350px);
+    transform: translateX(-700px);
 
   }
 }
@@ -299,7 +298,6 @@ body {
   75%  { transform: rotate(2deg); }
 
   100% { transform: rotate(0deg); }
-
 }
 
 /* =========================================================
@@ -315,7 +313,7 @@ body {
 
   .btnRasterFeld {
 
-    height: 220px;
+    height: 240px;
   }
 
   .kopfzeile {
@@ -553,11 +551,15 @@ function updateDaten() {
   document.getElementById("zeit").innerText =
     zeit;
 
+  /* =========================================================
+     Beispielwerte
+  ========================================================= */
+
   const lux = 420;
 
   const temperatur = 22.5;
 
-  const luftfeuchte = 6;
+  const luftfeuchte = 61;
 
   /* =========================================================
      Lux
@@ -633,6 +635,7 @@ function updateDaten() {
   ========================================================= */
 
   const stallStatus = "bewegung";
+  // offen | bewegung | geschlossen
 
   const stallBild =
     document.getElementById("stallStatusBild");
@@ -674,6 +677,10 @@ function updateDaten() {
   document.getElementById("dataStamp").innerText =
     "Letzte Aktualisierung: " + zeit;
 }
+
+/* =========================================================
+   Initialisierung
+========================================================= */
 
 updateDaten();
 
