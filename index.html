@@ -1,50 +1,40 @@
-```html
+```html id="8z4dqw"
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0" />
 
 <title>Hühnerstall Projekt</title>
 
 <style>
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
+/* =========================================================
+   Grundlayout
+========================================================= */
 
 body {
   font-family: Arial, sans-serif;
-  background: #f0f0f0;
   margin: 0;
+  background: #f0f0f0;
   padding: 20px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
 }
 
-.kopfzeile,
-.zeitAbrufStatus,
-.liste {
-  width: 100%;
-  max-width: 800px;
-}
+/* =========================================================
+   Kopfzeile
+========================================================= */
 
-/* Kopfzeile */
 .kopfzeile {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 10px auto;
+
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .kopfzeile h1 {
@@ -52,10 +42,12 @@ body {
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
-  text-align: center;
 }
 
-/* Zurück Button */
+/* =========================================================
+   Zurück Button
+========================================================= */
+
 .zurueck-btn {
   text-decoration: none;
   background: #007BFF;
@@ -64,47 +56,86 @@ body {
   border-radius: 10px;
   font-weight: bold;
   margin-left: auto;
-  display: inline-block;
-  touch-action: manipulation;
 }
 
-/* Statuszeile */
+/* =========================================================
+   Statuszeile
+========================================================= */
+
 .zeitAbrufStatus {
-  margin: 0 0 18px 0;
-  font-size: 13px;
-  color: #666;
+  width: 100%;
+  max-width: 900px;
+
+  margin: 0 auto 20px auto;
+
   text-align: right;
+  color: #666;
+  font-size: 13px;
 }
 
-/* Werte-Liste */
-.liste {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  margin: 0;
+/* =========================================================
+   Container
+========================================================= */
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
 }
 
-/* Einzelne Reihe */
-.reihe {
+/* =========================================================
+   Kachelraster
+========================================================= */
+
+.btnRaster {
   display: grid;
-  grid-template-columns: 120px 1fr 140px;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-rows: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+/* =========================================================
+   Kacheln
+========================================================= */
+
+.btnRasterFeld {
+
+  position: relative;
+
+  height: 220px;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background: white;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
   align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #e0e0e0;
-  gap: 12px;
-  min-height: 72px;
+
+  padding: 20px;
 }
 
-.reihe:last-child {
-  border-bottom: none;
-}
+/* =========================================================
+   Icons
+========================================================= */
 
-/* Icons */
 .icon {
-  width: 100px;
-  height: 100px;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
+
+  margin-bottom: 14px;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -116,17 +147,25 @@ body {
   object-fit: contain;
 }
 
-/* Texte */
-.messwerte {
+/* =========================================================
+   Titel
+========================================================= */
+
+.kachelTitel {
   font-size: 18px;
   font-weight: bold;
+  text-align: center;
+
+  margin-bottom: 10px;
 }
 
-.einheit {
-  font-size: 20px;
+/* =========================================================
+   Werte
+========================================================= */
+
+.kachelWert {
+  font-size: 28px;
   font-weight: bold;
-  text-align: right;
-  white-space: nowrap;
 }
 
 /* =========================================================
@@ -143,26 +182,18 @@ body {
   transition: color 0.5s ease;
 }
 
-/* Tag/Nacht */
-.tagNachtContainer {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
+/* Tag Nacht */
 #tagNachtIcon {
-  animation: drehen 12s linear infinite;
+  animation: drehen 120s linear infinite;
 }
 
-/* Stall Bewegung */
+/* Stallbewegung */
 #stallStatusBild.bewegung {
   animation: wackeln 0.5s infinite;
 }
 
-/* Animationen */
-
 @keyframes drehen {
+
   from {
     transform: rotate(0deg);
   }
@@ -182,62 +213,50 @@ body {
 
 }
 
-/* Mobile Ansicht */
-@media (max-width: 600px) {
+/* =========================================================
+   Mobile Ansicht
+========================================================= */
 
-  body {
-    padding: 14px;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom));
-    align-items: stretch;
+@media (max-width: 700px) {
+
+  .btnRaster {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .btnRasterFeld {
+
+    height: 200px;
+
   }
 
   .kopfzeile {
+
     flex-direction: column;
-    align-items: stretch;
+
     gap: 12px;
-    margin-bottom: 8px;
   }
 
   .kopfzeile h1 {
+
     position: static;
+
     transform: none;
-    text-align: center;
-    order: 1;
   }
 
   .zurueck-btn {
+
     width: 100%;
+
     text-align: center;
-    order: 2;
+
     margin-left: 0;
   }
 
   .zeitAbrufStatus {
+
     text-align: center;
-    margin-bottom: 14px;
-  }
-
-  .liste {
-    padding: 16px;
-  }
-
-  .reihe {
-    grid-template-columns: 56px 1fr auto;
-    padding: 12px 0;
-    min-height: 64px;
-  }
-
-  .icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .messwerte {
-    font-size: 16px;
-  }
-
-  .einheit {
-    font-size: 18px;
   }
 }
 
@@ -246,138 +265,168 @@ body {
 
 <body>
 
-<!-- Kopfbereich -->
+<!-- =========================================================
+     Kopfbereich
+========================================================= -->
+
 <div class="kopfzeile">
+
   <h1>Hühnerstall Projekt</h1>
-  <a class="zurueck-btn" href="index.html">
+
+  <a class="zurueck-btn"
+     href="index.html">
+
     Zurück zum Hauptmenü
+
   </a>
+
 </div>
 
-<!-- Status -->
-<div class="zeitAbrufStatus" id="dataStamp">
+<!-- =========================================================
+     Statuszeile
+========================================================= -->
+
+<div class="zeitAbrufStatus"
+     id="dataStamp">
+
   Letzte Aktualisierung: --
+
 </div>
 
-<!-- Werte-Liste -->
-<div class="liste">
+<!-- =========================================================
+     Kachelraster
+========================================================= -->
+
+<div class="container">
+
+<div class="btnRaster">
 
   <!-- Uhrzeit -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
-      <img src="clock.png" alt="Zeit">
+      <img src="clock.png">
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Aktuelle Zeit
     </div>
 
-    <div class="einheit" id="zeit">
+    <div class="kachelWert"
+         id="zeit">
+
       --:--:--
+
     </div>
 
   </div>
 
   <!-- Lux -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
-      <img src="lux.png" alt="Lux">
+      <img src="lux.png">
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Lichthelligkeit
     </div>
 
-    <div class="einheit" id="lux">
+    <div class="kachelWert"
+         id="lux">
+
       -- lx
+
     </div>
 
   </div>
 
   <!-- Temperatur -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
-      <img src="temperature.png" alt="Temperatur">
+      <img src="temperature.png">
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Raumtemperatur
     </div>
 
-    <div class="einheit" id="temperatur">
+    <div class="kachelWert"
+         id="temperatur">
+
       -- °C
+
     </div>
 
   </div>
 
   <!-- Luftfeuchtigkeit -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
       <img src="humidity.png"
-           id="humidityIcon"
-           alt="Luftfeuchtigkeit">
+           id="humidityIcon">
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Luftfeuchtigkeit
     </div>
 
-    <div class="einheit" id="luftfeuchtigkeit">
+    <div class="kachelWert"
+         id="luftfeuchtigkeit">
+
       -- %
+
     </div>
 
   </div>
 
   <!-- Tag Nacht -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
-
-      <div class="tagNachtContainer">
-
-        <img src="sunmoon.png"
-             id="tagNachtIcon"
-             alt="Tag Nacht">
-
-      </div>
-
+      <img src="sunmoon.png"
+           id="tagNachtIcon">
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Status Tag/Nacht
     </div>
 
-    <div class="einheit" id="tagNachtStatus">
+    <div class="kachelWert"
+         id="tagNachtStatus">
+
       Tag
+
     </div>
 
   </div>
 
   <!-- Stallstatus -->
-  <div class="reihe">
+  <div class="btnRasterFeld">
 
     <div class="icon">
 
       <img src="stall_offen.png"
-           id="stallStatusBild"
-           alt="Hühnerstall">
+           id="stallStatusBild">
 
     </div>
 
-    <div class="messwerte">
+    <div class="kachelTitel">
       Status Hühnerstall
     </div>
 
-    <div class="einheit" id="stallStatus">
+    <div class="kachelWert"
+         id="stallStatus">
+
       Offen
+
     </div>
 
   </div>
 
+</div>
 </div>
 
 <script>
@@ -388,27 +437,33 @@ body {
 
 function updateDaten() {
 
-  /* Uhrzeit */
   const jetzt = new Date();
 
-  const zeit = jetzt.toLocaleTimeString("de-DE");
+  const zeit =
+    jetzt.toLocaleTimeString("de-DE");
 
-  document.getElementById("zeit").innerText = zeit;
+  document.getElementById("zeit").innerText =
+    zeit;
 
   /* Beispielwerte */
+
   const lux = 420;
+
   const temperatur = 22.5;
+
   const luftfeuchte = 61;
 
   /* Lux */
+
   document.getElementById("lux").innerText =
     lux + " lx";
 
   /* Temperatur */
+
   document.getElementById("temperatur").innerText =
     temperatur + " °C";
 
-  /* Temperatur Farbe */
+  /* Temperaturfarbe */
 
   const tempEl =
     document.getElementById("temperatur");
@@ -435,18 +490,20 @@ function updateDaten() {
   }
 
   /* Luftfeuchtigkeit */
+
   document.getElementById("luftfeuchtigkeit").innerText =
     luftfeuchte + " %";
 
-  /* Tropfen skalieren */
-  const scale = 0.6 + (luftfeuchte / 100);
+  const scale =
+    0.6 + (luftfeuchte / 100);
 
   document.getElementById("humidityIcon").style.transform =
     `scale(${scale})`;
 
-  /* Tag / Nacht */
+  /* Tag/Nacht */
 
-  const stunde = jetzt.getHours();
+  const stunde =
+    jetzt.getHours();
 
   if (stunde >= 7 && stunde < 20) {
 
@@ -500,7 +557,8 @@ function updateDaten() {
 
   }
 
-  /* Statuszeile */
+  /* Aktualisierung */
+
   document.getElementById("dataStamp").innerText =
     "Letzte Aktualisierung: " + zeit;
 }
