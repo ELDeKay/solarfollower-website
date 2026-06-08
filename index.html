@@ -698,47 +698,55 @@ const animationAUF = [
    Animation starten
 ========================================================= */
 
+let animationLaeuft = false;
+
 function starteTorAnimation(zustand) {
 
-  clearInterval(animationInterval);
+  if (animationLaeuft) return;
 
-  animationsIndex = 0;
+  animationLaeuft = true;
 
   const aktuelleAnimation =
     zustand ? animationZU : animationAUF;
 
-  animationInterval = setInterval(() => {
+  let index = 0;
+
+  function naechstesBild() {
+
+    if (!motorLaeuft) {
+
+      animationLaeuft = false;
+
+      return;
+    }
 
     stallBild.src =
-      aktuelleAnimation[animationsIndex];
+      aktuelleAnimation[index];
 
     if (zustand) {
 
-      stallText.innerText =
-        "Schließt";
-    }
-    else {
+      stallText.innerText = "Schließt";
 
-      stallText.innerText =
-        "Öffnet";
+    } else {
+
+      stallText.innerText = "Öffnet";
     }
 
-    animationsIndex++;
+    index++;
 
-    if (animationsIndex >= aktuelleAnimation.length) {
+    if (index >= aktuelleAnimation.length) {
 
-      animationsIndex = 0;
+      index = 0;
 
-      clearInterval(animationInterval);
+      setTimeout(naechstesBild, 500);
 
-      setTimeout(() => {
+    } else {
 
-        starteTorAnimation(zustand);
-
-      }, 500);
+      setTimeout(naechstesBild, 500);
     }
+  }
 
-  }, 500);
+  naechstesBild();
 }
 
 /* =========================================================
@@ -786,7 +794,7 @@ function aktualisiereTorStatus(
 
 updateDaten();
 
-setInterval(updateDaten, 1000);
+setInterval(updateDaten, 5000);
 
 </script>
 
