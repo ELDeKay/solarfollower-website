@@ -202,11 +202,58 @@ body {
    Luftfeuchtigkeit
 ========================================================= */
 
+.humidityContainer {
+
+  position: relative;
+
+  width: 100px;
+
+  height: 100px;
+
+  margin-bottom: 14px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+}
+
+/* =========================================================
+   Fester Umriss
+========================================================= */
+
+.humidityOutline {
+
+  position: absolute;
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: contain;
+
+  z-index: 1;
+}
+
+/* =========================================================
+   Skalierbarer Tropfen
+========================================================= */
+
 #humidityIcon {
+
+  position: absolute;
+
+  width: 55%;
+
+  height: 55%;
+
+  object-fit: contain;
+
+  z-index: 2;
 
   transition: transform 0.5s ease;
 }
-
 /* =========================================================
    Temperatur
 ========================================================= */
@@ -449,30 +496,35 @@ body {
 
   </div>
 
-  <!-- Luftfeuchtigkeit -->
-  <div class="btnRasterFeld">
+<!-- Luftfeuchtigkeit -->
+<div class="btnRasterFeld">
 
-    <div class="icon">
+  <div class="humidityContainer">
 
-      <img src="wassertropfen.png"
-           id="humidityIcon">
+    <!-- Fester Umriss -->
+    <img src="umriss.png"
+         class="humidityOutline">
 
-    </div>
-
-    <div class="kachelTitel">
-
-      Luftfeuchtigkeit
-
-    </div>
-
-    <div class="kachelWert"
-         id="luftfeuchtigkeit">
-
-      -- %
-
-    </div>
+    <!-- Skalierbarer Tropfen -->
+    <img src="wassertropfen.png"
+         id="humidityIcon">
 
   </div>
+
+  <div class="kachelTitel">
+
+    Luftfeuchtigkeit
+
+  </div>
+
+  <div class="kachelWert"
+       id="luftfeuchtigkeit">
+
+    -- %
+
+  </div>
+
+</div>
 
   <!-- Tag Nacht -->
   <div class="btnRasterFeld">
@@ -615,9 +667,9 @@ function updateDaten() {
   document.getElementById("luftfeuchtigkeit").innerText =
     luftfeuchte + " %";
 
-  const scale =
-    0.6 + (luftfeuchte / 100);
-
+const scale =
+  0.2 + (luftfeuchte / 100) * 1.2;
+      
   document.getElementById("humidityIcon").style.transform =
     `scale(${scale})`;
 
