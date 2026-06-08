@@ -528,6 +528,19 @@ body {
 
 <script>
 
+let torAUF = false;
+
+let torZU = false;
+
+let zustand = true;
+
+/*
+  true  = Tor schließt
+  false = Tor öffnet
+*/
+
+let motorLaeuft = true;     
+
 /* =========================================================
    DATEN UPDATE
 ========================================================= */
@@ -556,15 +569,7 @@ function updateDaten() {
      Beispiel Stallwerte
   ========================================================= */
 
-  let torAUF = false;
 
-  let torZU = false;
-
-  let zustand = true;
-  // true = zufahren
-  // false = auffahren
-
-  let motorLaeuft = true;
 
   /* =========================================================
      Lux
@@ -639,12 +644,7 @@ function updateDaten() {
      Stallstatus
   ========================================================= */
 
-  aktualisiereTorStatus(
-    torAUF,
-    torZU,
-    zustand,
-    motorLaeuft
-  );
+aktualisiereTorStatus();
 
   /* =========================================================
      Aktualisierung
@@ -664,15 +664,13 @@ const stallBild =
 const stallText =
   document.getElementById("stallStatus");
 
-let animationInterval = null;
+let animationAktiv = false;
 
-let animationsIndex = 0;
+let animationTimeout;
 
 /* =========================================================
    Bilderfolgen
 ========================================================= */
-
-/* Zufahren */
 
 const animationZU = [
 
@@ -682,8 +680,6 @@ const animationZU = [
 
   "torZU.png"
 ];
-
-/* Auffahren */
 
 const animationAUF = [
 
@@ -695,33 +691,30 @@ const animationAUF = [
 ];
 
 /* =========================================================
-   Animation starten
+   Animation
 ========================================================= */
 
-let animationLaeuft = false;
+function starteTorAnimation() {
 
-function starteTorAnimation(zustand) {
+  if (animationAktiv) return;
 
-  if (animationLaeuft) return;
+  animationAktiv = true;
 
-  animationLaeuft = true;
-
-  const aktuelleAnimation =
+  const frames =
     zustand ? animationZU : animationAUF;
 
   let index = 0;
 
-  function naechstesBild() {
+  function nextFrame() {
 
     if (!motorLaeuft) {
 
-      animationLaeuft = false;
+      animationAktiv = false;
 
       return;
     }
 
-    stallBild.src =
-      aktuelleAnimation[index];
+    stallBild.src = frames[index];
 
     if (zustand) {
 
@@ -734,57 +727,64 @@ function starteTorAnimation(zustand) {
 
     index++;
 
-    if (index >= aktuelleAnimation.length) {
+    /* =============================================
+       Ende Durchlauf
+    ============================================= */
+
+    if (index >= frames.length) {
 
       index = 0;
 
-      setTimeout(naechstesBild, 500);
+      animationTimeout =
+        setTimeout(nextFrame, 500);
 
-    } else {
-
-      setTimeout(naechstesBild, 500);
+      return;
     }
+
+    animationTimeout =
+      setTimeout(nextFrame, 500);
   }
 
-  naechstesBild();
+  nextFrame();
 }
 
 /* =========================================================
-   Status aktualisieren
+   Status prüfen
 ========================================================= */
 
-function aktualisiereTorStatus(
-  torAUF,
-  torZU,
-  zustand,
-  motorLaeuft
-) {
+function aktualisiereTorStatus() {
+
+  /* =============================================
+     Motor läuft
+  ============================================= */
 
   if (motorLaeuft) {
 
-    starteTorAnimation(zustand);
+    starteTorAnimation();
 
     return;
   }
 
-  clearInterval(animationInterval);
+  /* =============================================
+     Motor aus
+  ============================================= */
+
+  clearTimeout(animationTimeout);
+
+  animationAktiv = false;
 
   if (torAUF) {
 
-    stallBild.src =
-      "torAUF.png";
+    stallBild.src = "torAUF.png";
 
-    stallText.innerText =
-      "Offen";
+    stallText.innerText = "Offen";
   }
 
   if (torZU) {
 
-    stallBild.src =
-      "torZU.png";
+    stallBild.src = "torZU.png";
 
-    stallText.innerText =
-      "Geschlossen";
+    stallText.innerText = "Geschlossen";
   }
 }
 
