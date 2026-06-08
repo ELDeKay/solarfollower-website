@@ -714,6 +714,10 @@ function starteTorAnimation() {
       return;
     }
 
+    /* =========================================
+       Bild anzeigen
+    ========================================= */
+
     stallBild.src = frames[index];
 
     if (zustand) {
@@ -725,24 +729,39 @@ function starteTorAnimation() {
       stallText.innerText = "Öffnet";
     }
 
-    index++;
+    /* =========================================
+       Timing
+    ========================================= */
 
-    /* =============================================
-       Ende Durchlauf
-    ============================================= */
+    let wartezeit = 350;
+
+    /*
+      Erstes und letztes Bild länger sichtbar
+    */
+
+    if (index === 0 || index === 2) {
+
+      wartezeit = 900;
+    }
+
+    /*
+      Bewegungsbild kürzer
+    */
+
+    if (index === 1) {
+
+      wartezeit = 250;
+    }
+
+    index++;
 
     if (index >= frames.length) {
 
       index = 0;
-
-      animationTimeout =
-        setTimeout(nextFrame, 500);
-
-      return;
     }
 
     animationTimeout =
-      setTimeout(nextFrame, 500);
+      setTimeout(nextFrame, wartezeit);
   }
 
   nextFrame();
