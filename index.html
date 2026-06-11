@@ -536,11 +536,11 @@ let daten = {
 
   zeit: null,
 
-  lux: 0,
+  helligkeit: 0,
 
   temperatur: 0,
 
-  luftfeuchte: 0,
+  luftfeucht: 0,
 
   torAUF: false,
 
@@ -565,16 +565,16 @@ function updateDaten() {
   document.getElementById("zeit").innerText =
     daten.zeit;
 
-const lux = daten.lux;
+const helligkeit = daten.helligkeit;
 
 const temperatur = daten.temperatur;
 
-const luftfeuchte = daten.luftfeuchte;
+const luftfeucht = daten.luftfeucht;
 
 
 
-  document.getElementById("lux").innerText =
-    lux + " lx";
+  document.getElementById("helligkeit").innerText =
+    helligkeit + " lx";
 
   /* =========================================================
      Temperatur
@@ -610,11 +610,11 @@ const luftfeuchte = daten.luftfeuchte;
      Luftfeuchtigkeit
   ========================================================= */
 
-  document.getElementById("luftfeuchtigkeit").innerText =
-    luftfeuchte + " %";
+  document.getElementById("luftfeucht").innerText =
+    luftfeucht + " %";
 
   const scale =
-    0.6 + (luftfeuchte / 100);
+    0.6 + (luftfeucht / 100);
 
   document.getElementById("humidityIcon").style.transform =
     `scale(${scale})`;
