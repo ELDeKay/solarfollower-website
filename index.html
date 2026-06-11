@@ -503,7 +503,7 @@ body {
 
     <div class="icon">
 
-      <img src="daten.torZU.png"
+      <img src="torZU.png"
            id="stallStatusBild">
 
     </div>
@@ -542,13 +542,13 @@ let daten = {
 
   luftfeuchte: 0,
 
-  daten.torAUF: false,
+  torAUF: false,
 
-  daten.torZU: false,
+  torZU: false,
 
-  daten.motorLaeuft: false,
+  motorLaeuft: false,
 
-  daten.zustand: false
+  zustand: false
 
 };
       
@@ -561,10 +561,9 @@ function updateDaten() {
   const jetzt = new Date();
 
   const zeit =
-    jetzt.toLocaleTimeString("de-DE");
 
   document.getElementById("zeit").innerText =
-    zeit;
+    daten.zeit;
 
 const lux = daten.lux;
 
@@ -673,20 +672,19 @@ let animationTimeout;
 
 const animationZU = [
 
-  "daten.torAUF.png",
+  "torAUF.png",
 
   "torBewegung.png",
 
-  "daten.torZU.png"
+  "torZU.png"
 ];
-
 const animationAUF = [
 
-  "daten.torZU.png",
+  "torZU.png",
 
   "torBewegung.png",
 
-  "daten.torAUF.png"
+  "torAUF.png"
 ];
 
 /* =========================================================
@@ -793,14 +791,14 @@ function aktualisiereTorStatus() {
 
   if (daten.torAUF) {
 
-    stallBild.src = "daten.torAUF.png";
+    stallBild.src = "torAUF.png";
 
     stallText.innerText = "Offen";
   }
 
   if (daten.torZU) {
 
-    stallBild.src = "daten.torZU.png";
+    stallBild.src = "torZU.png";
 
     stallText.innerText = "Geschlossen";
   }
