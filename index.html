@@ -503,7 +503,7 @@ body {
 
     <div class="icon">
 
-      <img src="torZU.png"
+      <img src="daten.torZU.png"
            id="stallStatusBild">
 
     </div>
@@ -528,19 +528,30 @@ body {
 
 <script>
 
-let torAUF = false;
+/* =========================================================
+   Backend Daten
+========================================================= */
 
-let torZU = false;
+let daten = {
 
-let zustand = true;
+  zeit: null,
 
-/*
-  true  = Tor schließt
-  false = Tor öffnet
-*/
+  lux: 0,
 
-let motorLaeuft = true;     
+  temperatur: 0,
 
+  luftfeuchte: 0,
+
+  daten.torAUF: false,
+
+  daten.torZU: false,
+
+  daten.motorLaeuft: false,
+
+  daten.zustand: false
+
+};
+      
 /* =========================================================
    DATEN UPDATE
 ========================================================= */
@@ -555,25 +566,13 @@ function updateDaten() {
   document.getElementById("zeit").innerText =
     zeit;
 
-  /* =========================================================
-     Beispielwerte
-  ========================================================= */
+const lux = daten.lux;
 
-  const lux = 420;
+const temperatur = daten.temperatur;
 
-  const temperatur = 22.5;
-
-  const luftfeuchte = 61;
-
-  /* =========================================================
-     Beispiel Stallwerte
-  ========================================================= */
+const luftfeuchte = daten.luftfeuchte;
 
 
-
-  /* =========================================================
-     Lux
-  ========================================================= */
 
   document.getElementById("lux").innerText =
     lux + " lx";
@@ -674,20 +673,20 @@ let animationTimeout;
 
 const animationZU = [
 
-  "torAUF.png",
+  "daten.torAUF.png",
 
   "torBewegung.png",
 
-  "torZU.png"
+  "daten.torZU.png"
 ];
 
 const animationAUF = [
 
-  "torZU.png",
+  "daten.torZU.png",
 
   "torBewegung.png",
 
-  "torAUF.png"
+  "daten.torAUF.png"
 ];
 
 /* =========================================================
@@ -701,13 +700,13 @@ function starteTorAnimation() {
   animationAktiv = true;
 
   const frames =
-    zustand ? animationZU : animationAUF;
+    daten.zustand ? animationZU : animationAUF;
 
   let index = 0;
 
   function nextFrame() {
 
-    if (!motorLaeuft) {
+    if (!daten.motorLaeuft) {
 
       animationAktiv = false;
 
@@ -720,7 +719,7 @@ function starteTorAnimation() {
 
     stallBild.src = frames[index];
 
-    if (zustand) {
+    if (daten.zustand) {
 
       stallText.innerText = "Schließt";
 
@@ -777,7 +776,7 @@ function aktualisiereTorStatus() {
      Motor läuft
   ============================================= */
 
-  if (motorLaeuft) {
+  if (daten.motorLaeuft) {
 
     starteTorAnimation();
 
@@ -792,16 +791,16 @@ function aktualisiereTorStatus() {
 
   animationAktiv = false;
 
-  if (torAUF) {
+  if (daten.torAUF) {
 
-    stallBild.src = "torAUF.png";
+    stallBild.src = "daten.torAUF.png";
 
     stallText.innerText = "Offen";
   }
 
-  if (torZU) {
+  if (daten.torZU) {
 
-    stallBild.src = "torZU.png";
+    stallBild.src = "daten.torZU.png";
 
     stallText.innerText = "Geschlossen";
   }
