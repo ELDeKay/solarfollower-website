@@ -417,7 +417,7 @@ body {
     </div>
 
     <div class="kachelWert"
-         id="lux">
+         id="helligkeit">
 
       -- lx
 
@@ -466,7 +466,7 @@ body {
     </div>
 
     <div class="kachelWert"
-         id="luftfeuchtigkeit">
+         id="luftfeucht">
 
       -- %
 
@@ -555,17 +555,53 @@ let daten = {
 };
       
 /* =========================================================
+   API
+========================================================= */
+
+const API_STATUS =
+  "https://solar-backend-ljck.onrender.com/api/data";
+
+async function ladeBackendDaten() {
+
+  try {
+
+    const response =
+      await fetch(API_STATUS);
+
+    const data =
+      await response.json();
+
+    /*
+       Backend liefert eine Liste.
+       Wir nehmen den letzten Datensatz.
+    */
+
+    if (Array.isArray(data) && data.length > 0) {
+
+      daten = data[data.length - 1];
+
+      updateDaten();
+    }
+
+  } catch (fehler) {
+
+    console.error(
+      "Backend nicht erreichbar:",
+      fehler
+    );
+  }
+}
+
+/* =========================================================
    DATEN UPDATE
 ========================================================= */
 
 function updateDaten() {
 
-  const jetzt = new Date();
+const zeit = daten.zeit;
 
-  const zeit =
-
-  document.getElementById("zeit").innerText =
-    daten.zeit;
+document.getElementById("zeit").innerText =
+  zeit;
 
 const helligkeit = daten.helligkeit;
 
@@ -627,7 +663,7 @@ const luftfeucht = daten.luftfeucht;
 
       document.getElementById("tagNachtStatus").innerText =
       daten.statusTagNacht;
-  }
+  
 
   /* =========================================================
      Stallstatus
@@ -799,9 +835,9 @@ function aktualisiereTorStatus() {
    Initialisierung
 ========================================================= */
 
-updateDaten();
+ladeBackendDaten();
 
-setInterval(updateDaten, 5000);
+setInterval(ladeBackendDaten, 5000);
 
 </script>
 
