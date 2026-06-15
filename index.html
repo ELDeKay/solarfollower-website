@@ -548,7 +548,9 @@ let daten = {
 
   motorLaeuft: false,
 
-  zustand: false
+  zustand: false,     
+
+  statusTagNacht: false
 
 };
       
@@ -623,19 +625,8 @@ const luftfeucht = daten.luftfeucht;
      Tag/Nacht
   ========================================================= */
 
-  const stunde =
-    jetzt.getHours();
-
-  if (stunde >= 7 && stunde < 20) {
-
-    document.getElementById("tagNachtStatus").innerText =
-      "Tag";
-
-  }
-  else {
-
-    document.getElementById("tagNachtStatus").innerText =
-      "Nacht";
+      document.getElementById("tagNachtStatus").innerText =
+      daten.statusTagNacht;
   }
 
   /* =========================================================
