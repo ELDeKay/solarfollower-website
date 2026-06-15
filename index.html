@@ -38,37 +38,29 @@ body {
 
   margin: 0 auto 20px auto;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
   position: relative;
 }
 
 .kopfzeile h1 {
 
+  text-align: center;
+
   margin: 0;
 }
 
-.settingsBtn img {
+.settingsBtn {
 
-  width: 60px;
+  position: absolute;
 
-  height: 60px;
+  top: 0;
 
-  object-fit: contain;
-}
+  right: 0;
 
-      
+  font-size: 50px;
 
+  text-decoration: none;
 
-      
-
-.kopfzeile h1 {
-
-  position: static;
-  transform: none;
-  margin: 0;
+  cursor: pointer;
 }
 
 /* =========================================================
@@ -365,9 +357,12 @@ body {
 
   <h1>Hühnerstall Projekt</h1>
 
-<a href="einstellungen.html" class="settingsBtn">
-  <img src="zahnrad.png" alt="Einstellungen">
-</a>
+  <a href="einstellungen.html"
+     class="settingsBtn">
+    ⚙️
+  </a>
+
+</div>
 
 </div>
 
