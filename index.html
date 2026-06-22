@@ -941,7 +941,9 @@ function aktualisiereTorStatus() {
     stallText.innerText = "Geschlossen";
   }
 }
-      <!-- =========================================================
+
+      
+<!-- =========================================================
      Graph Fenster
 ========================================================= -->
 
@@ -962,7 +964,20 @@ function aktualisiereTorStatus() {
 
 </div>
 
-<script>
+<div id="graphOverlay"
+     class="graphOverlay"
+     onclick="schliesseGraph()">
+
+  <div class="graphFenster"
+       onclick="event.stopPropagation()">
+
+    <div id="graphTitel">
+      Graph
+    </div>
+
+  </div>
+
+</div>
 
 /* =========================================================
    Graph Anzeige
