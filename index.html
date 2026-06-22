@@ -298,6 +298,75 @@ body {
 
   object-fit: contain;
 }
+      
+/* =========================================================
+   Graph Overlay
+========================================================= */
+
+.graphOverlay {
+
+  display: none;
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.4);
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+}
+
+.graphOverlay.aktiv {
+
+  display: flex;
+}
+
+.graphFenster {
+
+  width: 90%;
+  max-width: 1000px;
+
+  height: 80%;
+
+  background: white;
+
+  border-radius: 20px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  font-size: 32px;
+
+  font-weight: bold;
+}
+
+/* Klickbare Kacheln */
+
+.graphKachel {
+
+  cursor: pointer;
+
+  transition: transform 0.2s ease;
+}
+
+.graphKachel:hover {
+
+  transform: scale(1.03);
+}
+
+
+      
 
 /* =========================================================
    Mobile Ansicht
@@ -435,7 +504,8 @@ body {
   </div>
 
   <!-- Lux -->
-  <div class="btnRasterFeld">
+  <div class="btnRasterFeld graphKachel"
+     onclick="zeigeGraph('Lux Verlauf')">
 
     <div class="icon">
 
@@ -459,7 +529,8 @@ body {
   </div>
 
   <!-- Temperatur -->
-  <div class="btnRasterFeld">
+  <div class="btnRasterFeld graphKachel"
+     onclick="zeigeGraph('Temperatur Verlauf')">
 
     <div class="icon">
 
@@ -483,7 +554,8 @@ body {
   </div>
 
   <!-- Luftfeuchtigkeit -->
-  <div class="btnRasterFeld">
+  <div class="btnRasterFeld graphKachel"
+     onclick="zeigeGraph('Luftfeuchtigkeit Verlauf')">
 
     <div class="icon">
 
@@ -508,7 +580,8 @@ body {
   </div>
 
   <!-- Tag Nacht -->
-  <div class="btnRasterFeld">
+  <div class="btnRasterFeld graphKachel"
+     onclick="zeigeGraph('Tag/Nacht Verlauf')">
 
     <div class="skyWindow">
 
@@ -868,6 +941,48 @@ function aktualisiereTorStatus() {
     stallText.innerText = "Geschlossen";
   }
 }
+      <!-- =========================================================
+     Graph Fenster
+========================================================= -->
+
+<div id="graphOverlay"
+     class="graphOverlay"
+     onclick="schliesseGraph()">
+
+  <div class="graphFenster"
+       onclick="event.stopPropagation()">
+
+    <div id="graphTitel">
+
+      Graph
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   Graph Anzeige
+========================================================= */
+
+function zeigeGraph(titel) {
+
+  document.getElementById("graphTitel").innerText =
+    titel;
+
+  document.getElementById("graphOverlay")
+    .classList.add("aktiv");
+}
+
+function schliesseGraph() {
+
+  document.getElementById("graphOverlay")
+    .classList.remove("aktiv");
+}
+
 
 /* =========================================================
    Initialisierung
