@@ -631,7 +631,21 @@ body {
 
 </div>
 </div>
+      
+<div id="graphOverlay"
+     class="graphOverlay"
+     onclick="schliesseGraph()">
 
+  <div class="graphFenster"
+       onclick="event.stopPropagation()">
+
+    <div id="graphTitel">
+      Graph
+    </div>
+
+  </div>
+
+</div>
 <script>
 
 /* =========================================================
@@ -943,41 +957,6 @@ function aktualisiereTorStatus() {
 }
 
       
-<!-- =========================================================
-     Graph Fenster
-========================================================= -->
-
-<div id="graphOverlay"
-     class="graphOverlay"
-     onclick="schliesseGraph()">
-
-  <div class="graphFenster"
-       onclick="event.stopPropagation()">
-
-    <div id="graphTitel">
-
-      Graph
-
-    </div>
-
-  </div>
-
-</div>
-
-<div id="graphOverlay"
-     class="graphOverlay"
-     onclick="schliesseGraph()">
-
-  <div class="graphFenster"
-       onclick="event.stopPropagation()">
-
-    <div id="graphTitel">
-      Graph
-    </div>
-
-  </div>
-
-</div>
 
 /* =========================================================
    Graph Anzeige
