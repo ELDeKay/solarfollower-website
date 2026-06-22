@@ -81,7 +81,13 @@ body {
 
   margin: 0 auto 20px auto;
 
-  text-align: right;
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 10px;
 
   color: #666;
 
@@ -367,8 +373,6 @@ body {
 
   <h1>Hühnerstall Projekt</h1>
 
-<a href="einstellungen.html" class="settingsBtn">
-  <img src="zahnrad.png" alt="Einstellungen">
 </a>
 
 
@@ -378,10 +382,15 @@ body {
      Statuszeile
 ========================================================= -->
 
-<div class="zeitAbrufStatus"
-     id="dataStamp">
+<div class="zeitAbrufStatus">
 
-  Letzte Aktualisierung: --
+  <span id="dataStamp">
+    Letzte Aktualisierung: --
+  </span>
+
+  <a href="einstellungen.html" class="settingsBtn">
+    <img src="zahnrad.png" alt="Einstellungen">
+  </a>
 
 </div>
 
