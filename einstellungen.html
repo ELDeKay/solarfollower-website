@@ -1,50 +1,56 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
 
-  <!-- =========================================================
-        Eigenschaften der Website
-       - width=device-width: Layout passt sich der Gerätebreite an
-       - initial-scale=1.0: Start-Zoom = 100%
-       ========================================================= -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>Einstellungen</title>
 
   <style>
-    /* =========================================================
-       Globale Eingenschaften : Einheitliches Box-Modell für alle Elemente
-       ========================================================= */
-    *, *::before, *::after { box-sizing: border-box; }
-
-    /* Seite soll mindestens Bildschirmhöhe haben */
-    html, body { height: 100%; }
 
     /* =========================================================
-       Grundlayout der Website
-       ========================================================= */
+       Grundlayout
+    ========================================================= */
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
       margin: 0;
       padding: 20px;
+
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
+
     /* =========================================================
        Kopfzeile
-       - Titel mittig
-       - Zurück-Button rechts (Desktop)
-       ========================================================= */
+    ========================================================= */
+
     .kopfzeile {
       width: 100%;
       max-width: 800px;
+
       position: relative;
+
       display: flex;
       align-items: center;
+
       margin-bottom: 30px;
     }
 
@@ -52,267 +58,380 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+
       margin: 0;
       text-align: center;
     }
 
-    /* Button "Zurück zum Hauptmenü" */
     .zurueck-btn {
-      text-decoration: none;
+      margin-left: auto;
+
+      display: inline-block;
+
+      padding: 10px 16px;
+
+      border-radius: 10px;
+
       background: #007BFF;
       color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
+
       font-weight: bold;
-      margin-left: auto;
-      display: inline-block;
+      text-decoration: none;
+
       touch-action: manipulation;
     }
 
+
     /* =========================================================
-       Hauptbox Eigenschaften
-       ========================================================= */
+       Hauptbox
+    ========================================================= */
+
     .box {
       width: 100%;
       max-width: 800px;
-      background: white;
-      border-radius: 16px;
+
       padding: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      margin: 0;
+
+      background: white;
+
+      border-radius: 16px;
+
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .box h2 {
       margin-top: 0;
       margin-bottom: 20px;
+
       text-align: center;
     }
 
+
     /* =========================================================
-       Eingabefelder
-       ========================================================= */
-    .eingabefeld { margin-bottom: 20px; }
+       Eingabefelder und Buttons
+    ========================================================= */
+
+    .eingabefeld {
+      margin-bottom: 20px;
+    }
 
     .eingabefeld label {
       display: block;
+
       margin-bottom: 6px;
+
       font-weight: bold;
     }
 
     .eingabefeld input[type="number"],
     .eingabefeld input[type="text"] {
       width: 100%;
+
       padding: 12px;
+
       font-size: 16px;
-      border-radius: 8px;
+
       border: 1px solid #ccc;
+      border-radius: 8px;
     }
 
-    /* =========================================================
-       Button-Layout
-       - Desktop: 2 Buttons nebeneinander
-       - Mobile: untereinander
-       ========================================================= */
-    .btn-reihe {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 10px;
-    }
-
-    /* Gemeinsames Design aller Buttons */
     .btns {
       width: 100%;
+
+      display: block;
+
       padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
+
       border: none;
       border-radius: 10px;
+
       background: #007BFF;
       color: white;
-      cursor: pointer;
-      touch-action: manipulation;
-    
-      display: block;
+
+      font-size: 16px;
+      font-weight: bold;
       text-align: center;
       text-decoration: none;
 
-    .btns:active { transform: scale(0.99); }
+      cursor: pointer;
 
-    /* =========================================================
-       Status-Anzeige
-       - zeigt aktuellen Zustand der Datenübertragung
-       ========================================================= */
-    .status {
-      margin-top: 20px;
-      font-size: 14px;
-      text-align: center;
-      color: #555;
+      touch-action: manipulation;
     }
 
+    .btns:active {
+      transform: scale(0.99);
+    }
+
+    .status {
+      margin-top: 20px;
+
+      color: #555;
+
+      font-size: 14px;
+      text-align: center;
+    }
+
+
     /* =========================================================
-       Mobile Anpassungen
-       ========================================================= */
+       Mobile Ansicht
+    ========================================================= */
+
     @media (max-width: 600px) {
+
       body {
         padding: 14px;
-        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+        padding-bottom:
+          calc(14px + env(safe-area-inset-bottom));
+
         align-items: stretch;
       }
 
       .kopfzeile {
         flex-direction: column;
         align-items: stretch;
+
         gap: 12px;
+
         margin-bottom: 18px;
       }
 
       .kopfzeile h1 {
         position: static;
         transform: none;
-        text-align: center;
+
         order: 1;
+
+        text-align: center;
       }
 
       .zurueck-btn {
         width: 100%;
-        text-align: center;
+
         order: 2;
+
         margin-left: 0;
+
+        text-align: center;
       }
 
-      .box { padding: 18px; }
-
-      /* Mobile: Buttons untereinander */
-      .btn-reihe {
-        grid-template-columns: 1fr;
+      .box {
+        padding: 18px;
       }
     }
+
   </style>
 </head>
 
 <body>
 
   <!-- =========================================================
-       Titel + Navigation zurück zur Startseite
-       ========================================================= -->
+       Kopfbereich
+  ========================================================= -->
+
   <div class="kopfzeile">
+
     <h1>Einstellungen</h1>
-    <a class="zurueck-btn" href="index.html">Zurück zum Hauptmenü</a>
+
+    <a class="zurueck-btn"
+       href="index.html">
+      Zurück zum Hauptmenü
+    </a>
+
   </div>
+
 
   <!-- =========================================================
-       Inhalt der Hauptbox: IP-Adresse, GEO-Daten
-       ========================================================= -->
+       Standortdaten
+  ========================================================= -->
+
   <div class="box">
+
     <h2>Standortdaten</h2>
 
-    <!-- Koordinaten: Latitude -->
     <div class="eingabefeld">
-      <label for="latitude">Breitengrad (Latitude)</label>
-      <input type="number" id="latitude" step="0.000001" placeholder="z. B. 48.137154" />
+
+      <label for="latitude">
+        Breitengrad (Latitude)
+      </label>
+
+      <input type="number"
+             id="latitude"
+             step="0.000001"
+             placeholder="z. B. 48.137154">
+
     </div>
 
-    <!-- Koordinaten: Longitude -->
     <div class="eingabefeld">
-      <label for="longitude">Längengrad (Longitude)</label>
-      <input type="number" id="longitude" step="0.000001" placeholder="z. B. 11.576124" />
+
+      <label for="longitude">
+        Längengrad (Longitude)
+      </label>
+
+      <input type="number"
+             id="longitude"
+             step="0.000001"
+             placeholder="z. B. 11.576124">
+
     </div>
 
+    <div class="eingabefeld">
 
+      <button id="sendeGeoDatenBtn"
+              type="button"
+              class="btns">
+        Geo-Daten schicken
+      </button>
 
-    <!-- Aktionen: Geo-Daten senden -->
-    <div class="eigabefeld">
-      <button id="sendeGeoDatenBtn" type="button" class="btns">Geo-Daten schicken</button>
     </div>
 
-    <br>
-
-
-    <!-- Anleitung -->
     <div class="eingabefeld">
-      <a href="anleitung.html" type="button" class="btns"style="width:100%;">
+
+      <a href="anleitung.html"
+         class="btns">
         Anleitung
       </a>
+
     </div>
-    
-    <!-- Statusanzeige für den Benutzer -->
-    <div class="status" id="statusText">
+
+    <div class="status"
+         id="statusText">
       Geo-Daten werden zurzeit nicht übertragen
     </div>
+
   </div>
 
-<script>
-  /* =========================================================
-     "Key"Namen und Variablen Deklarationen
-     ========================================================= */
 
-  // Backend-URL (Render API)
-  const API_BASE = "https://solar-backend-ljck.onrender.com";
+  <script>
 
-  // Input-Felder
-  const latitudeInput = document.getElementById("latitude");
-  const longitudeInput = document.getElementById("longitude");
+    /* =========================================================
+       Variablen
+    ========================================================= */
 
-  // Buttons
-  const sendeGeoDatenBtn = document.getElementById("sendeGeoDatenBtn");
-  // Statusanzeige
-  const statusText = document.getElementById("statusText");
+    const API_BASE =
+      "https://solar-backend-ljck.onrender.com";
 
-  /* =========================================================
-     Überprüfung: IPv4-Adresse gültig?
-     ========================================================= */
-  function istGueltigeIPv4(ip) {
-    const parts = ip.split(".");
-    if (parts.length !== 4) return false;
-    return parts.every(p => {
-      if (p.trim() === "") return false;
-      if (!/^\d+$/.test(p)) return false;
-      const n = Number(p);
-      return n >= 0 && n <= 255;
-    });
-  }
+    const latitudeInput =
+      document.getElementById("latitude");
 
-  /* =========================================================
-     Funktion: Einstellungen an Backend senden
-     ========================================================= */
-  async function posteinstellungen(payload) {
-    const res = await fetch(`${API_BASE}/api/einstellungen`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json().catch(() => ({}));
-  }
+    const longitudeInput =
+      document.getElementById("longitude");
 
-  /* =========================================================
-     Button: Geo-Daten senden (Latitude & Longitude)
-     ========================================================= */
-  sendeGeoDatenBtn.addEventListener("click", async () => {
-    const latitude = parseFloat(latitudeInput.value);
-    const longitude = parseFloat(longitudeInput.value);
+    const sendeGeoDatenBtn =
+      document.getElementById("sendeGeoDatenBtn");
 
-    // Eingabe prüfen
-    if (isNaN(latitude) || isNaN(longitude)) {
-      alert("Bitte geben Sie gültige Koordinaten ein");
-      return;
+    const statusText =
+      document.getElementById("statusText");
+
+
+    /* Sendet Einstellungen als JSON an das Backend. */
+    async function posteEinstellungen(payload) {
+
+      const response = await fetch(
+        `${API_BASE}/api/einstellungen`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify(payload)
+        }
+      );
+
+      let antwort = {};
+
+      try {
+        antwort = await response.json();
+      } catch {
+        antwort = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          antwort.error ||
+          "HTTP-Fehler " + response.status
+        );
+      }
+
+      return antwort;
     }
 
-    try {
-      statusText.innerText = "Übertragung läuft ...";
-      await posteinstellungen({ latitude, longitude });
-      statusText.innerText = "Daten werden übertragen";
-    } catch {
-      statusText.innerText = "Übertragung fehlgeschlagen";
+
+    /* Prüft den erlaubten Wertebereich von Breiten- und Längengrad. */
+    function sindKoordinatenGueltig(
+      latitude,
+      longitude
+    ) {
+      return (
+        Number.isFinite(latitude) &&
+        Number.isFinite(longitude) &&
+        latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180
+      );
     }
-  });
 
 
-  
+    /* Liest die Koordinaten ein und überträgt sie an das Backend. */
+    sendeGeoDatenBtn.addEventListener(
+      "click",
+      async () => {
 
-</script>
+        const latitude =
+          Number(latitudeInput.value);
+
+        const longitude =
+          Number(longitudeInput.value);
+
+        if (
+          !sindKoordinatenGueltig(
+            latitude,
+            longitude
+          )
+        ) {
+          alert(
+            "Bitte gültige Koordinaten eingeben.\n\n" +
+            "Breitengrad: -90 bis 90\n" +
+            "Längengrad: -180 bis 180"
+          );
+
+          return;
+        }
+
+        try {
+          sendeGeoDatenBtn.disabled = true;
+
+          statusText.innerText =
+            "Geo-Daten werden übertragen ...";
+
+          await posteEinstellungen({
+            latitude,
+            longitude
+          });
+
+          statusText.innerText =
+            "Geo-Daten wurden erfolgreich übertragen";
+
+        } catch (fehler) {
+          console.error(
+            "Geo-Daten konnten nicht übertragen werden:",
+            fehler
+          );
+
+          statusText.innerText =
+            "Übertragung fehlgeschlagen: " +
+            fehler.message;
+
+        } finally {
+          sendeGeoDatenBtn.disabled = false;
+        }
+      }
+    );
+
+  </script>
 
 </body>
 </html>
-
