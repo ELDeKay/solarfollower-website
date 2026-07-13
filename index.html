@@ -710,13 +710,12 @@ body {
                 width:100% !important;
                 height:100% !important;">
 
-                <button onclick="ladeGraph(1)">24h</button>
+            <button onclick="ladeGraph(1)">24h</button>
+            <button onclick="ladeGraph(7)">7 Tage</button>
+            <button onclick="ladeGraph(14)">14 Tage</button>
+            <button onclick="ladeGraph(30)">30 Tage</button>
 
-                <button onclick="ladeGraph(7)">7 Tage</button>
-
-                <button onclick="ladeGraph(30)">30 Tage</button>
-
-                <button onclick="ladeGraph(90)">90 Tage</button>
+ 
 
             </div>
 
@@ -727,14 +726,27 @@ body {
 </div>
 <script>
 
+/* =========================================================
+   Zeitfunktionen
+========================================================= */
+
 function unixZeitZuDatum(unixSekunden) {
-  if (unixSekunden === null || unixSekunden === undefined) {
+  if (
+    unixSekunden === null ||
+    unixSekunden === undefined
+  ) {
     return "--";
   }
 
-  const datum = new Date(Number(unixSekunden) * 1000);
+  const sekunden = Number(unixSekunden);
 
-  if (isNaN(datum.getTime())) {
+  if (!Number.isFinite(sekunden)) {
+    return "--";
+  }
+
+  const datum = new Date(sekunden * 1000);
+
+  if (Number.isNaN(datum.getTime())) {
     return "--";
   }
 
@@ -748,165 +760,257 @@ function unixZeitZuDatum(unixSekunden) {
   });
 }
 
+
+/*
+  Kürzere Zeitdarstellung für die X-Achse.
+*/
+function unixZeitZuGraphLabel(unixSekunden, tage) {
+  const sekunden = Number(unixSekunden);
+
+  if (!Number.isFinite(sekunden)) {
+    return "--";
+  }
+
+  const datum = new Date(sekunden * 1000);
+
+  if (tage <= 1) {
+    return datum.toLocaleString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  if (tage <= 7) {
+    return datum.toLocaleString("de-DE", {
+      weekday: "short",
+      hour: "2-digit"
+    });
+  }
+
+  return datum.toLocaleString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit"
+  });
+}
+
+
 /* =========================================================
-   Backend Daten
+   Backend-Daten
 ========================================================= */
 
 let daten = {
-
   zeit: null,
-
   helligkeit: 0,
-
   temperatur: 0,
-
   luftfeucht: 0,
-
   torAUF: false,
-
   torZU: false,
-
   motorLaeuft: false,
-
-  zustand: false,     
-
-  statusTagNacht: false,
-
-  licht: false,
+  zustand: false,
+  statusTagNacht: false
 };
-      
- let lichtStatusAktuell = false;
-      
+
+let lichtStatusAktuell = false;
+
+
 /* =========================================================
-   API
+   API-Adressen
 ========================================================= */
 
-const API_STATUS =
-  "https://solar-backend-ljck.onrender.com/api/data";
+/*
+  Nur der aktuellste Messwert.
+*/
+const API_AKTUELL =
+  "https://solar-backend-ljck.onrender.com/api/aktuell";
+
+/*
+  Berechnete Stundenmittelwerte der letzten 30 Tage.
+*/
+const API_STUNDENWERTE =
+  "https://solar-backend-ljck.onrender.com/api/stundenwerte";
+
+/*
+  Licht und sonstige Einstellungen.
+*/
 const API_EINSTELLUNGEN =
   "https://solar-backend-ljck.onrender.com/api/einstellungen";
 
-async function ladeBackendDaten() {
+
+/* =========================================================
+   Hilfsfunktion: API abrufen
+========================================================= */
+
+async function holeJson(url, optionen = {}) {
+  const response = await fetch(
+    url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(),
+    {
+      cache: "no-store",
+      ...optionen
+    }
+  );
+
+  let antwort;
 
   try {
+    antwort = await response.json();
+  } catch {
+    throw new Error(
+      "Backend liefert keine gültige JSON-Antwort"
+    );
+  }
 
-    const response =
-      await fetch(API_STATUS);
+  if (!response.ok) {
+    throw new Error(
+      antwort.error ||
+      "HTTP-Fehler " + response.status
+    );
+  }
 
-    const data =
-      await response.json();
+  return antwort;
+}
+
+
+/* =========================================================
+   Aktuellen Messwert laden
+========================================================= */
+
+async function ladeBackendDaten() {
+  try {
+    const antwort = await holeJson(API_AKTUELL);
 
     /*
-       Backend liefert eine Liste.
-       Wir nehmen den letzten Datensatz.
+      Nicht das komplette Objekt ersetzen.
+      Dadurch bleiben weitere vorhandene Werte erhalten.
     */
+    daten = {
+      ...daten,
+      ...antwort
+    };
 
-    if (Array.isArray(data) && data.length > 0) {
-
-      daten = data[data.length - 1];
-
-      updateDaten();
-    }
+    updateDaten();
 
   } catch (fehler) {
-
     console.error(
-      "Backend nicht erreichbar:",
+      "Aktuelle Messdaten konnten nicht geladen werden:",
       fehler
     );
+
+    document.getElementById("dataStamp").innerText =
+      "Backend nicht erreichbar";
   }
 }
 
+
 /* =========================================================
-   DATEN UPDATE
+   Anzeige der Kacheln aktualisieren
 ========================================================= */
 
 function updateDaten() {
+  const zeitText = unixZeitZuDatum(daten.zeit);
 
-const zeit = unixZeitZuDatum(daten.zeit);
-
-document.getElementById("zeit").innerText =
-  zeit;
-
-const helligkeit = daten.helligkeit;
-
-const temperatur = daten.temperatur;
-
-const luftfeucht = daten.luftfeucht;
+  document.getElementById("zeit").innerText =
+    zeitText;
 
 
+  /* ---------------------------------------------------------
+     Helligkeit
+  --------------------------------------------------------- */
+
+  const helligkeit = Number(daten.helligkeit);
 
   document.getElementById("helligkeit").innerText =
-    helligkeit + " lx";
+    Number.isFinite(helligkeit)
+      ? helligkeit.toFixed(0) + " lx"
+      : "-- lx";
 
-  /* =========================================================
+
+  /* ---------------------------------------------------------
      Temperatur
-  ========================================================= */
+  --------------------------------------------------------- */
+
+  const temperatur = Number(daten.temperatur);
 
   document.getElementById("temperatur").innerText =
-    temperatur + " °C";
+    Number.isFinite(temperatur)
+      ? temperatur.toFixed(1) + " °C"
+      : "-- °C";
 
   const tempEl =
     document.getElementById("temperatur");
 
-  if (temperatur < 10) {
-
-    tempEl.style.color = "#2196F3";
-
-  }
-  else if (temperatur < 22) {
-
-    tempEl.style.color = "#4CAF50";
-
-  }
-  else if (temperatur < 30) {
-
-    tempEl.style.color = "#FF9800";
-
-  }
-  else {
-
-    tempEl.style.color = "#F44336";
+  if (Number.isFinite(temperatur)) {
+    if (temperatur < 10) {
+      tempEl.style.color = "#2196F3";
+    }
+    else if (temperatur < 22) {
+      tempEl.style.color = "#4CAF50";
+    }
+    else if (temperatur < 30) {
+      tempEl.style.color = "#FF9800";
+    }
+    else {
+      tempEl.style.color = "#F44336";
+    }
   }
 
-  /* =========================================================
+
+  /* ---------------------------------------------------------
      Luftfeuchtigkeit
-  ========================================================= */
+  --------------------------------------------------------- */
+
+  const luftfeucht = Number(daten.luftfeucht);
 
   document.getElementById("luftfeucht").innerText =
-    luftfeucht + " %";
+    Number.isFinite(luftfeucht)
+      ? luftfeucht.toFixed(1) + " %"
+      : "-- %";
 
-  const scale =
-    0.6 + (luftfeucht / 100);
+  if (Number.isFinite(luftfeucht)) {
+    const begrenzt = Math.min(
+      100,
+      Math.max(0, luftfeucht)
+    );
 
-  document.getElementById("humidityIcon").style.transform =
-    `scale(${scale})`;
+    const scale =
+      0.6 + (begrenzt / 100);
 
-  /* =========================================================
+    document.getElementById(
+      "humidityIcon"
+    ).style.transform = `scale(${scale})`;
+  }
+
+
+  /* ---------------------------------------------------------
      Tag/Nacht
-  ========================================================= */
+  --------------------------------------------------------- */
 
-document.getElementById("tagNachtStatus").innerText =
-  daten.statusTagNacht ? "Tag" : "Nacht";
-  
+  document.getElementById(
+    "tagNachtStatus"
+  ).innerText =
+    daten.statusTagNacht === true
+      ? "Tag"
+      : "Nacht";
 
-  /* =========================================================
+
+  /* ---------------------------------------------------------
      Stallstatus
-  ========================================================= */
+  --------------------------------------------------------- */
 
-aktualisiereTorStatus();
+  aktualisiereTorStatus();
 
 
-  /* =========================================================
-     Aktualisierung
-  ========================================================= */
+  /* ---------------------------------------------------------
+     Letzte Aktualisierung
+  --------------------------------------------------------- */
 
   document.getElementById("dataStamp").innerText =
-    "Letzte Aktualisierung: " + zeit;
+    "Letzte Aktualisierung: " + zeitText;
 }
 
+
 /* =========================================================
-   STALL STATUS SYSTEM
+   Stallstatus
 ========================================================= */
 
 const stallBild =
@@ -916,102 +1020,67 @@ const stallText =
   document.getElementById("stallStatus");
 
 let animationAktiv = false;
+let animationTimeout = null;
 
-let animationTimeout;
-
-/* =========================================================
-   Bilderfolgen
-========================================================= */
 
 const animationZU = [
-
   "torAUF.png",
-
   "torBewegung.png",
-
   "torZU.png"
 ];
+
 const animationAUF = [
-
   "torZU.png",
-
   "torBewegung.png",
-
   "torAUF.png"
 ];
 
-/* =========================================================
-   Animation
-========================================================= */
 
 function starteTorAnimation() {
-
-  if (animationAktiv) return;
+  if (animationAktiv) {
+    return;
+  }
 
   animationAktiv = true;
 
   const frames =
-    daten.zustand ? animationZU : animationAUF;
+    daten.zustand
+      ? animationZU
+      : animationAUF;
 
   let index = 0;
 
   function nextFrame() {
-
     if (!daten.motorLaeuft) {
-
       animationAktiv = false;
-
       return;
     }
 
-    /* =========================================
-       Bild anzeigen
-    ========================================= */
-
     stallBild.src = frames[index];
 
-    if (daten.zustand) {
-
+    if (!daten.torAUF && !daten.torZU) {
+      stallText.innerText = "In Bewegung";
+    }
+    else if (daten.zustand) {
       stallText.innerText = "Schließt";
-
-    } else {
-
+    }
+    else {
       stallText.innerText = "Öffnet";
     }
-   if (!daten.torAUF && !daten.torZU) {
-
-  stallText.innerText = "In Bewegung";
-
-}
-
-    /* =========================================
-       Timing
-    ========================================= */
 
     let wartezeit = 350;
 
-    /*
-      Erstes und letztes Bild länger sichtbar
-    */
-
     if (index === 0 || index === 2) {
-
       wartezeit = 900;
     }
 
-    /*
-      Bewegungsbild kürzer
-    */
-
     if (index === 1) {
-
       wartezeit = 250;
     }
 
     index++;
 
     if (index >= frames.length) {
-
       index = 0;
     }
 
@@ -1022,175 +1091,324 @@ function starteTorAnimation() {
   nextFrame();
 }
 
-/* =========================================================
-   Status prüfen
-========================================================= */
 
 function aktualisiereTorStatus() {
-
-  /* =============================================
-     Motor läuft
-  ============================================= */
-
-  if (daten.motorLaeuft) {
-
+  if (daten.motorLaeuft === true) {
     starteTorAnimation();
-
     return;
   }
 
-  /* =============================================
-     Motor aus
-  ============================================= */
-
   clearTimeout(animationTimeout);
-
   animationAktiv = false;
 
-  if (daten.torAUF) {
-
+  if (daten.torAUF === true) {
     stallBild.src = "torAUF.png";
-
     stallText.innerText = "Offen";
   }
-
-  if (daten.torZU) {
-
+  else if (daten.torZU === true) {
     stallBild.src = "torZU.png";
-
     stallText.innerText = "Geschlossen";
   }
 }
 
-      
 
 /* =========================================================
-   Graph Anzeige
+   Graphen
 ========================================================= */
+
 let chart = null;
 let aktuellerGraph = "";
+let aktuellerZeitraum = 30;
 
-async function zeigeGraph(titel){
 
-    aktuellerGraph = titel;
+/*
+  Diese Einstellungen bestimmen für jede Kachel:
+  - Datenbankfeld
+  - Einheit
+  - Titel
+*/
+const graphKonfiguration = {
+  "Lux Verlauf": {
+    feld: "helligkeit",
+    einheit: " lx",
+    achsenTitel: "Helligkeit in Lux"
+  },
 
-    document.getElementById("graphTitel").innerText = titel;
+  "Temperatur Verlauf": {
+    feld: "temperatur",
+    einheit: " °C",
+    achsenTitel: "Temperatur in °C"
+  },
 
-    document.getElementById("graphOverlay")
-            .classList.add("aktiv");
+  "Luftfeuchtigkeit Verlauf": {
+    feld: "luftfeucht",
+    einheit: " %",
+    achsenTitel: "Luftfeuchtigkeit in %"
+  },
 
-    ladeGraph(90);
+  "Tag/Nacht Verlauf": {
+    feld: "statusTagNacht",
+    einheit: "",
+    achsenTitel: "Tag / Nacht"
+  }
+};
 
+
+async function zeigeGraph(titel) {
+  aktuellerGraph = titel;
+
+  document.getElementById("graphTitel").innerText =
+    titel;
+
+  document.getElementById("graphOverlay")
+    .classList.add("aktiv");
+
+  /*
+    Standardmäßig 30 Tage, weil die Datenbank
+    maximal 30 Tage Stundenwerte speichert.
+  */
+  await ladeGraph(30);
 }
 
-function schliesseGraph(){
 
-    document.getElementById("graphOverlay")
-            .classList.remove("aktiv");
-
+function schliesseGraph() {
+  document.getElementById("graphOverlay")
+    .classList.remove("aktiv");
 }
 
-async function ladeGraph(tage){
 
-    const response = await fetch(API_STATUS);
+async function ladeGraph(tage) {
+  aktuellerZeitraum = tage;
 
-    const alleDaten = await response.json();
+  const konfiguration =
+    graphKonfiguration[aktuellerGraph];
 
-    const jetzt = new Date();
+  if (!konfiguration) {
+    console.error(
+      "Unbekannter Graph:",
+      aktuellerGraph
+    );
+    return;
+  }
 
-    const grenze = jetzt.getTime() - tage*24*60*60*1000;
+  try {
+    const alleDaten =
+      await holeJson(API_STUNDENWERTE);
 
-    const daten = alleDaten.filter(e=>{
-
-        if(!e.zeit) return false;
-
-        return new Date(e.zeit).getTime() >= grenze;
-
-    });
-
-    const labels = [];
-
-    const werte = [];
-
-    daten.forEach(e=>{
-
-        labels.push(e.zeit);
-
-        switch(aktuellerGraph){
-
-            case "Lux Verlauf":
-                werte.push(e.helligkeit);
-                break;
-
-            case "Temperatur Verlauf":
-                werte.push(e.temperatur);
-                break;
-
-            case "Luftfeuchtigkeit Verlauf":
-                werte.push(e.luftfeucht);
-                break;
-
-            case "Tag/Nacht Verlauf":
-                werte.push(e.statusTagNacht ? 1 : 0);
-                break;
-
-        }
-
-    });
-
-    if(chart){
-
-        chart.destroy();
-
+    if (!Array.isArray(alleDaten)) {
+      throw new Error(
+        "Stundenwerte sind keine Liste"
+      );
     }
 
+    /*
+      Der Backend-Zeitstempel ist in Sekunden.
+      Deshalb wird hier ebenfalls in Sekunden gerechnet.
+    */
+    const jetztSekunden =
+      Math.floor(Date.now() / 1000);
+
+    const grenzeSekunden =
+      jetztSekunden - (tage * 24 * 60 * 60);
+
+    const gefilterteDaten = alleDaten.filter(
+      eintrag => {
+        const zeit = Number(eintrag.zeit);
+
+        return (
+          Number.isFinite(zeit) &&
+          zeit >= grenzeSekunden
+        );
+      }
+    );
+
+
+    const labels = [];
+    const werte = [];
+
+
+    gefilterteDaten.forEach(eintrag => {
+      const rohwert =
+        eintrag[konfiguration.feld];
+
+      let wert;
+
+      if (
+        konfiguration.feld ===
+        "statusTagNacht"
+      ) {
+        wert = rohwert === true ? 1 : 0;
+      }
+      else {
+        wert = Number(rohwert);
+
+        if (!Number.isFinite(wert)) {
+          return;
+        }
+      }
+
+      labels.push(
+        unixZeitZuGraphLabel(
+          eintrag.zeit,
+          tage
+        )
+      );
+
+      werte.push(wert);
+    });
+
+
+    if (chart !== null) {
+      chart.destroy();
+      chart = null;
+    }
+
+
+    const istTagNacht =
+      konfiguration.feld ===
+      "statusTagNacht";
+
+
     chart = new Chart(
-        document.getElementById("meinGraph"),
-        {
+      document.getElementById("meinGraph"),
+      {
+        type: "line",
 
-            type:"line",
+        data: {
+          labels: labels,
 
-            data:{
+          datasets: [
+            {
+              label: aktuellerGraph,
+              data: werte,
+              borderWidth: 2,
+              tension: istTagNacht ? 0 : 0.25,
+              stepped: istTagNacht,
+              fill: false,
+              pointRadius:
+                werte.length > 100 ? 0 : 3,
+              pointHoverRadius: 5,
+              spanGaps: false
+            }
+          ]
+        },
 
-                labels:labels,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
 
-                datasets:[{
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
 
-                    label:aktuellerGraph,
-
-                    data:werte,
-
-                    borderWidth:2,
-
-                    tension:0.3,
-
-                    fill:false
-
-                }]
-
+          plugins: {
+            legend: {
+              display: false
             },
 
-            options:{
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (istTagNacht) {
+                    return context.raw === 1
+                      ? "Tag"
+                      : "Nacht";
+                  }
 
-                responsive:true,
-
-                maintainAspectRatio:false,
-
-                interaction:{
-                    intersect:false
-                },
-
-                plugins:{
-                    legend:{
-                        display:false
-                    }
+                  return (
+                    Number(context.raw).toFixed(2) +
+                    konfiguration.einheit
+                  );
                 }
-
+              }
             }
+          },
 
-        });
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "Zeit"
+              },
 
+              ticks: {
+                maxRotation: 45,
+                minRotation: 0,
+                autoSkip: true,
+                maxTicksLimit:
+                  tage <= 1 ? 12 : 16
+              }
+            },
+
+            y: {
+              beginAtZero:
+                konfiguration.feld ===
+                "helligkeit",
+
+              min: istTagNacht ? 0 : undefined,
+              max: istTagNacht ? 1 : undefined,
+
+              title: {
+                display: true,
+                text:
+                  konfiguration.achsenTitel
+              },
+
+              ticks: istTagNacht
+                ? {
+                    stepSize: 1,
+
+                    callback: function(value) {
+                      if (value === 1) {
+                        return "Tag";
+                      }
+
+                      if (value === 0) {
+                        return "Nacht";
+                      }
+
+                      return "";
+                    }
+                  }
+                : {
+                    callback: function(value) {
+                      return (
+                        value +
+                        konfiguration.einheit
+                      );
+                    }
+                  }
+            }
+          }
+        }
+      }
+    );
+
+
+    /*
+      Falls noch keine vollständige Stunde vorhanden ist.
+    */
+    if (werte.length === 0) {
+      console.info(
+        "Für diesen Zeitraum gibt es noch keine Stundenwerte."
+      );
+    }
+
+  } catch (fehler) {
+    console.error(
+      "Graph konnte nicht geladen werden:",
+      fehler
+    );
+
+    alert(
+      "Graph konnte nicht geladen werden: " +
+      fehler.message
+    );
+  }
 }
+
+
 /* =========================================================
    Licht manuell schalten
 ========================================================= */
@@ -1207,41 +1425,55 @@ function aktualisiereLichtAnzeige() {
       : "Aus";
 }
 
-async function lichtUmschalten() {
-  const neuerStatus = !lichtStatusAktuell;
 
-  console.log("Sende Lichtstatus:", neuerStatus);
+async function lichtUmschalten() {
+  const neuerStatus =
+    !lichtStatusAktuell;
 
   try {
-    const response = await fetch(API_EINSTELLUNGEN, {
-      method: "POST",
+    const response = await fetch(
+      API_EINSTELLUNGEN,
+      {
+        method: "POST",
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-      body: JSON.stringify({
-        licht: neuerStatus
-      })
-    });
+        body: JSON.stringify({
+          licht: neuerStatus
+        })
+      }
+    );
 
-    const antwort = await response.json();
+    let antwort;
 
-    console.log("Antwort vom Backend:", antwort);
-
-    if (!response.ok) {
+    try {
+      antwort = await response.json();
+    } catch {
       throw new Error(
-        antwort.error || "HTTP-Fehler " + response.status
+        "Backend liefert keine gültige Antwort"
       );
     }
 
-    if (typeof antwort.licht !== "boolean") {
+    if (!response.ok) {
+      throw new Error(
+        antwort.error ||
+        "HTTP-Fehler " + response.status
+      );
+    }
+
+    if (
+      typeof antwort.licht !== "boolean"
+    ) {
       throw new Error(
         "Backend liefert keinen gültigen Lichtwert"
       );
     }
 
-    lichtStatusAktuell = antwort.licht;
+    lichtStatusAktuell =
+      antwort.licht;
 
     aktualisiereLichtAnzeige();
 
@@ -1261,24 +1493,15 @@ async function lichtUmschalten() {
 
 async function ladeLichtStatus() {
   try {
-    const response = await fetch(
-      API_EINSTELLUNGEN + "?t=" + Date.now(),
-      {
-        method: "GET",
-        cache: "no-store"
-      }
-    );
+    const antwort =
+      await holeJson(API_EINSTELLUNGEN);
 
-    const antwort = await response.json();
+    if (
+      typeof antwort.licht === "boolean"
+    ) {
+      lichtStatusAktuell =
+        antwort.licht;
 
-    if (!response.ok) {
-      throw new Error(
-        antwort.error || "HTTP-Fehler " + response.status
-      );
-    }
-
-    if (typeof antwort.licht === "boolean") {
-      lichtStatusAktuell = antwort.licht;
       aktualisiereLichtAnzeige();
     }
 
@@ -1289,8 +1512,8 @@ async function ladeLichtStatus() {
     );
   }
 }
-      
-      
+
+
 /* =========================================================
    Initialisierung
 ========================================================= */
@@ -1298,8 +1521,15 @@ async function ladeLichtStatus() {
 ladeBackendDaten();
 ladeLichtStatus();
 
-setInterval(ladeBackendDaten, 5000);
-setInterval(ladeLichtStatus, 5000);
+setInterval(
+  ladeBackendDaten,
+  5000
+);
+
+setInterval(
+  ladeLichtStatus,
+  5000
+);
 
 </script>
 
