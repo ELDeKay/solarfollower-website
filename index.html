@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0" />
 
 <title>Hühnerstall Projekt</title>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 
 /* =========================================================
@@ -347,6 +347,7 @@ body {
 
   width: 90%;
   max-width: 1000px;
+  padding:20px;
 
   height: 80%;
 
@@ -680,14 +681,55 @@ body {
      class="graphOverlay"
      onclick="schliesseGraph()">
 
-  <div class="graphFenster"
-       onclick="event.stopPropagation()">
+    <div class="graphFenster"
+         onclick="event.stopPropagation()">
 
-    <div id="graphTitel">
-      Graph
+        <div style="width:95%;height:95%;display:flex;flex-direction:column;">
+
+            <div style="display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        margin-bottom:15px;">
+
+                <h2 id="graphTitel"></h2>
+
+                <button onclick="schliesseGraph()"
+                        style="
+                        border:none;
+                        background:#f44336;
+                        color:white;
+                        padding:8px 15px;
+                        border-radius:10px;
+                        cursor:pointer;">
+                    Schließen
+                </button>
+
+            </div>
+
+            <canvas id="meinGraph"></canvas>
+
+            <div style="
+                
+                display:flex;
+                justify-content:center;
+                gap:15px;
+                margin-top:20px;
+                width:100% !important;
+                height:100% !important;">
+
+                <button onclick="ladeGraph(1)">24h</button>
+
+                <button onclick="ladeGraph(7)">7 Tage</button>
+
+                <button onclick="ladeGraph(30)">30 Tage</button>
+
+                <button onclick="ladeGraph(90)">90 Tage</button>
+
+            </div>
+
+        </div>
+
     </div>
-
-  </div>
 
 </div>
 <script>
@@ -1017,20 +1059,129 @@ function aktualisiereTorStatus() {
 /* =========================================================
    Graph Anzeige
 ========================================================= */
+let chart = null;
+let aktuellerGraph = "";
 
-function zeigeGraph(titel) {
+async function zeigeGraph(titel){
 
-  document.getElementById("graphTitel").innerText =
-    titel;
+    aktuellerGraph = titel;
 
-  document.getElementById("graphOverlay")
-    .classList.add("aktiv");
+    document.getElementById("graphTitel").innerText = titel;
+
+    document.getElementById("graphOverlay")
+            .classList.add("aktiv");
+
+    ladeGraph(90);
+
 }
 
-function schliesseGraph() {
+function schliesseGraph(){
 
-  document.getElementById("graphOverlay")
-    .classList.remove("aktiv");
+    document.getElementById("graphOverlay")
+            .classList.remove("aktiv");
+
+}
+
+async function ladeGraph(tage){
+
+    const response = await fetch(API_STATUS);
+
+    const alleDaten = await response.json();
+
+    const jetzt = new Date();
+
+    const grenze = jetzt.getTime() - tage*24*60*60*1000;
+
+    const daten = alleDaten.filter(e=>{
+
+        if(!e.zeit) return false;
+
+        return new Date(e.zeit).getTime() >= grenze;
+
+    });
+
+    const labels = [];
+
+    const werte = [];
+
+    daten.forEach(e=>{
+
+        labels.push(e.zeit);
+
+        switch(aktuellerGraph){
+
+            case "Lux Verlauf":
+                werte.push(e.helligkeit);
+                break;
+
+            case "Temperatur Verlauf":
+                werte.push(e.temperatur);
+                break;
+
+            case "Luftfeuchtigkeit Verlauf":
+                werte.push(e.luftfeucht);
+                break;
+
+            case "Tag/Nacht Verlauf":
+                werte.push(e.statusTagNacht ? 1 : 0);
+                break;
+
+        }
+
+    });
+
+    if(chart){
+
+        chart.destroy();
+
+    }
+
+    chart = new Chart(
+        document.getElementById("meinGraph"),
+        {
+
+            type:"line",
+
+            data:{
+
+                labels:labels,
+
+                datasets:[{
+
+                    label:aktuellerGraph,
+
+                    data:werte,
+
+                    borderWidth:2,
+
+                    tension:0.3,
+
+                    fill:false
+
+                }]
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                maintainAspectRatio:false,
+
+                interaction:{
+                    intersect:false
+                },
+
+                plugins:{
+                    legend:{
+                        display:false
+                    }
+                }
+
+            }
+
+        });
+
 }
 /* =========================================================
    Licht manuell schalten
