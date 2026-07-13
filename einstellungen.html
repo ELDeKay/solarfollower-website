@@ -202,7 +202,7 @@
   </div>
 
   <!-- =========================================================
-       Inhalt der Hauptbox: IP-Adresse, GEO-Daten, Werkseinstellung
+       Inhalt der Hauptbox: IP-Adresse, GEO-Daten
        ========================================================= -->
   <div class="box">
     <h2>Standortdaten</h2>
@@ -228,12 +228,6 @@
 
     <br>
 
-    <!-- Werkseinstellung (Factory Reset) -->
-    <div class="eingabefeld">
-      <button id="werkseinstellungBtn" type="button" class="btns" style="width:100%;">
-        Werkseinstellung wiederherstellen
-      </button>
-    </div>
 
     <!-- Anleitung -->
     <div class="eingabefeld">
@@ -262,8 +256,6 @@
 
   // Buttons
   const sendeGeoDatenBtn = document.getElementById("sendeGeoDatenBtn");
-  const werkseinstellungBtn = document.getElementById("werkseinstellungBtn");
-
   // Statusanzeige
   const statusText = document.getElementById("statusText");
 
@@ -318,29 +310,7 @@
 
 
   
-  /* =========================================================
-     Button: Werkseinstellung (Factory Reset)
-     ========================================================= */
-  werkseinstellungBtn.addEventListener("click", async () => {
-    const ok = confirm(
-      "Werkseinstellung ausführen?\n\n" +
-      "Druch drücken von 'OK' werden Geo-Daten, IP-Adresse des Leistungsmessers und WLAN-Zugang zurückgesetzt."
-    );
-    if (!ok) return;
 
-    try {
-      statusText.innerText = "Werkseinstellung wird wiederhergestellt ...";
-      await posteinstellungen({ werkseinstellungbool: true });
-
-      // UI zurücksetzen (nur Frontend)
-      latitudeInput.value = "";
-      longitudeInput.value = "";
-
-      statusText.innerText = "Daten werden übertragen";
-    } catch {
-      statusText.innerText = "Werkseinstellung fehlgeschlagen";
-    }
-  });
 </script>
 
 </body>
