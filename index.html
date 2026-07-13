@@ -644,8 +644,9 @@ body {
     </div>
 
   </div>
+      
         <!-- Licht -->
-<!-- Licht -->
+
 <div class="btnRasterFeld lichtkachel"
      id="lichtKachel"
      onclick="lichtUmschalten()"
@@ -818,21 +819,15 @@ let lichtStatusAktuell = false;
    API-Adressen
 ========================================================= */
 
-/*
-  Nur der aktuellste Messwert.
-*/
+// Aktuellster Messwert für die Kacheln
 const API_AKTUELL =
   "https://solar-backend-ljck.onrender.com/api/aktuell";
 
-/*
-  Berechnete Stundenmittelwerte der letzten 30 Tage.
-*/
+// Stundenmittelwerte der letzten 30 Tage für die Graphen
 const API_STUNDENWERTE =
   "https://solar-backend-ljck.onrender.com/api/stundenwerte";
 
-/*
-  Licht und sonstige Einstellungen.
-*/
+// Lichtsteuerung und Standortdaten
 const API_EINSTELLUNGEN =
   "https://solar-backend-ljck.onrender.com/api/einstellungen";
 
@@ -879,10 +874,7 @@ async function ladeBackendDaten() {
   try {
     const antwort = await holeJson(API_AKTUELL);
 
-    /*
-      Nicht das komplette Objekt ersetzen.
-      Dadurch bleiben weitere vorhandene Werte erhalten.
-    */
+// Vorhandene Zustandswerte bleiben erhalten, wenn das Backend sie nicht mitsendet.
     daten = {
       ...daten,
       ...antwort
@@ -1121,12 +1113,7 @@ let aktuellerGraph = "";
 let aktuellerZeitraum = 30;
 
 
-/*
-  Diese Einstellungen bestimmen für jede Kachel:
-  - Datenbankfeld
-  - Einheit
-  - Titel
-*/
+// Ordnet jedem Graphen das passende Datenfeld und seine Einheit zu.
 const graphKonfiguration = {
   "Lux Verlauf": {
     feld: "helligkeit",
@@ -1163,10 +1150,8 @@ async function zeigeGraph(titel) {
   document.getElementById("graphOverlay")
     .classList.add("aktiv");
 
-  /*
-    Standardmäßig 30 Tage, weil die Datenbank
-    maximal 30 Tage Stundenwerte speichert.
-  */
+// Öffnet den Graphen standardmäßig mit den letzten 30 Tagen.
+await ladeGraph(30);
   await ladeGraph(30);
 }
 
@@ -1201,10 +1186,7 @@ async function ladeGraph(tage) {
       );
     }
 
-    /*
-      Der Backend-Zeitstempel ist in Sekunden.
-      Deshalb wird hier ebenfalls in Sekunden gerechnet.
-    */
+// Filtert die Stundenwerte anhand der Unix-Zeit in Sekunden.
     const jetztSekunden =
       Math.floor(Date.now() / 1000);
 
@@ -1386,9 +1368,7 @@ async function ladeGraph(tage) {
     );
 
 
-    /*
-      Falls noch keine vollständige Stunde vorhanden ist.
-    */
+// Vor der ersten abgeschlossenen Stunde enthält der Graph noch keine Werte.
     if (werte.length === 0) {
       console.info(
         "Für diesen Zeitraum gibt es noch keine Stundenwerte."
