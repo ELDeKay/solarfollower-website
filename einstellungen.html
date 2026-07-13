@@ -216,22 +216,11 @@
       <input type="number" id="longitude" step="0.000001" placeholder="z. B. 11.576124" />
     </div>
 
-    <!-- IP-Adresse des Leistungsmessers -->
-    <div class="eingabefeld">
-      <label for="ipWLANschuko">IP-Adresse Leistungsmesser</label>
-      <input
-        type="text"
-        id="ipWLANschuko"
-        placeholder="z.B. 192.168.4.12"
-        autocomplete="off"
-        spellcheck="false"
-      />
-    </div>
 
-    <!-- Aktionen: Geo-Daten senden / IP senden -->
+
+    <!-- Aktionen: Geo-Daten senden -->
     <div class="btn-reihe">
       <button id="sendeGeoDatenBtn" type="button" class="btns">Geo-Daten schicken</button>
-      <button id="sendeIpBtn" type="button" class="btns">IP-Adresse schicken</button>
     </div>
 
     <br>
@@ -260,11 +249,9 @@
   // Input-Felder
   const latitudeInput = document.getElementById("latitude");
   const longitudeInput = document.getElementById("longitude");
-  const ipWLANschukoInput = document.getElementById("ipWLANschuko");
 
   // Buttons
   const sendeGeoDatenBtn = document.getElementById("sendeGeoDatenBtn");
-  const sendeIpBtn = document.getElementById("sendeIpBtn");
   const werkseinstellungBtn = document.getElementById("werkseinstellungBtn");
 
   // Statusanzeige
@@ -319,27 +306,8 @@
     }
   });
 
-  /* =========================================================
-     Button: IP-Adresse senden
-     ========================================================= */
-  sendeIpBtn.addEventListener("click", async () => {
-    const ipWLANschuko = (ipWLANschukoInput.value || "").trim();
 
-    // Eingabe prüfen
-    if (ipWLANschuko.length === 0 || !istGueltigeIPv4(ipWLANschuko)) {
-      alert("Bitte geben Sie eine gültige IPv4-Adresse ein (z. B. 192.168.0.10)");
-      return;
-    }
-
-    try {
-      statusText.innerText = "Übertragung läuft ...";
-      await posteinstellungen({ ipWLANschuko });
-      statusText.innerText = "Daten werden übertragen";
-    } catch {
-      statusText.innerText = "Übertragung fehlgeschlagen";
-    }
-  });
-
+  
   /* =========================================================
      Button: Werkseinstellung (Factory Reset)
      ========================================================= */
@@ -357,7 +325,6 @@
       // UI zurücksetzen (nur Frontend)
       latitudeInput.value = "";
       longitudeInput.value = "";
-      ipWLANschukoInput.value = "";
 
       statusText.innerText = "Daten werden übertragen";
     } catch {
