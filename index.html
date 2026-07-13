@@ -1188,35 +1188,38 @@ async function ladeGraph(tage){
 ========================================================= */
 
 async function lichtUmschalten() {
-
   const neuerStatus = !daten.licht;
 
   try {
-
-    await fetch(API_STATUS, {
-
+    const response = await fetch(API_EINSTELLUNGEN, {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
         licht: neuerStatus
       })
-
     });
 
-    // Sofortige Anzeige aktualisieren
-    daten.licht = neuerStatus;
-    updateDaten();
+    const antwort = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        antwort.error || "HTTP-Fehler " + response.status
+      );
+    }
+
+    daten.licht = antwort.licht;
+
+    document.getElementById("licht_manuell").src =
+      daten.licht ? "Licht_ON.png" : "Licht_OFF.png";
+
+    document.getElementById("lichtStatus").innerText =
+      daten.licht ? "Ein" : "Aus";
 
   } catch (fehler) {
-
     console.error("Licht konnte nicht geschaltet werden:", fehler);
-
   }
-
 }
 
 /* =========================================================
