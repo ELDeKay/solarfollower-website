@@ -628,6 +628,32 @@ body {
     </div>
 
   </div>
+        <!-- Licht -->
+  <div class="btnRasterFeld">
+
+    <div class="icon"
+         onclick="lichtUmschalten()"
+         style="cursor:pointer;">
+
+      <img src="Licht_OFF.png"
+           id="licht_manuell">
+
+    </div>
+
+    <div class="kachelTitel">
+
+      Stallbeleuchtung
+
+    </div>
+
+    <div class="kachelWert"
+         id="lichtStatus">
+
+      Aus
+
+    </div>
+
+  </div>
 
 </div>
 </div>
@@ -670,7 +696,9 @@ let daten = {
 
   zustand: false,     
 
-  statusTagNacht: false
+  statusTagNacht: false,
+
+  licht: false
 
 };
       
@@ -790,6 +818,16 @@ document.getElementById("tagNachtStatus").innerText =
   ========================================================= */
 
 aktualisiereTorStatus();
+
+/* =========================================================
+   Licht
+========================================================= */
+
+document.getElementById("licht_manuell").src =
+    daten.licht ? "Licht_ON.png" : "Licht_OFF.png";
+
+document.getElementById("lichtStatus").innerText =
+    daten.licht ? "Ein" : "Aus";
 
   /* =========================================================
      Aktualisierung
@@ -976,7 +1014,41 @@ function schliesseGraph() {
   document.getElementById("graphOverlay")
     .classList.remove("aktiv");
 }
+/* =========================================================
+   Licht manuell schalten
+========================================================= */
 
+async function lichtUmschalten() {
+
+  const neuerStatus = !daten.licht;
+
+  try {
+
+    await fetch(API_STATUS, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        licht: neuerStatus
+      })
+
+    });
+
+    // Sofortige Anzeige aktualisieren
+    daten.licht = neuerStatus;
+    updateDaten();
+
+  } catch (fehler) {
+
+    console.error("Licht konnte nicht geschaltet werden:", fehler);
+
+  }
+
+}
 
 /* =========================================================
    Initialisierung
