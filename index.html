@@ -648,32 +648,28 @@ body {
 
   </div>
         <!-- Licht -->
-  <div class="btnRasterFeld lichtkachel">
+<!-- Licht -->
+<div class="btnRasterFeld lichtkachel"
+     id="lichtKachel"
+     onclick="lichtUmschalten()"
+     style="cursor: pointer;">
 
-    <div class="icon"
-         onclick="lichtUmschalten()"
-         style="cursor:pointer;">
-
-      <img src="Licht_OFF.png"
-           id="licht_manuell">
-
-    </div>
-
-    <div class="kachelTitel">
-
-      Stallbeleuchtung
-
-    </div>
-
-    <div class="kachelWert"
-         id="lichtStatus">
-
-      Aus
-
-    </div>
-
+  <div class="icon">
+    <img src="Licht_OFF.png"
+         id="licht_manuell"
+         alt="Stallbeleuchtung">
   </div>
 
+  <div class="kachelTitel">
+    Stallbeleuchtung
+  </div>
+
+  <div class="kachelWert"
+       id="lichtStatus">
+    Aus
+  </div>
+
+</div>
 </div>
 </div>
       
@@ -758,7 +754,9 @@ let daten = {
 
   statusTagNacht: false,
 
-  licht: false
+  licht: false,
+
+  let lichtStatusAktuell = false;
 
 };
       
@@ -768,6 +766,8 @@ let daten = {
 
 const API_STATUS =
   "https://solar-backend-ljck.onrender.com/api/data";
+const API_EINSTELLUNGEN =
+  "https://solar-backend-ljck.onrender.com/api/einstellungen";
 
 async function ladeBackendDaten() {
 
@@ -879,15 +879,6 @@ document.getElementById("tagNachtStatus").innerText =
 
 aktualisiereTorStatus();
 
-/* =========================================================
-   Licht
-========================================================= */
-
-document.getElementById("licht_manuell").src =
-    daten.licht ? "Licht_ON.png" : "Licht_OFF.png";
-
-document.getElementById("lichtStatus").innerText =
-    daten.licht ? "Ein" : "Aus";
 
   /* =========================================================
      Aktualisierung
@@ -1187,19 +1178,79 @@ async function ladeGraph(tage){
    Licht manuell schalten
 ========================================================= */
 
+function aktualisiereLichtAnzeige() {
+  document.getElementById("licht_manuell").src =
+    lichtStatusAktuell
+      ? "Licht_ON.png"
+      : "Licht_OFF.png";
+
+  document.getElementById("lichtStatus").innerText =
+    lichtStatusAktuell
+      ? "Ein"
+      : "Aus";
+}
+
 async function lichtUmschalten() {
-  const neuerStatus = !daten.licht;
+  const neuerStatus = !lichtStatusAktuell;
+
+  console.log("Sende Lichtstatus:", neuerStatus);
 
   try {
     const response = await fetch(API_EINSTELLUNGEN, {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
+
       body: JSON.stringify({
         licht: neuerStatus
       })
     });
+
+    const antwort = await response.json();
+
+    console.log("Antwort vom Backend:", antwort);
+
+    if (!response.ok) {
+      throw new Error(
+        antwort.error || "HTTP-Fehler " + response.status
+      );
+    }
+
+    if (typeof antwort.licht !== "boolean") {
+      throw new Error(
+        "Backend liefert keinen gültigen Lichtwert"
+      );
+    }
+
+    lichtStatusAktuell = antwort.licht;
+
+    aktualisiereLichtAnzeige();
+
+  } catch (fehler) {
+    console.error(
+      "Licht konnte nicht geschaltet werden:",
+      fehler
+    );
+
+    alert(
+      "Licht konnte nicht geschaltet werden: " +
+      fehler.message
+    );
+  }
+}
+
+
+async function ladeLichtStatus() {
+  try {
+    const response = await fetch(
+      API_EINSTELLUNGEN + "?t=" + Date.now(),
+      {
+        method: "GET",
+        cache: "no-store"
+      }
+    );
 
     const antwort = await response.json();
 
@@ -1209,26 +1260,29 @@ async function lichtUmschalten() {
       );
     }
 
-    daten.licht = antwort.licht;
-
-    document.getElementById("licht_manuell").src =
-      daten.licht ? "Licht_ON.png" : "Licht_OFF.png";
-
-    document.getElementById("lichtStatus").innerText =
-      daten.licht ? "Ein" : "Aus";
+    if (typeof antwort.licht === "boolean") {
+      lichtStatusAktuell = antwort.licht;
+      aktualisiereLichtAnzeige();
+    }
 
   } catch (fehler) {
-    console.error("Licht konnte nicht geschaltet werden:", fehler);
+    console.error(
+      "Lichtstatus konnte nicht geladen werden:",
+      fehler
+    );
   }
 }
-
+      
+      
 /* =========================================================
    Initialisierung
 ========================================================= */
 
 ladeBackendDaten();
+ladeLichtStatus();
 
 setInterval(ladeBackendDaten, 5000);
+setInterval(ladeLichtStatus, 5000);
 
 </script>
 
